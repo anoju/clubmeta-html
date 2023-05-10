@@ -1,8 +1,7 @@
 // <script class="__include" src="/as-is/html/include/head.js"></script>
 
 (function () {
-  let str = `<meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  let str = `<meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
   <script src="/as-is/rsc/front/js/jquery-2.2.0.min.js"></script>
