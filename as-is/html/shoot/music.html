@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="/as-is/html/include/head.js"></script>
+    <script type="text/javascript">
+      openMusicListPage();
+
+      function openMusicListPage() {
+        getPageAjax('../shoot/music_layer.html', null).done(function (result) {
+          $('#musicPop').remove();
+          $('body').append(result);
+          $('#musicPop').animate({ bottom: '0' }, 300);
+          var x = window.scrollX,
+            y = window.scrollY;
+          window.onscroll = function () {
+            window.scrollTo(x, y);
+          };
+        });
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

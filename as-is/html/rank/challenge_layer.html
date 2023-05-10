@@ -1,0 +1,356 @@
+<div class="wrap div_layer" id="challengeWrap">
+  <style>
+    .btn_go_challenge:disabled {
+      background: #000;
+      opacity: 1;
+    }
+  </style>
+  <script type="text/javascript">
+    var maxVideoCnt = 50; //챌린저 비디오 최대 노출 개수
+    var CRswiper; //swiper변수
+    var chlgNo;
+
+    $(document).ready(function () {
+      //chlgNo params 받기
+      chlgNo = '${param.chlgNo}';
+
+      getChallengeInfo(chlgNo);
+
+      getPrizeList(chlgNo);
+    });
+
+    function challengeDetailBack() {
+      $('body').find('.wrap').last().remove();
+      $('body').find('.wrap').last().show();
+
+      if (typeof closeChallengeDetail == 'function') {
+        closeChallengeDetail();
+      }
+
+      if (typeof afterCloseLoginPage() == 'function') {
+        //랭크 다시 조회
+        afterCloseLoginPage()();
+      }
+    }
+
+    function getChallengeInfo(chlgNo) {
+      get('/api/challenge/select/' + chlgNo, '').done(function (result) {
+        //챌린지명
+        $('#challengeWrap header h1').text('');
+        $('#challengeWrap header h1').text(result.data.chlgName);
+
+        //챌린지 시작, 종료일
+        $('.challenge_infobox #startDt').text(result.data.startDt.replaceAll('-', '.'));
+        $('.challenge_infobox #endDt').text(result.data.endDt.replaceAll('-', '.'));
+
+        //챌린지 정보
+        var html = '';
+        //html += '<a href="javascript:playVideo(\''+result.data.videoNo+'\');" class="thumb">';
+        //html += '<a href="javascript:playVideo(\'playChlgVideo\', \''+result.data.videoNo+'\', null, null, null, null, null);" class="thumb">';
+        html += "<a href=\"javascript:playVideo('playChlgVideo', '" + result.data.videoUrl + '\', null, null, null, null, null);" class="thumb">';
+        html += '	<span class="play"></span>';
+        html += '	<img src="' + result.data.videoThumbUrl + '" alt="' + result.data.chlgName + '" onerror="this.src=\'/rsc/front/images/common/no_img.jpg\'">';
+        html += '</a>';
+
+        $('#challengeWrap #challengeInfo').html(html);
+
+        //챌린지랭킹 영상목록
+        var videoList = result.data.challengervideolist;
+        var html = '';
+        var isSwiper = false;
+        if (videoList.length > 0) {
+          isSwiper = true;
+          var videoLastPage = parseInt((result.data.chlgPtcpVideoCnt - 1) / 10) + 1;
+          html += '	<form id="challengerForm_' + result.data.chlgNo + '">';
+          html += '		<input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10">';
+          html += '		<input type="hidden" id="nowPage" name="nowPage" value="1">';
+          html += '		<input type="hidden" id="lastPage" name="lastPage" value="' + videoLastPage + '">';
+          html += '		<input type="hidden" id="chlgNo" name="chlgNo" value="' + result.data.chlgNo + '">';
+          html += '	</form>';
+          if (isSwiper) {
+            html += '	<div class="ranking_slider" data-chlg-no="' + result.data.chlgNo + '">';
+          } else {
+            html += '	<div class="">';
+          }
+          html += '		<div class="swiper-wrapper" id="swiper-wrapper-' + result.data.chlgNo + '">';
+
+          for (var i = 0; i < videoList.length; i++) {
+            var blind = '';
+            var clickUseYn = '';
+            var memberId = '@' + videoList[i].memberId;
+            var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + videoList[i].regMemberNo + '\');" style="background-image:url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+            if (videoList[i].delYn == 'Y' || videoList[i].videoViewYn == 'N') {
+              blind = 'blind';
+              clickUseYn = 'N';
+            }
+            if (videoList[i].memberStatusCd == 'M20' || videoList[i].memberStatusCd == 'M99') {
+              //memberId = "@"+videoList[i].memberId;
+              memberId = videoList[i].memberStatusCd == 'M20' ? '정지회원' : '탈퇴회원';
+              divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + videoList[i].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+            }
+            html += '			<div class="challenger_list swiper-slide">';
+            //html += '				<div class="performer" onclick="viewUserProfile(\''+videoList[i].regMemberNo+'\');" style="background-image: url('+videoList[i].profileImgUrl+'), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+            html += divPerformer;
+            //html += '				<a href="javascript:playVideo(\''+videoList[i].videoNo+'\');" class="thumb">';
+            html += "				<a href=\"javascript:playVideo('rankVideo', '" + videoList[i].videoNo + "', '10', '1', '" + result.data.chlgNo + "', null, null, '" + clickUseYn + '\');" class="thumb ' + blind + '">';
+            html += '					<img src="' + videoList[i].videoThumbUrl + '" alt="">';
+            html += '				</a>';
+            html += '				<div class="id">';
+            html += '					<p onclick="viewUserProfile(\'' + videoList[i].regMemberNo + '\');">' + memberId + '</p>';
+            html += '					<div class="point_area">';
+            html += '							<span><i class="ico_shoe"></i>' + videoList[i].votingCnt + ' 표</span>';
+            html += '							<span><i class="ico_ai"></i>' + videoList[i].aiScore + ' 점</span>';
+            html += '					</div>';
+            html += '				</div>';
+            html += '			</div>';
+          }
+          html += '		</div>';
+          html += '	</div>';
+        } else {
+          html += '<div class="challenge_no">';
+          html += '	  <i class="ico_empty"></i>';
+          html += '		순위에 든 퍼포머가 없네요!<br>';
+          html += '		챌린지에 참여하고 우승해 랭킹에 올라보세요.';
+          html += '</div>';
+        }
+        $('#challengeWrap #challengeRankingList').html(html);
+
+        CRswiper = new Swiper('.ranking_slider', {
+          freeMode: false,
+          slidesPerView: 'auto',
+          spaceBetween: 13,
+          observer: true,
+          on: {
+            activeIndexChange: function () {
+              var chlgNo = this.$el[0].dataset.chlgNo;
+              var activeIndex = this.activeIndex;
+              var realIndex = $('#swiper-wrapper-' + chlgNo).children().length;
+              //슬라이드 중간쯤 active되면 다음페이지 가져오기
+              if (activeIndex >= Number(realIndex) - 5) {
+                getChallengerVideoList(chlgNo);
+              }
+            }
+          }
+        });
+
+        // 상태가 "진행중"이 아니면 챌린지 참가 버튼 비활성
+        if (result.data.chlgProgStatusCd != '<%= CommonConstants.CHLG_PROG_STATUS_CD_C20 %>') {
+          $('#challengeWrap .btn_go_challenge').prop('disabled', true);
+        }
+      });
+    }
+
+    //챌린저 비디오 가져오기
+    function getChallengerVideoList(chlgNo) {
+      if ($('#challengerForm_' + chlgNo + ' #nowPage').val() >= $('#challengerForm_' + chlgNo + ' #lastPage').val() || $('#swiper-wrapper-' + chlgNo).children().length >= maxVideoCnt) return;
+      $('#challengerForm_' + chlgNo + ' #nowPage').val(Number($('#challengerForm_' + chlgNo + ' #nowPage').val()) + 1);
+
+      var param = $('#challengerForm_' + chlgNo).serialize();
+      get('/api/challenge/challengerVideoList', param).done(function (result) {
+        var list = result.data.list;
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          var blind = '';
+          var clickUseYn = '';
+          var memberId = '@' + list[i].memberId;
+          var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list[i].regMemberNo + '\');" style="background-image:url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          if (list[i].delYn == 'Y' || list[i].videoViewYn == 'N') {
+            blind = 'blind';
+            clickUseYn = 'N';
+          }
+          if (list[i].memberStatusCd == 'M20' || list[i].memberStatusCd == 'M99') {
+            //memberId = "@"+list[i].memberId;
+            memberId = list[i].memberStatusCd == 'M20' ? '정지회원' : '탈퇴회원';
+            divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + list[i].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          }
+          html += '<div class="challenger_list swiper-slide">';
+          //html += '	<div class="performer" onclick="viewUserProfile(\''+list[i].regMemberNo+'\');" style="background-image: url('+list[i].profileImgUrl+'), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          html += divPerformer;
+          //html += '	<a href="javascript:playVideo(\''+list[i].videoNo+'\');" class="thumb">';
+          html += "	<a href=\"javascript:playVideo('rankVideo', '" + list[i].videoNo + "', '" + $('#challengerForm_' + chlgNo + ' #rowsPerPage').val() + "', '" + $('#challengerForm_' + chlgNo + ' #nowPage').val() + "', '" + chlgNo + "', null, null, '" + clickUseYn + '\');" class="thumb ' + blind + '">';
+          html += '		<img src="' + list[i].videoThumbUrl + '" alt="">';
+          html += '	</a>';
+          html += '	<div class="id">';
+          html += '		<p onclick="viewUserProfile(\'' + list[i].regMemberNo + '\');">' + memberId + '</p>';
+          html += '		<div class="point_area">';
+          html += '			<span><i class="ico_shoe"></i>' + list[i].votingCnt + ' 표</span>';
+          html += '			<span><i class="ico_ai"></i>' + list[i].aiScore + ' 점</span>';
+          html += '		</div>';
+          html += '	</div>';
+          html += '</div>';
+        }
+        $('#challengeWrap #swiper-wrapper-' + chlgNo).append(html);
+      });
+    }
+
+    //챌린지 상금안내 팝업 열기
+    function oepnPrizeInfoPop() {
+      $('#challengeWrap #prize-info-pop').show();
+    }
+
+    //챌린지 상금안내 팝업 닫기
+    function closePrizeInfoPop() {
+      $('#challengeWrap #prize-info-pop').hide();
+    }
+
+    //챌린지 참가 버튼 클릭
+    function openChallengePrize() {
+      getAccessToken().done(function (result) {
+        if (result == null || result == '') {
+          openLoginPage();
+        } else {
+          //휴대폰번호 존재하는지 확인한 후 다음페이지 이동해야함
+          get('/api/userSetting', null).done(function (result) {
+            if (result.data.mobileNo != '' && result.data.mobileNo != null && result.data.mobileNo != 'undefined') {
+              //베타버전에서는 비용화면 스킵하고 바로 촬영화면으로 넘어가야 함. 추후에 아래 주석처리하고 openChallengeJoin() 주석 해제하도록.
+              reqToApp('ChooseChallenge', JSON.stringify({ chlgNo: '${param.chlgNo}' }));
+              // 챌린지 참가
+              //openChallengeJoin();
+            } else {
+              layerConfirm('챌린지 우승 결과 공지를 받으실 전화번호 인증이 필요합니다.', '', '확인', '취소')
+                .done(function (result) {
+                  //휴대폰번호 수정페이지 이동
+                  getPageAjax('../mypage/phone.html', 'entryType=challengePtcp').done(function (result) {
+                    $('body').find('.wrap').hide();
+                    $('body').append(result);
+                  });
+                })
+                .fail(function (result) {});
+            }
+          });
+        }
+      });
+    }
+
+    //챌린지 참가
+    function openChallengeJoin() {
+      getPageAjax('../rank/challenge_ptcp_layer.html?chlgNo=' + chlgNo, null).done(function (result) {
+        $('body').find('.wrap').hide();
+        $('body').append(result);
+      });
+    }
+
+    function back() {
+      $('body').find('.wrap').last().remove();
+      $('body').find('.wrap').last().show();
+    }
+
+    // 상금안내 목록 표시
+    function getPrizeList(chlgNo) {
+      get('/api/challenge/selectPrizeList?chlgNo=' + chlgNo, null).done(function (result) {
+        var list = result.data.list;
+        var html = '';
+        if (list.length > 0) {
+          for (var i = 0; i < list.length; i++) {
+            var chlgRanking = list[i].chlgRanking;
+            var winPoint = list[i].winPoint;
+            var icoClass = '';
+            if (chlgRanking * 1 == 1) {
+              icoClass = 'ico_no1';
+            } else if (chlgRanking * 1 == 2) {
+              icoClass = 'ico_no2';
+            } else if (chlgRanking * 1 == 3) {
+              icoClass = 'ico_no3';
+            }
+            html += '<div class="prize_box">';
+            html += '	<div class="ranking"><i class="' + icoClass + '"></i>위</div>';
+            html += '	<div class="shoe_point">';
+            html += '		<i class="ico_shoe"></i>';
+            html += '		<i class="ico_multiply"></i>' + winPoint;
+            html += '	</div>';
+            html += '</div>';
+          }
+        }
+
+        $('#prizeList').html(html);
+      });
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="challengeDetailBack();">이전으로</button>
+    <h1></h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <div class="challenge_detail" id="challengeInfo">
+      <a href="javascript:void(0);" class="thumb">
+        <span class="play"></span>
+        <img id="chlgVideoThumb" src="/as-is/rsc/front/images/common/no_img.jpg" alt="" onerror="this.src='/rsc/front/images/common/no_img.jpg'" />
+      </a>
+    </div>
+
+    <!-- 		<div class="challenge_prize">
+		    <h3>상금안내</h3>
+		    <a href="javascript:oepnPrizeInfoPop();" class="btn_view_info">상금안내 보기</a>
+		</div> -->
+    <div class="challenge_infobox">
+      <div class="challenge_date">
+        <span class="stit">챌린지 시작</span>
+        <div class="time" id="startDt"></div>
+      </div>
+      <div class="challenge_date">
+        <span class="stit">챌린지 종료</span>
+        <div class="time" id="endDt"></div>
+      </div>
+      <!-- 	
+	        <div class="challenge_prize">
+	            <h3>상금 안내</h3>
+	            <a href="javascript:oepnPrizeInfoPop();" class="btn_view_info">상금안내 보기</a>
+	        </div>
+ -->
+    </div>
+
+    <h3 class="prize_stit">상금 안내</h3>
+
+    <div id="prizeList">
+      <!-- 
+			<div class="prize_box">
+				<div class="ranking"><i class="ico_no1"></i>위</div>
+				<div class="shoe_point">
+					<i class="ico_shoe"></i>
+					<i class="ico_multiply"></i>50
+				</div>
+			</div>
+			<div class="prize_box">
+				<div class="ranking"><i class="ico_no2"></i>위</div>
+				<div class="shoe_point">
+					<i class="ico_shoe"></i>
+					<i class="ico_multiply"></i>30
+				</div>
+			</div>
+			<div class="prize_box">
+				<div class="ranking"><i class="ico_no3"></i>위</div>
+				<div class="shoe_point">
+					<i class="ico_shoe"></i>
+					<i class="ico_multiply"></i>20
+				</div>
+			</div>
+ -->
+    </div>
+
+    <button type="button" class="btn_go_challenge" onclick="openChallengePrize()">챌린지 참가</button>
+
+    <div class="challenge_ranking">
+      <h2>챌린지 랭킹<i class="ico_ranking"></i></h2>
+
+      <div id="challengeRankingList"></div>
+    </div>
+  </div>
+  <!--// contents -->
+
+  <!-- popup -->
+  <div class="layer_popup prize div_layer" id="prize-info-pop" style="display: none">
+    <div class="inner">
+      <h1>챌린지 상금안내</h1>
+      <div class="prize_info_txt">상금안내</div>
+      <div class="btn_area">
+        <button type="button" class="btn_okay" onclick="closePrizeInfoPop()">확인</button>
+      </div>
+    </div>
+  </div>
+  <!-- //popup -->
+</div>

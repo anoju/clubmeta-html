@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="/as-is/html/include/head.js"></script>
+    <style>
+      #rankWrap {
+        height: 100%;
+        position: relative;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap" id="rankWrap">
+      <!-- header -->
+      <header>
+        <h1>챌린지</h1>
+        <button type="button" class="btn_q" onclick="openChallengePopup()">챌린지안내</button>
+        <button type="button" class="btn_search" onclick="openGlobalSearchPopup()">검색</button>
+      </header>
+      <!--// header -->
+
+      <!-- contents -->
+      <div class="contents">
+        <h2>이벤트<i class="ico_event"></i></h2>
+        <!-- slider evnet -->
+        <div class="event_slider">
+          <div class="swiper-wrapper" id="eventList"></div>
+
+          <div class="swiper-pagination"></div>
+        </div>
+        <!--// slider evnet -->
+
+        <div class="tit_more">
+          <h2>인기 챌린지<i class="ico_hit"></i></h2>
+          <button type="button" class="btn_open_challenge" onclick="openHold()" style="display: none">개최</button>
+        </div>
+        <div id="hotChallengeList"></div>
+        <button type="button" class="btn_more_challenge" onclick="searchChallenge()" style="display: none">더 많은 챌린지 찾기</button>
+
+        <div class="tit_more">
+          <h2>퍼포머 랭킹<i class="ico_ranking"></i></h2>
+          <a href="javascript:searchClubber()" id="viewMoreClubber" class="btn_view_more">더 보기</a>
+        </div>
+        <div id="topClubberList"></div>
+      </div>
+      <!--// contents -->
+    </div>
+
+    <!-- popup_detail view-->
+    <div class="popup div_layer" id="eventPop" style="display: none">
+      <button type="button" class="btn_close" onclick="closeEventPopup()">창닫기</button>
+      <div class="popup_head">
+        <h1>이벤트</h1>
+      </div>
+      <div class="popup_body">이벤트 상세설명</div>
+    </div>
+    <!--// popup_detail view-->
+
+    <div class="popup div_layer" id="challengePop" style="display: none">
+      <button type="button" class="btn_close" onclick="closeChallengePopup()">창닫기</button>
+      <div class="popup_head">
+        <h1>챌린지란 무엇인가요?</h1>
+      </div>
+      <div class="popup_body">
+        <div class="popup_img">
+          <img src="/as-is/rsc/front/images/challenge_desc.png" alt="" />
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var EVTswiper; //이밴트 슬라이드
+
+      $(document).ready(function () {
+        //이벤트
+        getEventList();
+
+        //인기챌린지
+        getHotChallengeList();
+
+        //퍼포머 랭킹
+        getTopClubberList();
+      });
+
+      //이벤트
+      function getEventList() {
+        get('/api/eventList', null).done(function (result) {
+          var list = result.data.list;
+          var html = '';
+          if (list.length > 0) {
+            for (var i = 0; i < list.length; i++) {
+              html += '<a href="javascript:openEventPopup(\'' + list[i].eventNo + '\')" class="swiper-slide"><img src="' + list[i].eventThumbFileUrl + '" alt="' + list[i].eventTitle + '" onerror="this.src=\'/rsc/front/images/common/no_img.jpg\'"></a>';
+            }
+          } else {
+          }
+          $('#eventList').append(html);
+
+          EVTswiper = new Swiper('.event_slider', {
+            freeMode: false,
+            slidesPerView: 1,
+            spaceBetween: 7,
+            centeredSlides: true,
+            autoplay: {
+              delay: 5000
+            },
+            pagination: {
+              el: '.event_slider .swiper-pagination',
+              hide: true
+            },
+            breakpoints: {
+              413: {
+                slidesPerView: 'auto',
+                spaceBetween: 40
+              }
+            }
+          });
+        });
+      }
+
+      //이벤트 상세팝업 열기
+      function openEventPopup(eventNo) {
+        $('#eventPop .popup_head h1').text('');
+        $('#eventPop .popup_body').text('');
+
+        get('/api/eventDetail/' + eventNo, null).done(function (result) {
+          var data = result.data;
+          $('#eventPop .popup_head h1').text(data.eventTitle);
+          $('#eventPop .popup_body').html(data.eventCont);
+
+          $('#eventPop').show();
+          /* 		    $("#eventPop").animate({bottom:"0"}, 300);
+            $('body').css('overflow','hidden');
+              var x=window.scrollX, y=window.scrollY;
+              window.onscroll=function(){window.scrollTo(x, y)}; */
+        });
+      }
+
+      //이벤트 상세팝업 닫기
+      function closeEventPopup() {
+        $('#eventPop').hide();
+        /* 	    $("#eventPop").animate({bottom:"-100%"}, 300);
+          $('body').css('overflow','');
+              window.onscroll=function(){}; */
+      }
+
+      //개최하기
+      function openHold() {
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            openLoginPage();
+          } else {
+            getPageAjax('../rank/hold.html', null).done(function (result) {
+              $('body').append(result);
+            });
+          }
+        });
+      }
+
+      //인기챌린지
+      function getHotChallengeList() {
+        get('/api/challenge/topChlgList', null).done(function (result) {
+          var list = result.data.list;
+          var html = '';
+          if (list.length > 0) {
+            $('.btn_more_challenge').show();
+            $('.btn_more_challenge').html('더 많은 챌린지 찾기');
+            for (var i = 0; i < list.length; i++) {
+              html += '<div class="hit_challenge">';
+              html += '	<div class="tit_more">';
+              html += '		<h3 onclick="openChallengeDetail(\'' + list[i].chlgNo + '\')">' + list[i].chlgName + '</h3>';
+              html += '		<a href="javascript:openChallengeDetail(\'' + list[i].chlgNo + '\');" class="btn_view_more">더 보기</a>';
+              html += '	</div>';
+              //html += '	<a href="javascript:playVideo(\''+list[i].videoNo+'\');" class="thumb">';
+              //html += '	<a href="javascript:playVideo(\'playChlgVideo\', \''+list[i].videoNo+'\', null, null, null, null, null);" class="thumb">';
+              html += "	<a href=\"javascript:playVideo('playChlgVideo', '" + list[i].videoUrl + '\', null, null, null, null, null);" class="thumb">';
+              html += '		<span class="play"></span>';
+              html += '		<img src="' + list[i].videoThumbUrl + '" alt="' + list[i].chlgName + '" onerror="this.src=\'/rsc/front/images/common/no_img.jpg\'">';
+              html += '	</a>';
+              html += '</div>';
+            }
+          } else {
+            $('.btn_more_challenge').show();
+            $('.btn_more_challenge').html('이전 챌린지 찾아보기');
+            html += '<div class="challenge_no">';
+            html += '	<i class="ico_empty"></i>현재 진행 중인 챌린지가 없습니다';
+            html += '</div>';
+          }
+          $('#hotChallengeList').append(html);
+        });
+      }
+
+      //챌린지 상세보기
+      /* function viewChallengeDetail(chlgNo){
+        //layerAlert("챌린지 상세보기 chlgNo="+chlgNo);
+        openChallengeDetail(chlgNo);
+      } */
+
+      //더많은 챌린지 찾기
+      function searchChallenge() {
+        getPageAjax('../rank/search_challenge.html', null).done(function (result) {
+          $('body').find('.wrap').hide();
+          $('body').append(result);
+        });
+      }
+
+      //퍼포머 랭킹
+      function getTopClubberList() {
+        $('#topClubberList').empty();
+        get('/api/challenge/topClubberList', 'topClobber=Y&memberGrdCd=PERFORMER').done(function (result) {
+          //퍼포머 랭킹 3인 미만일 경우 더보기 숨김
+          if (result.data.list.length < 3) {
+            $('#viewMoreClubber').hide();
+          }
+          var list = result.data.list;
+          var html = '';
+          var checked = '';
+          var ranking = '';
+          var badge = '';
+          if (list.length > 0) {
+            for (var i = 0; i < list.length; i++) {
+              switch (list[i].ranking) {
+                case 1:
+                  ranking = 'first';
+                  badge = 'no_1';
+                  break;
+                case 2:
+                  ranking = 'second';
+                  badge = 'no_2';
+                  break;
+                case 3:
+                  ranking = 'third';
+                  badge = 'no_3';
+                  break;
+                default:
+                  ranking = '';
+                  badge = '';
+              }
+              var followDisabled = '';
+              if (list[i].myFollowYn == 'Y') {
+                checked = '';
+              } else if (list[i].myFollowYn == 'N') {
+                checked = 'checked';
+              } else {
+                followDisabled = 'style="display:none;"';
+              }
+              html += '<div class="performer_list ranking ' + ranking + '">';
+              html += '	<a href="javascript:viewUserProfile(\'' + list[i].memberNo + '\');">';
+              html += '		<div class="performer" style="background-image: url(' + list[i].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);">';
+              html += '			<i class="badge ' + badge + '">' + list[i].ranking + '</i>';
+              html += '		</div>';
+              html += '	</a>';
+              html += '	<div class="id">';
+              html += '		<p>@' + list[i].memberId + '</p>';
+              html += '		<span>' + list[i].winCnt + ' Win</span>';
+              html += '	</div>';
+              html += '	<div class="follow_toggle" ' + followDisabled + '>';
+              html += '		<input type="checkbox" id="follow_' + list[i].memberNo + '" ' + checked + ' data-member-no="' + list[i].memberNo + '" value="' + list[i].myFollowYn + '">';
+              html += '		<label for="follow_' + list[i].memberNo + '"><span></span></label>';
+              html += '	</div>';
+              html += '</div >';
+            }
+          } else {
+            html += '<div class="challenge_no performer">';
+            html += '	  <i class="ico_empty"></i>';
+            html += '		순위에 든 퍼포머가 없네요!<br>';
+            html += '		챌린지에 참여하고 우승해 랭킹에 올라보세요.';
+            html += '</div>';
+          }
+          $('#topClubberList').append(html);
+        });
+      }
+
+      //퍼포머 랭킹 더보기
+      function searchClubber() {
+        getPageAjax('../rank/search_clubber.html', null).done(function (result) {
+          $('body').find('.wrap').hide();
+          $('body').append(result);
+        });
+      }
+
+      //팔로우  toggle
+      $(document)
+        .off('click', '#rankWrap #topClubberList input[type=checkbox][id^=follow_]')
+        .on('click', '#rankWrap #topClubberList input[type=checkbox][id^=follow_]', function (e) {
+          var memberNo = $(this).data('memberNo');
+          var followYn = $(this).val();
+          var $this = $('#rankWrap #topClubberList #follow_' + memberNo);
+
+          getAccessToken().done(function (result) {
+            if (result == null || result == '') {
+              $this.prop('checked', !$this.is(':checked'));
+              openLoginPage();
+              /* 				$this.prop("checked", !$this.is(":checked"));
+            layerAlert("로그인이 필요한 서비스입니다.")
+            .done(openLoginPage); */
+            } else {
+              if (followYn == 'Y') {
+                del('/api/followCancel/' + memberNo, null, null)
+                  .done(function (result) {
+                    $this.val('N');
+                  })
+                  .fail(function (result) {
+                    $this.prop('checked', !$this.is(':checked'));
+                  });
+              } else {
+                post('/api/follow/' + memberNo, null, null)
+                  .done(function (result) {
+                    $this.val('Y');
+                  })
+                  .fail(function (result) {
+                    $this.prop('checked', !$this.is(':checked'));
+                  });
+              }
+            }
+          });
+        });
+
+      // 로그인 창이 닫혔을때 (개최페이지, 랭크 팔로우, 퍼포머 랭킹팔로우에서 공통으로 사용)
+      function afterCloseLoginPage() {
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+          } else {
+            if (typeof getTopClubberList == 'function') {
+              //퍼포머랭킹
+              getTopClubberList();
+            }
+            if (typeof clubberSearch == 'function') {
+              //클러버 검색
+              clubberSearch();
+            }
+            if (typeof fn_checkLoginYn == 'function') {
+              //개최약관
+              fn_checkLoginYn('Y');
+            }
+          }
+        });
+      }
+
+      //챌린지 안내 팝업 열기
+      function openChallengePopup() {
+        $('#challengePop').show();
+        $('#challengePop .popup_img').scrollTop(0);
+      }
+
+      //챌린지 안내 팝업 닫기
+      function closeChallengePopup() {
+        $('#challengePop').hide();
+      }
+    </script>
+  </body>
+</html>

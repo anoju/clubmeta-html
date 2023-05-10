@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="/as-is/html/include/head.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        //글로벌검색열기
+        openGlobalSearchPopup();
+      });
+
+      //검색 닫기
+      function closeGlobalSearchPopup() {
+        reqToApp('ClosePopupUrl', null);
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="/as-is/html/include/head.js"></script>
+  </head>
+  <body>
+    <!-- 댓글 -->
+    <div class="layer_reply" style="bottom: 0; height: 100%">
+      <div class="reply_head">
+        <h1>댓글 <span id="em_totalCnt"></span></h1>
+        <button type="button" class="btn_close" onclick="close_reply()">창닫기</button>
+      </div>
+
+      <!-- 댓글 템플릿 -->
+      <div class="reply_list" id="div_replyTmplt_normal" style="display: none">
+        <a onclick="fn_goUserProfile(event);">
+          <div class="performer"></div>
+        </a>
+        <div class="id">
+          <a onclick="fn_goUserProfile(event);">
+            <p class="p_memberId"></p>
+          </a>
+
+          <div class="txt replyCont"></div>
+          <div class="info">
+            <span class="time"></span>
+            <a class="a_reportReply" onclick="fn_cmmtReport(event);">신고</a>
+            <a class="a_delReply" onclick="fn_deleteCmmt(event);">삭제</a>
+          </div>
+        </div>
+        <div class="like_toggle">
+          <input type="checkbox" id="" onclick="fn_cmmtLike(event);" />
+          <label for=""><span></span><em class="em_likeCnt"></em></label>
+        </div>
+      </div>
+      <!-- 댓글 템플릿 - 신고 -->
+      <div class="reply_list" id="div_replyTmplt_report" style="display: none">
+        <a>
+          <div class="performer"></div>
+        </a>
+        <div class="id">
+          <a>
+            <p class="p_memberId"></p>
+          </a>
+          <div class="txt reported">해당 댓글은 신고로 인해 삭제처리 된 댓글입니다.</div>
+        </div>
+      </div>
+
+      <div class="reply_body" id="div_replyList_wrapper">
+        <div id="div_replyList"></div>
+      </div>
+
+      <div class="reply_btm">
+        <div class="performer" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
+        <div class="reply_form">
+          <input type="text" name="cmmtCont" style="font-weight: 300" />
+          <button onclick="fn_insertReply(event);" id="btnInsertReply">전송</button>
+        </div>
+      </div>
+    </div>
+    <!--// 댓글 -->
+    <script type="text/javascript">
+      var videoNo = "<%= request.getParameter('videoNo') %>";
+
+      var isLoading = false;
+      var restCnt = 0;
+
+      $(document).ready(function () {
+        if (videoNo == null || videoNo == '' || videoNo == 'null') {
+          layerAlert('잘못된 접근입니다.').done(function () {
+            reqToApp('ClosePopupUrl');
+          });
+          return;
+        }
+
+        // 댓글 조회
+        fn_getFirstPage();
+
+        // 댓글 입력창으로 focus
+        //$(".reply_form [name=cmmtCont]").focus();	// 이건 웹뷰에서는 안먹음.(사용자 Action이 뭔가 있어야 한다고 함.)
+
+        // 댓글 가능 여부 확인
+        get('/api/selectVideo/' + videoNo).done(function (result) {
+          if (result.data.cmmtAllowYn != 'Y') {
+            $('.reply_form [name=cmmtCont]').val('');
+            $('.reply_form [name=cmmtCont]').attr('placeholder', '댓글이 허용되지 않는 영상입니다.');
+            // 댓글 입력 막기
+            $('.reply_form [name=cmmtCont]').prop('disabled', true);
+            // 전송 버튼 숨기기
+            $('.reply_form #btnInsertReply').hide();
+            $('.reply_form button')[0].onclick = () => {
+              layerAlert('댓글이 허용되지 않는 영상입니다.');
+            };
+          }
+        });
+
+        // 스크롤시 추가 데이터 조회
+        $('#div_replyList_wrapper').on('scroll', function (e) {
+          if (isLoading) return;
+          if (restCnt > 0) {
+            if ($('#div_replyList').height() - ($('#div_replyList_wrapper').scrollTop() + $('#div_replyList_wrapper').height()) < 100) {
+              isLoading = true;
+              fn_getNextPage().done(function () {
+                isLoading = false;
+              });
+            }
+          }
+        });
+
+        // 로그인 했으면 프로필 이미지 세팅
+        getAccessToken().done(function (result) {
+          if (result != null && result != '') {
+            get('/api/myProfile').done(function (result) {
+              $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+            });
+          }
+        });
+      });
+
+      // 첫페이지 조회
+      function fn_getFirstPage() {
+        $('#div_replyList_wrapper').scrollTop(0);
+        return fn_getPage('');
+      }
+      // 다음 페이지 조회
+      function fn_getNextPage() {
+        var lastCmmtNo = $('#div_replyList .reply_list:last').data('cmmtNo');
+        return fn_getPage(lastCmmtNo);
+      }
+
+      function fn_getPage(lastCmmtNo) {
+        var dfd = $.Deferred();
+        if (lastCmmtNo == null) lastCmmtNo = '';
+        get('/api/replyList/' + videoNo, 'lastCmmtNo=' + lastCmmtNo).done(function (result) {
+          restCnt = result.data.restCnt * 1;
+          if (lastCmmtNo == null || lastCmmtNo == '') {
+            // 총 개수 다시 세팅
+            $('#em_totalCnt').html(result.data.restCnt * 1 + result.data.list.length);
+            // 기존 댓글 다 지우기
+            $('#div_replyList .reply_list').remove();
+          }
+          result.data.list.forEach(function (d) {
+            $('#div_replyList').append(fn_makeDiv(d));
+          });
+          dfd.resolve();
+        });
+
+        return dfd.promise();
+      }
+
+      function fn_makeDiv(d) {
+        var div = '';
+        if (d.delYn == 'Y') {
+          div = $('#div_replyTmplt_report').clone();
+        } else {
+          div = $('#div_replyTmplt_normal').clone();
+
+          div.find('.replyCont').html(d.cmmtCont);
+          if (d.yearDiff * 1 > 0) {
+            div.find('.time').html(d.yearDiff + '년 전');
+          } else if (d.monthDiff * 1 > 0) {
+            div.find('.time').html(d.monthDiff + '달 전');
+          } else if (d.dayDiff * 1 > 0) {
+            div.find('.time').html(d.dayDiff + '일 전');
+          } else if (d.hourDiff * 1 > 0) {
+            div.find('.time').html(d.hourDiff + '시간 전');
+          } else if (d.minDiff * 1 > 0) {
+            div.find('.time').html(d.minDiff + '분 전');
+          } else if (d.secDiff * 1 > 0) {
+            div.find('.time').html(d.secDiff + '초 전');
+          }
+
+          if (d.myCmmtYn == 'Y') {
+            // 내 글이면 신고하기 제거
+            div.find('.a_reportReply').remove();
+          } else {
+            // 다른 사람 글이면 삭제하기 제거
+            div.find('.a_delReply').remove();
+          }
+
+          div.find('.like_toggle input[type=checkbox]').attr('id', 'like' + d.cmmtNo);
+          div.find('.like_toggle label').attr('for', 'like' + d.cmmtNo);
+          if (d.likeYn == 'Y') {
+            // 좋아요 여부에 따라 화면표시
+            div.find('.like_toggle input[type=checkbox]').prop('checked', true);
+          }
+          // 좋아요 건수
+          div.find('.em_likeCnt').html(d.cmmtLikeCnt);
+        }
+
+        if (d.memberStatusCd == 'M20' || d.memberStatusCd == 'M99') {
+          div.find('.performer').css('background-image', 'url(/as-is/rsc/front/images/common/ico_mypage.png)');
+          if (d.memberStatusCd == 'M20') {
+            div.find('.p_memberId').html('정지회원');
+          } else {
+            div.find('.p_memberId').html('탈퇴회원');
+          }
+          div.attr('data-member-no', '');
+        } else {
+          div.find('.performer').css('background-image', 'url(' + d.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+          div.find('.p_memberId').html(d.memberId);
+          div.attr('data-member-no', d.memberNo);
+        }
+        div.css('display', '');
+        div.attr('id', '');
+        div.attr('data-cmmt-no', d.cmmtNo);
+        div.attr('data-my-cmmt-yn', d.myCmmtYn);
+
+        return div;
+      }
+
+      // 댓글 등록
+      function fn_insertReply(e) {
+        $(e.target).blur();
+        // 로그인 체크 하고, 로그인 되어 있으면 등록
+        fn_checkLoginYn('N', fn_insertReplyAfterLogin);
+      }
+      // 댓글 등록 실제 프로세스
+      function fn_insertReplyAfterLogin() {
+        var cmmtCont = $('.reply_form [name=cmmtCont]').val().trim();
+        if (cmmtCont == '') {
+          layerAlert('댓글 내용을 입력해 주세요.').done(function () {
+            $('.reply_form [name=cmmtCont]').select();
+          });
+        } else {
+          post('/api/replyPost/' + videoNo, null, { cmmtCont: cmmtCont })
+            .done(function (result) {
+              // 입력한거 지우고
+              $('.reply_form [name=cmmtCont]').val('');
+              // 다시 조회
+              fn_getFirstPage();
+
+              reqToApp('CommentSuccess', JSON.stringify({ cmmtCnt: result.data.replyCnt }));
+            })
+            .fail(function (result) {
+              layerAlert(result.respMsg);
+            });
+        }
+      }
+      // 댓글 좋아요
+      function fn_cmmtLike(e) {
+        // 		var checked = $(e.target).prop("checked");
+        // 		var cmmtNo = $(e.target).closest(".reply_list").data("cmmtNo");
+        $(e.target).blur();
+        fn_checkLoginYn(
+          'N',
+          () => {
+            fn_cmmtLikeLogin(e);
+          },
+          () => {
+            fn_cmmtLikeNoLogin(e);
+          }
+        );
+      }
+
+      // 댓글 좋아요 실제 프로세스 (로그인시)
+      function fn_cmmtLikeLogin(e) {
+        var checked = $(e.target).prop('checked');
+        var cmmtNo = $(e.target).closest('.reply_list').data('cmmtNo');
+
+        if (checked) {
+          // 좋아요
+          post('/api/replyLike/' + cmmtNo, null, null).done(function (result) {
+            $("#div_replyList .reply_list[data-cmmt-no='" + cmmtNo + "'] .em_likeCnt").html(result.data.likeCnt);
+          });
+        } else {
+          // 좋아요 취소
+          del('/api/replyLikeCancel/' + cmmtNo, null, null).done(function (result) {
+            $("#div_replyList .reply_list[data-cmmt-no='" + cmmtNo + "'] .em_likeCnt").html(result.data.likeCnt);
+          });
+        }
+      }
+      // 댓글 좋아요 로그인 안한 경우
+      function fn_cmmtLikeNoLogin(e) {
+        var checked = $(e.target).prop('checked');
+        var cmmtNo = $(e.target).closest('.reply_list').data('cmmtNo');
+        $(e.target).prop('checked', !checked); // 체크박스 원래대로 되돌리기
+      }
+
+      // 댓글 신고하기
+      function fn_cmmtReport(e) {
+        var cmmtNo = $(e.target).closest('.reply_list').data('cmmtNo');
+        fn_checkLoginYn('N', () => {
+          openReportPopup('CMMT', cmmtNo);
+        });
+      }
+
+      // 댓글 삭제
+      function fn_deleteCmmt(e) {
+        var cmmtNo = $(e.target).closest('.reply_list').data('cmmtNo');
+        layerConfirm('댓글을 삭제하시겠습니까?').done(function () {
+          del('/api/replyDel/' + cmmtNo)
+            .done(function (result) {
+              openToastPop('댓글이 삭제되었습니다.');
+              // 				.done(function() {
+              // 댓글 화면에서 지우기
+              $('#div_replyList div.reply_list[data-cmmt-no=' + cmmtNo + ']').remove();
+              // 전체 개수 -1
+              var totCnt = $('#em_totalCnt').html() * 1;
+              $('#em_totalCnt').html(totCnt - 1);
+
+              reqToApp('CommentSuccess', JSON.stringify({ cmmtCnt: result.data.replyCnt }));
+              // 				});
+            })
+            .fail(function (result) {
+              layerAlert(result.respMsg);
+            });
+        });
+      }
+
+      // 로그인 체크 해서 로그인 안했으면 로그인 창
+      function fn_checkLoginYn(alertYn, callback, noLoginCallback) {
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            if (alertYn == 'Y') {
+              layerAlert('로그인이 필요한 서비스입니다.').done(openLoginPage);
+            } else {
+              openLoginPage();
+            }
+            if (noLoginCallback) noLoginCallback();
+          } else {
+            if (callback) {
+              callback();
+            }
+          }
+        });
+      }
+
+      // 로그인창 닫혔을때
+      function afterCloseLoginPage() {
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+          } else {
+            // 다시 조회
+            fn_getFirstPage();
+            // 프로필 이미지 표시
+            get('/api/myProfile').done(function (result) {
+              $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+            });
+          }
+        });
+      }
+
+      // 창닫기
+      function close_reply() {
+        reqToApp('ClosePopupUrl');
+      }
+
+      // 사용자 프로필
+      function fn_goUserProfile(e) {
+        var myCmmtYn = $(e.target).closest('.reply_list').data('myCmmtYn');
+        var memberNo = $(e.target).closest('.reply_list').data('memberNo');
+
+        if (memberNo == '') return;
+
+        viewUserProfile(memberNo);
+        /*
+          if(myCmmtYn == "Y") {
+            // 내 프로필
+            document.location.replace("/mypage/profile");
+            return;
+          } else {
+            // 다른 사람 프로필
+            document.location.replace("/user/profile?memberNo=" + memberNo);
+          }
+          */
+      }
+    </script>
+  </body>
+</html>
