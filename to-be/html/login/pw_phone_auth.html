@@ -1,0 +1,108 @@
+<div class="wrap findPwStep div_layer" id="divFindPwPhoneAuth">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // 전화번호 입력시 전화번호 형식으로
+      // 정상 입력시 코드 전송 버튼 활성화
+      $('#divFindPwPhoneAuth [name=mobileNo]').on('input', function () {
+        // 코드 받기 버튼 비활성
+        $('#divFindPwPhoneAuth .btn_send_code').prop('disabled', true);
+
+        // 오류메시지 숨기기
+        $('#divFindPwPhoneAuth .warning_txt').hide();
+
+        // 휴대폰 형식으로 변환
+        $(this).val(fn_getHpVal($(this).val()));
+
+        if ($(this).val() == '') return false;
+
+        if (fn_checkValid('hp', $(this).val())) {
+          // 코드 받기 버튼 활성화
+          $('#divFindPwPhoneAuth .btn_send_code').prop('disabled', false);
+        } else {
+          $('#divFindPwPhoneAuth .warning_txt.not_valid').show();
+        }
+      });
+
+      // 코드 전송 버튼 클릭
+      $('#divFindPwPhoneAuth .btn_send_code').on('click', function () {
+        var body = { countryCd: $('#divFindPwPhoneAuth [name=countryCd]').val(), mobileNo: $('#divFindPwPhoneAuth [name=mobileNo]').val(), checkExistsYn: 'Y' };
+
+        post('/api/sendSmsCertiNo', null, body)
+          .done(function (result) {
+            getPageAjax('/login/confirm_code', 'type=findPw&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+              $('#findPwForm').append(result); // 인증 코드 입력 화면 붙이고
+              $('#divFindPwPhoneAuth').hide(); // 현재화면 (전화번호인증) 숨기기
+            });
+          })
+          .fail(function (result) {
+            if (result.respCode == '<%= CommonConstants.ERR_CD_NOT_EXISTS_MEMBER %>') {
+              $('#divFindPwPhoneAuth .warning_txt.not_exists').html(result.respMsg);
+              $('#divFindPwPhoneAuth .warning_txt.not_exists').show();
+              // 코드 받기 버튼 비활성화
+              $('#divFindPwPhoneAuth .btn_send_code').prop('disabled', true);
+            } else {
+              layerAlert(result.respMsg);
+            }
+          });
+      });
+    });
+
+    var countryCdSelector;
+    function fn_initCountryCdSelector() {
+      var countryCdArr = [
+        { value: '82', text: 'KR +82' }
+        // 					, {value: "83", text: "KR +83"}
+        // 					, {value: "84", text: "KR +84"}
+        // 					, {value: "85", text: "KR +85"}
+      ];
+
+      countryCdSelector = new IosSelector({
+        el: '#countryCd',
+        type: 'normal',
+        source: countryCdArr,
+        value: '82',
+        count: 20,
+        sensitivity: 5, // 숫자가 낮을수록 돌렸을때 팽그르르 돌며, 초기 select 할때도 느려진다. 기본값은 0.8
+        onChange: (selected) => {
+          $('#divFindPwPhoneAuth #txt_countryCd').val(selected.text);
+          $('#divFindPwPhoneAuth [name=countryCd]').val(selected.value);
+        }
+      });
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev">이전으로</button>
+    <h1>비밀번호 재설정</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <div class="joinus_form">
+      <div class="form_row">
+        <span class="stit">전화번호</span>
+        <div class="input_wrap phone">
+          <input type="text" value="KR +82" id="txt_countryCd" class="select_s" readonly="readonly" />
+          <input type="hidden" name="countryCd" value="82" />
+          <input type="tel" name="mobileNo" value="" class="clear" maxlength="13" />
+          <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+        </div>
+        <!-- 입력 오류시 -->
+        <p class="warning_txt not_valid" style="display: none">전화번호 형식이 올바르지 않습니다.</p>
+        <p class="warning_txt not_exists" style="display: none"></p>
+      </div>
+    </div>
+    <button type="button" class="btn_send_code" disabled>코드 전송</button>
+  </div>
+  <!--// contents -->
+
+  <!-- selectbox -->
+  <div class="selectboxD" style="bottom: -100%">
+    <div class="date-selector">
+      <div id="countryCd" style="width: 80%"></div>
+    </div>
+  </div>
+  <!--// selectbox -->
+</div>

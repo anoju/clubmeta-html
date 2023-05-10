@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="../include/head.js"></script>
+  </head>
+  <body style="background: transparent">
+    <script type="text/javascript">
+      $(document).ready(function () {
+        //	openLoginPage(0);
+
+        getPageAjax('../login/login_layer.html', null).done(function (result) {
+          $('body').append(result);
+        });
+      });
+
+      function afterCloseLoginPage() {
+        reqToApp('ClosePopupUrl');
+      }
+    </script>
+  </body>
+</html>

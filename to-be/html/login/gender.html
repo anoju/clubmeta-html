@@ -1,0 +1,50 @@
+<div class="wrap joinStep div_layer" id="divGender">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // 성별 선택시 다음 버튼 활성화
+      $('#divGender [name=genderCd]').on('click', function () {
+        if ($('#divGender [name=genderCd]:checked').length > 0) {
+          $('#divGender .btn_progress').prop('disabled', false);
+        } else {
+          $('#divGender .btn_progress').prop('disabled', true);
+        }
+      });
+
+      // 다음 버튼 클릭시
+      $('#divGender .btn_progress').on('click', function () {
+        getPageAjax('../login/memberId.html', null).done(function (result) {
+          $('#joinForm').append(result); // 사용자ID 입력 화면 붙이고
+          $('#divGender').hide(); // 현재화면 (성별 선택 화면) 숨기기
+        });
+      });
+    });
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev">이전으로</button>
+    <h1>가입하기</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <div class="joinus_form">
+      <div class="form_row">
+        <span class="stit">성별을 선택해주세요.</span>
+        <div class="input_gender">
+          <input type="radio" id="gender_f" name="genderCd" value="FEMAIL" />
+          <label for="gender_f">여성</label>
+
+          <input type="radio" id="gender_m" name="genderCd" value="MAIL" />
+          <label for="gender_m">남성</label>
+
+          <input type="radio" id="gender_etc" name="genderCd" value="QUEER" />
+          <label for="gender_etc">기타</label>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn_progress" disabled>다음</button>
+  </div>
+  <!--// contents -->
+</div>

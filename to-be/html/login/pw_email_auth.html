@@ -1,0 +1,81 @@
+<div class="wrap findPwStep div_layer" id="divFindPwEmailAuth">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('#joinForm [name=joinTypeCd]').val('EMAIL');
+
+      // 이메일 입력시 처리
+      $('#divFindPwEmailAuth [name=email]').on('input', function () {
+        // 코드 받기 버튼 비활성
+        $('#divFindPwEmailAuth .btn_send_code').prop('disabled', true);
+
+        if (!fn_checkValid('email', $(this).val())) {
+          // 오류 메시지 표시
+          if ($(this).val().length > 0) {
+            $('#divFindPwEmailAuth .warning_txt').html('정확한 이메일 주소를 입력해 주세요.');
+            $('#divFindPwEmailAuth .warning_txt').show();
+          } else {
+            $('#divFindPwEmailAuth .warning_txt').hide();
+          }
+          // 성공 메시지 숨기기
+          // 					$("#divFindPwEmailAuth .check_ok_txt").hide();
+        } else {
+          // 오류 메시지 숨기기
+          $('#divFindPwEmailAuth .warning_txt').hide();
+          // 코드 받기 버튼 활성화
+          $('#divFindPwEmailAuth .btn_send_code').prop('disabled', false);
+        }
+      });
+
+      // 코드 전송 버튼 클릭
+      $('#divFindPwEmailAuth .btn_send_code').on('click', function () {
+        var body = { email: $('#divFindPwEmailAuth [name=email]').val(), checkExistsYn: 'Y' };
+
+        post('/api/sendEmailCertiNo', null, body)
+          .done(function (result) {
+            getPageAjax('../login/confirm_code.html', 'type=findPw&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+              $('#findPwForm').append(result); // 인증 코드 입력 화면 붙이고
+              $('#divFindPwEmailAuth').hide(); // 현재화면 (이메일인증) 숨기기
+            });
+          })
+          .fail(function (result) {
+            if (result.respCode == '<%= CommonConstants.ERR_CD_NOT_EXISTS_MEMBER %>') {
+              $('#divFindPwEmailAuth .warning_txt').html(result.respMsg);
+              $('#divFindPwEmailAuth .warning_txt').show();
+              // 코드 받기 버튼 비활성화
+              $('#divFindPwEmailAuth .btn_send_code').prop('disabled', true);
+            } else {
+              layerAlert(result.respMsg);
+            }
+          });
+      });
+    });
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev">이전으로</button>
+    <h1>비밀번호 재설정</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <div class="joinus_form">
+      <div class="form_row">
+        <span class="stit">이메일</span>
+        <div class="input_wrap">
+          <input type="email" name="email" value="" class="clear" />
+          <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+        </div>
+        <!-- 입력 오류시 -->
+        <p class="warning_txt" style="display: none">정확한 메일 주소를 입력해주세요.</p>
+
+        <!-- 가능확인 -->
+        <!-- 				<p class="check_ok_txt" style="display: none;">사용가능한 이메일입니다.</p> -->
+      </div>
+    </div>
+
+    <button type="button" class="btn_send_code" disabled>코드 전송</button>
+  </div>
+  <!--// contents -->
+</div>

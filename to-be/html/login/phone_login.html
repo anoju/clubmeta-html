@@ -1,0 +1,203 @@
+<div class="wrap loginStep div_layer" id="divPhoneLogin">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('#loginForm [name=loginTypeCd]').val('PHONE');
+
+      // 전화번호 입력시
+      $('#divPhoneLogin [name=mobileNo]').on('input', function () {
+        // 로그인 버튼 비활성
+        $('#divPhoneLogin .btn_progress').prop('disabled', true);
+        // 오류 메시지 숨기기
+        $('#divPhoneLogin .warning_txt').hide();
+
+        // 휴대폰 형식으로 변환
+        $(this).val(fn_getHpVal($(this).val()));
+
+        // 로그인 버튼 활성화/비활성화 처리
+        fn_checkValidLoginInfo();
+      });
+
+      // 비밀번호 입력시
+      $('#divPhoneLogin [name=pwd]').on('input', function () {
+        // 로그인 버튼 비활성
+        $('#divPhoneLogin .btn_progress').prop('disabled', true);
+
+        // 오류 메시지 숨기기
+        $('#divPhoneLogin .warning_txt.invalid_info').hide();
+
+        // 한글제거
+        var pwd = $('#divPhoneLogin [name=pwd]')
+          .val()
+          .replace(/[ㄱ-힣]/g, '');
+        $('#divPhoneLogin [name=pwd]').val(pwd);
+
+        // 로그인 버튼 활성화/비활성화 처리
+        fn_checkValidLoginInfo();
+      });
+
+      // 비밀번호 보이기 / 숨기기
+      $('#divPhoneLogin .eyes').on('click', function () {
+        var pwInput = $(this).closest('div.password').find('.form_pw');
+        if (pwInput.attr('type') == 'password') {
+          pwInput.attr('type', 'text');
+          $(this).find('i').removeClass('ico_eye_slash');
+          $(this).find('i').addClass('ico_eye');
+        } else {
+          pwInput.attr('type', 'password');
+          $(this).find('i').removeClass('ico_eye');
+          $(this).find('i').addClass('ico_eye_slash');
+        }
+        pwInput.focus();
+      });
+
+      // 로그인 버튼 클릭
+      $('#divPhoneLogin .btn_progress').on('click', function () {
+        var body = $('#loginForm').serializeObject();
+
+        post('/api/login', null, body)
+          .done(function (result) {
+            // 로그인 성공시
+            fn_setToken(result).done(function (result) {
+              closeLoginPage();
+            });
+          })
+          .fail(function (result) {
+            if (result.respCode == '<%= CommonConstants.ERR_CD_INVALID_LOGIN_INFO %>') {
+              $('#divPhoneLogin .warning_txt.invalid_info').show();
+            } else if (result.respCode == '<%= CommonConstants.ERR_CD_SUSPENDED_MEMBER %>') {
+              // 중지된 계정
+              var msg = JSON.parse(result.respMsg);
+              layerConfirm('해당 계정은 [' + msg.reason + '](으)로 인해 계정 사용이 정지 되었습니다.', '자세한 정보는 문의하기를 통해 확인하실 수 있습니다.', '문의하기', '취소').done(function () {
+                getPageAjax('../inquiry/inquiry_layer.html').done(function (result) {
+                  var $result = $(result);
+                  $result.find('[name=memberNo]').val(msg.memberNo);
+                  $('body').append($result);
+                });
+              });
+            } else if (result.respCode == '<%= CommonConstants.ERR_CD_DORMANT_MEMBER %>') {
+              // 휴면 계정
+              layerConfirm('해당 계정은 휴면 처리된 계정입니다. 본인 확인 후 다시 계정 사용이 가능합니다.', null, '본인인증', '취소')
+                .done(function () {
+                  // 본인 인증 화면 표시
+                  var msg = JSON.parse(result.respMsg);
+                  $('#dormantMemberForm [name=memberNo]').val(msg.memberNo);
+                  getPageAjax('../login/dormant_phone_auth.html', null).done(function (result) {
+                    $('#dormantMemberForm').append(result);
+                    $('#div_dormantMemberForm').addClass('div_dormantMemberForm');
+                  });
+                })
+                .fail(function () {
+                  // 로그인 창으로 가야됨.
+                  $('#loginForm').find('.wrap.loginStep').remove();
+                  $('#div_loginForm').removeClass('div_loginForm');
+                });
+            } else if (result.respCode == '<%= CommonConstants.ERR_CD_TERMS_AGREE_EXISTS %>') {
+              // 필수 미동의 약관 존재
+              var msg = JSON.parse(result.respMsg);
+              getPageAjax('../login/terms_of_use_exp_layer.html', 'memberNo=' + msg.memberNo).done(function (result) {
+                $('body').append(result);
+              });
+            }
+          });
+      });
+
+      // 이메일 로그인으로 이동
+      $('#divPhoneLogin #a_email').on('click', function () {
+        getPageAjax('../login/email_login.html', null).done(function (result) {
+          $('#loginForm').append(result); // 이메일 인증 화면 붙이고
+          $('#divPhoneLogin').remove(); // 현재 화면(휴대폰인증) 제거
+        });
+      });
+    });
+
+    var countryCdSelector;
+    function fn_initCountryCdSelector() {
+      var countryCdArr = [
+        { value: '82', text: 'KR +82' }
+        // 					, {value: "83", text: "KR +83"}
+        // 					, {value: "84", text: "KR +84"}
+        // 					, {value: "85", text: "KR +85"}
+      ];
+
+      countryCdSelector = new IosSelector({
+        el: '#countryCd',
+        type: 'normal',
+        source: countryCdArr,
+        value: '82',
+        count: 20,
+        sensitivity: 5, // 숫자가 낮을수록 돌렸을때 팽그르르 돌며, 초기 select 할때도 느려진다. 기본값은 0.8
+        onChange: (selected) => {
+          $('#divPhoneLogin #txt_countryCd').val(selected.text);
+          $('#divPhoneLogin [name=countryCd]').val(selected.value);
+        }
+      });
+    }
+
+    // 전화번호/비밀번호 입력 여부에 따라 로그인 버튼 활성화
+    function fn_checkValidLoginInfo() {
+      if ($('#divPhoneLogin [name=mobileNo]').val() == '') return;
+
+      if (fn_checkValid('hp', $('#divPhoneLogin [name=mobileNo]').val())) {
+        if ($('#divPhoneLogin [name=pwd]').val().length > 0) {
+          $('#divPhoneLogin .btn_progress').prop('disabled', false);
+        }
+      } else {
+        $('#divPhoneLogin .warning_txt.invalid_mobileno').show();
+        $('#divPhoneLogin .btn_progress').prop('disabled', true);
+      }
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev">이전으로</button>
+    <h1>로그인</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <div class="tabs_menu">
+      <a class="active">전화</a>
+      <a id="a_email">이메일</a>
+    </div>
+
+    <div class="login_form">
+      <p class="warning_txt invalid_info" style="display: none">전화번호 혹은 비밀번호가 정확하지 않습니다.</p>
+      <div class="form_row">
+        <span class="stit">전화번호</span>
+        <div class="input_wrap phone">
+          <input type="text" value="KR +82" id="txt_countryCd" class="select_s" readonly="readonly" />
+          <input type="hidden" name="countryCd" value="82" />
+          <input type="tel" name="mobileNo" value="" class="clear" maxlength="13" />
+          <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+        </div>
+        <!-- 입력 오류시 -->
+        <p class="warning_txt invalid_mobileno" style="display: none">전화번호 형식이 올바르지 않습니다.</p>
+      </div>
+
+      <div class="form_row">
+        <span class="stit">비밀번호</span>
+        <div class="input_wrap password">
+          <input type="password" name="pwd" value="" class="form_pw clear" />
+          <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+          <div class="eyes">
+            <i class="ico_eye_slash"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn_progress" disabled>로그인</button>
+  </div>
+  <!--// contents -->
+
+  <a href="javascript:fn_showPwdRestType();" class="btn_search_pw">비밀번호를 잊으셨나요?</a>
+
+  <!-- selectbox -->
+  <div class="selectboxD" style="bottom: -100%">
+    <div class="date-selector">
+      <div id="countryCd" style="width: 80%"></div>
+    </div>
+  </div>
+  <!--// selectbox -->
+</div>

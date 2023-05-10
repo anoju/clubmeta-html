@@ -1,0 +1,177 @@
+<div class="wrap joinStep div_layer" id="divTermsOfUse">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // 약관 목록 조회 및 화면 세팅
+      get('/api/terms/TERMS10/list', '').done(function (result) {
+        for (var i = 0; i < result.data.list.length; i++) {
+          var idx = i + 1;
+          var data = result.data.list[i];
+          var div = $('#divTermsOfUse #div_agree_' + idx);
+
+          // 화면에는 3개만 표시되는데 그 이상인 경우.
+          if (div.length == 0) {
+            var clone = $('#divTermsOfUse #div_agree_0').clone();
+            clone.attr('id', clone.attr('id').replace('_0', '_' + idx));
+            clone.find('[id$=_0]').each(function () {
+              $(this).attr(
+                'id',
+                $(this)
+                  .attr('id')
+                  .replace('_0', '_' + idx)
+              );
+            });
+            clone.find('[for$=_0]').each(function () {
+              $(this).attr(
+                'for',
+                $(this)
+                  .attr('for')
+                  .replace('_0', '_' + idx)
+              );
+            });
+            clone.show();
+            $('#divTermsOfUse .agree_check_area').append(clone);
+
+            div = $('#divTermsOfUse #div_agree_' + idx);
+          }
+
+          div.find('#em_agreeTitle_' + idx).html(data.termsDivNm);
+          div.find('#em_agreeReqYn_' + idx).html(data.reqYn == 'Y' ? '(필수)' : '(선택)');
+          div.find('#div_agreeCont_' + idx).load(data.termsFilePathUrl);
+
+          div.find('#agree_' + idx).data('reqYn', data.reqYn);
+
+          $('#divTermsOfUse').append("<input type='hidden' name='termsNo' value='" + data.termsNo + "' />");
+        }
+        if (result.data.list.length < 3) {
+          $('#divTermsOfUse .agree_check_area .agree_box').each(function () {
+            var idx = $(this).attr('id').replace('div_agree_', '');
+            if (idx * 1 > result.data.list.length) {
+              $(this).remove();
+            }
+          });
+        }
+      });
+
+      // 전체 선택 / 해제
+      $('#divTermsOfUse #agree_all')
+        .off('click')
+        .on('click', function () {
+          if ($(this).prop('checked')) {
+            $('#divTermsOfUse input[type=checkbox]').prop('checked', true);
+          } else {
+            $('#divTermsOfUse input[type=checkbox]').prop('checked', false);
+          }
+        });
+      // 체크박스 1개라도 해제되면 전체선택체크박스는 해제
+      $('#divTermsOfUse input[type=checkbox]')
+        .off('change')
+        .on('change', function () {
+          if ($(this).attr('id') != 'agree_all' && !$(this).prop('checked')) {
+            $('#divTermsOfUse #agree_all').prop('checked', false);
+          }
+
+          // 필수 체크 확인
+          var isOk = true;
+          $('#divTermsOfUse input[type=checkbox]').each(function () {
+            if ($(this).data('reqYn') == 'Y' && $(this).prop('checked') == false) {
+              isOk = false;
+              return false;
+            }
+          });
+          if (isOk) {
+            $('#divTermsOfUse .btn_progress').prop('disabled', false);
+          } else {
+            $('#divTermsOfUse .btn_progress').prop('disabled', true);
+          }
+        });
+
+      // 다음으로
+      $('#divTermsOfUse .btn_progress')
+        .off('click')
+        .on('click', function () {
+          var isOk = true;
+          // 필수 체크 확인
+          $('#divTermsOfUse input[type=checkbox]').each(function () {
+            if ($(this).data('reqYn') == 'Y' && $(this).prop('checked') == false) {
+              isOk = false;
+              var agreeTitle = $(this).closest('div.agree_box').find('[id^=em_agreeTitle_]').html();
+              layerAlert('사용 약관에 동의해 주세요.<br>[' + agreeTitle + ']');
+              return false;
+            }
+          });
+
+          if (isOk) {
+            // 체크박스 선택 여부 hidden으로 화면에 세팅
+            $('#divTermsOfUse input[name=agreeYn]').remove(); // 혹시 모르니 일단 다 지우고
+            // 체크박스 루프 돌면서 hidden으로 세팅해주기
+            $('#divTermsOfUse .agree_check_area .agree_box input[type=checkbox][id^=agree_]').each(function () {
+              var checkYn = $(this).prop('checked') ? 'Y' : 'N';
+              $('#divTermsOfUse').append("<input type='hidden' name='agreeYn' value='" + checkYn + "' />");
+            });
+
+            var joinTypeCd = $('#joinForm [name=joinTypeCd]').val();
+            if (joinTypeCd == 'PHONE' || joinTypeCd == 'EMAIL') {
+              // 가입 유형이 전화번호이면 전화번호 인증화면으로 이동 (여기까지는 이메일/전화번호 동일하게 전화번호로 넘어옴)
+              // 가입유형을 이메일로 변경, 뒤로가기, 약관동의, 결과는 생일입력으로 이동됨.(EMAIL로 넘어와서 joinTypeCd 이메일 추가)
+              getPageAjax('../login/phone_auth.html', null).done(function (result) {
+                $('#joinForm').append(result);
+                $('#divTermsOfUse').hide();
+              });
+            } else {
+              // SNS 로그인은 전화번호/이메일 인증, 비밀번호 설정 없이 다음 단계(생년월일 설정)로 이동
+              getPageAjax('../login/birthday.html', null).done(function (result) {
+                $('#joinForm').append(result); // 생년월일 입력 화면 붙이고
+                $('#divTermsOfUse').hide(); // 현재 화면(비밀번호입력) 숨기기
+              });
+            }
+          }
+        });
+    });
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev">이전으로</button>
+    <h1>가입하기</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <div class="agree_box" id="div_agree_0" style="display: none">
+      <input type="checkbox" id="agree_0" name="chk_agreeYn" />
+      <label for="agree_0"><span></span><em id="em_agreeTitle_0"></em> <em id="em_agreeReqYn_0"></em></label>
+      <div class="agree_txt" id="div_agreeCont_0"></div>
+    </div>
+
+    <h2 class="joinus">사용약관</h2>
+    <div class="agree_check_area">
+      <input type="checkbox" id="agree_all" />
+      <label for="agree_all"><span></span>전체 동의</label>
+
+      <div class="agree_box" id="div_agree_1">
+        <input type="checkbox" id="agree_1" />
+        <label for="agree_1"><span></span><em id="em_agreeTitle_1"></em> <em id="em_agreeReqYn_1"></em></label>
+
+        <div class="agree_txt" id="div_agreeCont_1"></div>
+      </div>
+
+      <div class="agree_box" id="div_agree_2">
+        <input type="checkbox" id="agree_2" />
+        <label for="agree_2"><span></span><em id="em_agreeTitle_2"></em> <em id="em_agreeReqYn_2"></em></label>
+
+        <div class="agree_txt" id="div_agreeCont_2"></div>
+      </div>
+
+      <div class="agree_box" id="div_agree_3">
+        <input type="checkbox" id="agree_3" />
+        <label for="agree_3"><span></span><em id="em_agreeTitle_3"></em> <em id="em_agreeReqYn_3"></em></label>
+
+        <div class="agree_txt" id="div_agreeCont_3"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn_progress" disabled="disabled">다음</button>
+  </div>
+  <!--// contents -->
+</div>

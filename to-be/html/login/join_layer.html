@@ -1,0 +1,47 @@
+<div class="popup div_layer" style="bottom: -100%" id="join_layer">
+  <!-- 퍼블확인용 스타일 추가 -->
+  <script type="text/javascript">
+    // 회원 가입 레이어 닫기
+    function closeJoinPage() {
+      $('#join_layer').animate({ bottom: '-100%' }, 300, function () {
+        // 애니메이션 종료 후
+
+        if ($('.popup:visible').length == 0) {
+          // 다른 팝업이 없으면 원래대로
+          $('body').css('overflow', '');
+          window.onscroll = function () {};
+        }
+
+        // 레이어 제거
+        $('#join_layer').remove();
+      });
+    }
+
+    // 약관 동의 띄우기
+    function openJoinAgree(type) {
+      $('#joinForm [name=joinTypeCd]').val(type);
+      getPageAjax('../login/terms_of_use.html', null).done(function (result) {
+        $('#joinForm').append(result);
+        $('#div_joinForm').addClass('div_joinForm');
+      });
+    }
+  </script>
+
+  <button type="button" class="btn_close" onclick="closeJoinPage()">창닫기</button>
+  <div class="popup_head">
+    <h1><b>CLUBMETA APP</b>에 회원가입</h1>
+  </div>
+  <div class="popup_member">
+    <div class="member_btn_area">
+      <button type="button" class="btn_email" onclick="openJoinAgree('PHONE');">전화번호 또는 이메일 회원가입</button>
+      <button type="button" class="btn_kakao" onclick="fn_goLogin('KAKAO');">카카오로 회원가입</button>
+      <button type="button" class="btn_naver" onclick="fn_goLogin('NAVER');">네이버로 회원가입</button>
+      <button type="button" class="btn_google" onclick="fn_goLogin('GOOGLE');">구글로 회원가입</button>
+      <!-- 			<button type="button" class="btn_apple" onclick="fn_goLogin('APPLE');">애플로 회원가입</button> -->
+    </div>
+    <div class="member_btn_area2">
+      <p class="txt">이미 계정이 있으신가요?</p>
+      <button type="button" class="btn_member" onclick="closeJoinPage();">로그인</button>
+    </div>
+  </div>
+</div>

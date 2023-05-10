@@ -1,0 +1,375 @@
+<div class="popup div_layer" id="login_layer">
+  <style type="text/css">
+    .div_loginForm {
+      position: absolute;
+      z-index: 11;
+      height: 100%;
+      width: 100%;
+      top: 0;
+    }
+    .div_findPwForm {
+      position: absolute;
+      z-index: 12;
+      height: 100%;
+      width: 100%;
+      top: 0;
+    }
+    .pw_reset .inner {
+      border: 1px solid rgb(240 240 240 / 20%);
+    }
+
+    .div_joinForm {
+      position: absolute;
+      z-index: 11;
+      height: 100%;
+      width: 100%;
+      top: 0;
+    }
+
+    .divTermsOfUseExp {
+      position: absolute;
+      z-index: 12;
+      min-height: 100%;
+      width: 100%;
+      top: 0;
+    }
+    .div_dormantMemberForm {
+      position: absolute;
+      z-index: 12;
+      height: 100%;
+      width: 100%;
+      top: 0;
+    }
+  </style>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // 로그인 form에서 뒤로가기
+      $(document)
+        .off('click', '#div_loginForm .btn_go_prev')
+        .on('click', '#div_loginForm .btn_go_prev', function () {
+          var divLen = $('#div_loginForm').find('.wrap.loginStep').length;
+
+          $('#loginForm').find('.wrap.loginStep').last().remove(); // 마지막 화면(현재화면) 지우고
+          $('#loginForm').find('.wrap.loginStep').last().show(); // 마지막 화면 (현재화면 이전화면) 보이기
+          if (divLen == 1) {
+            $('#div_loginForm').removeClass('div_loginForm');
+          }
+        });
+      // 회원가입 form에서 뒤로 가기
+      $(document)
+        .off('click', '#div_joinForm .btn_go_prev')
+        .on('click', '#div_joinForm .btn_go_prev', function () {
+          var divLen = $('#div_joinForm').find('.wrap.joinStep').length;
+
+          $('#joinForm').find('.wrap.joinStep').last().remove(); // 마지막 화면(현재화면) 지우고
+          if ($('#joinForm').find('.wrap.joinStep').last().attr('id') == 'divConfirmCode') {
+            // 인증번호 입력 화면이면 한칸 더 앞으로
+            $('#joinForm').find('.wrap.joinStep').last().remove();
+          }
+          $('#joinForm').find('.wrap.joinStep').last().show(); // 마지막 화면 (현재화면 이전화면) 보이기
+          if (divLen == 1) {
+            $('#div_joinForm').removeClass('div_joinForm');
+          }
+        });
+      // 비밀번호 재설정 form에서 뒤로가기
+      $(document)
+        .off('click', '#div_findPwForm .btn_go_prev')
+        .on('click', '#div_findPwForm .btn_go_prev', function () {
+          var divLen = $('#div_findPwForm').find('.wrap.findPwStep').length;
+
+          $('#findPwForm').find('.wrap.findPwStep').last().remove(); // 마지막 화면(현재화면) 지우고
+          if ($('#findPwForm').find('.wrap.findPwStep').last().attr('id') == 'divConfirmCode') {
+            // 인증번호 입력 화면이면 한칸 더 앞으로
+            $('#findPwForm').find('.wrap.findPwStep').last().remove();
+          }
+          $('#findPwForm').find('.wrap.findPwStep').last().show(); // 마지막 화면 (현재화면 이전화면) 보이기
+          if (divLen == 1) {
+            $('#div_findPwForm').removeClass('div_findPwForm');
+            $('#div_loginForm').show(); // 로그인 화면 보이기
+          }
+        });
+      // 휴면해제에서 뒤로가기
+      $(document)
+        .off('click', '#div_dormantMemberForm .btn_go_prev')
+        .on('click', '#div_dormantMemberForm .btn_go_prev', function () {
+          var divLen = $('#div_dormantMemberForm').find('.wrap.dormantStep').length;
+
+          $('#div_dormantMemberForm').find('.wrap.dormantStep').last().remove(); // 마지막 화면(현재화면) 지우고
+          if ($('#div_dormantMemberForm').find('.wrap.dormantStep').last().attr('id') == 'divConfirmCode') {
+            // 인증번호 입력 화면이면 한칸 더 앞으로
+            $('#div_dormantMemberForm').find('.wrap.dormantStep').last().remove();
+          }
+          $('#div_dormantMemberForm').find('.wrap.dormantStep').last().show(); // 마지막 화면 (현재화면 이전화면) 보이기
+          if (divLen == 1) {
+            $('#div_dormantMemberForm').removeClass('div_dormantMemberForm');
+            $('#div_loginForm').show(); // 로그인 화면 보이기
+          }
+        });
+    });
+
+    $(document).on('keydown', '#loginForm input', function (e) {
+      if (e.keyCode == '13') {
+        return false;
+      }
+    });
+    $(document).on('keydown', '#findPwForm input', function (e) {
+      if (e.keyCode == '13') {
+        return false;
+      }
+    });
+    $(document).on('keydown', '#joinForm input', function (e) {
+      if (e.keyCode == '13') {
+        return false;
+      }
+    });
+
+    function fn_goLogin(type) {
+      if (type == 'PHONE') {
+        // 전화번호 또는 이메일 로그인
+        getPageAjax('../login/phone_login.html', null).done(function (result) {
+          $('#loginForm').append(result); // 이메일 인증 화면 붙이고
+          $('#div_loginForm').addClass('div_loginForm');
+        });
+      } else {
+        $('#loginForm [name=loginTypeCd]').val(type);
+        // SNS 로그인
+        var snsType = '';
+        if (type == 'NAVER') snsType = 'NV';
+        else if (type == 'KAKAO') snsType = 'KK';
+        else if (type == 'GOOGLE') snsType = 'GG';
+        else if (type == 'APPLE') snsType = 'AP';
+
+        reqToApp('SNSLogin', JSON.stringify({ snsType: snsType }));
+        // 			.done(function(result) {
+        // 				fn_afterSnsAppLogin(result);
+        // 			});
+      }
+    }
+
+    // 회원 가입 페이지 레이어 팝업
+    function fn_goJoinPage() {
+      $('#join_layer').remove();
+
+      getPageAjax('../login/join_layer.html', null).done(function (result) {
+        // 			$("body").append(result);
+        $('#div_joinForm').before(result);
+        $('#join_layer').animate({ bottom: '0' }, 300);
+        // 			$('body').css('overflow','hidden');
+        // 			var x=window.scrollX, y=window.scrollY;
+        // 			window.onscroll=function(){window.scrollTo(x, y)};
+      });
+    }
+
+    // 회원가입 오류시 이전 단계 화면으로 돌아가기
+    function fn_backToJoinStep(divId) {
+      if ($('#joinForm').find('.wrap.joinStep').length == 0) return; // 혹시 모를 오류에 대비. 무한반복 방지.
+
+      if ($('#joinForm').find('.wrap.joinStep').last().attr('id') != divId) {
+        // 마지막 화면이 파라미터 ID가 아니면
+        $('#joinForm').find('.wrap.joinStep').last().remove(); // 마지막 화면(현재화면) 지우고
+        fn_backToJoinStep(divId); // 다시 실행
+      } else {
+        // 마지막 화면이 파라미터 ID인 경우
+        $('#joinForm').find('.wrap.joinStep').last().show(); // 마지막 화면 보이기
+      }
+    }
+
+    // 비밀번호 재설정 방법 선택 팝업 표시
+    function fn_showPwdRestType() {
+      $('#div_loginForm .pw_reset').show();
+    }
+
+    // 비밀번호 재설정 화면으로 이동
+    function fn_goResetPw(type) {
+      $('#div_loginForm .pw_reset').hide();
+      $('#findPwForm [name=findPwTypeCd]').val(type);
+
+      if (type == 'EMAIL') {
+        getPageAjax('../login/pw_email_auth.html', null).done(function (result) {
+          $('#findPwForm').append(result); // 이메일 인증 화면 붙이고
+          $('#div_findPwForm').addClass('div_findPwForm');
+          $('#div_loginForm').hide(); // 로그인 화면 숨기기
+        });
+      } else if (type == 'PHONE') {
+        getPageAjax('../login/pw_phone_auth.html', null).done(function (result) {
+          $('#findPwForm').append(result); // 휴대폰 인증 화면 붙이고
+          $('#div_findPwForm').addClass('div_findPwForm');
+          $('#div_loginForm').hide(); // 로그인 화면 숨기기
+        });
+      }
+    }
+
+    // 문의하기 창 닫은후
+    function afterCloseInquiryLayer() {
+      // 로그인 창으로 가야됨.
+      $('#loginForm').find('.wrap.loginStep').remove();
+      $('#div_loginForm').removeClass('div_loginForm');
+    }
+
+    // 만료 약관 재동의
+    function openExpTermsAgree() {
+      getPageAjax('../login/terms_of_use_exp_layer.html', 'memberNo=' + memberNo).done(function (result) {
+        $('body').append(result);
+      });
+    }
+    // 만료 약관 재동의 팝업 닫기
+    function afterCloseExpTermsAgree(result) {
+      if (result) {
+        // 약관 동의 완료
+        var loginTypeCd = $('#div_loginForm #loginForm [name=loginTypeCd]').val();
+        if (loginTypeCd == 'EMAIL') {
+          $('#divEmailLogin .btn_progress').trigger('click');
+        } else if (loginTypeCd == 'PHONE') {
+          $('#divPhoneLogin .btn_progress').trigger('click');
+        } else {
+          fn_afterSnsAppLogin(tmpAppSnsResult);
+        }
+      } else {
+        // 로그인 창으로 가야됨.
+        $('#loginForm').find('.wrap.loginStep').remove();
+        $('#div_loginForm').removeClass('div_loginForm');
+      }
+    }
+
+    // 휴면 해제 완료
+    function afterDormantWake() {
+      // 로그인 창으로 가야됨.
+      $('#div_dormantMemberForm').find('.wrap.dormantStep').remove();
+      $('#div_dormantMemberForm').removeClass('div_dormantMemberForm');
+
+      var loginTypeCd = $('#div_loginForm #loginForm [name=loginTypeCd]').val();
+      if (loginTypeCd == 'EMAIL') {
+        $('#divEmailLogin .btn_progress').trigger('click');
+      } else if (loginTypeCd == 'PHONE') {
+        $('#divPhoneLogin .btn_progress').trigger('click');
+      } else {
+        fn_afterSnsAppLogin(tmpAppSnsResult);
+      }
+    }
+
+    // SNS 로그인 앱 처리 이후 실행
+    var tmpAppSnsResult = ''; // 약관 동의 등의 처리 이후 재 로그인을 위해 임시 저장할 변수
+    function fn_afterSnsAppLogin(result) {
+      tmpAppSnsResult = result; // 임시 저장
+
+      var data = JSON.parse(result);
+      var type = $('#loginForm [name=loginTypeCd]').val();
+      // SNS 로그인 처리
+      post('/api/sns-login', null, { loginTypeCd: type, snsUserId: data.user_id })
+        .done(function (result) {
+          // 로그인 성공시
+          fn_setToken(result).done(function (result) {
+            closeLoginPage();
+          });
+        })
+        .fail(function (result) {
+          // 미가입 SNS ID
+          if (result.respCode == '<%= CommonConstants.ERR_CD_SNS_ID_NOT_EXISTS %>') {
+            // 회원 미가입 상태명 회원 가입 프로세스로 이동
+            $('#joinForm [name=joinTypeCd]').val(type);
+            $('#joinForm [name=snsUserId]').val(data.user_id);
+            $('#joinForm [name=memberNm]').val(data.name);
+            getPageAjax('../login/terms_of_use.html', null).done(function (result) {
+              $('#joinForm').append(result);
+              $('#div_joinForm').addClass('div_joinForm');
+            });
+          } else if (result.respCode == '<%= CommonConstants.ERR_CD_SUSPENDED_MEMBER %>') {
+            // 중지된 계정
+            var msg = JSON.parse(result.respMsg);
+            layerConfirm('해당 계정은 [' + msg.reason + '](으)로 인해 계정 사용이 정지 되었습니다.', '자세한 정보는 문의하기를 통해 확인하실 수 있습니다.', '문의하기', '취소').done(function () {
+              getPageAjax('../inquiry/inquiry_layer.html').done(function (result) {
+                var $result = $(result);
+                $result.find('[name=memberNo]').val(msg.memberNo);
+                $('body').append($result);
+              });
+            });
+          } else if (result.respCode == '<%= CommonConstants.ERR_CD_DORMANT_MEMBER %>') {
+            // 휴면 계정
+            layerConfirm('해당 계정은 휴면 처리된 계정입니다. 본인 확인 후 다시 계정 사용이 가능합니다.', null, '본인인증', '취소')
+              .done(function () {
+                // 본인 인증 화면 표시
+                var msg = JSON.parse(result.respMsg);
+                $('#dormantMemberForm [name=memberNo]').val(msg.memberNo);
+                getPageAjax('../login/dormant_phone_auth.html').done(function (result) {
+                  $('#dormantMemberForm').append(result);
+                  $('#div_dormantMemberForm').addClass('div_dormantMemberForm');
+                  //							$("#div_loginForm").hide();	// 로그인 화면 숨기기
+                });
+              })
+              .fail(function () {
+                // 로그인 레이어 표시
+              });
+          } else if (result.respCode == '<%= CommonConstants.ERR_CD_TERMS_AGREE_EXISTS %>') {
+            // 필수 미동의 약관 존재
+            var msg = JSON.parse(result.respMsg);
+            getPageAjax('../login/terms_of_use_exp_layer.html', 'memberNo=' + msg.memberNo).done(function (result) {
+              $('body').append(result);
+            });
+          } else if (result.respCode == '<%= CommonConstants.ERR_CD_WITHDRAWAL_MEMBER %>') {
+            layerAlert('해당 계정은 탈퇴한 계정입니다.');
+          }
+        });
+    }
+  </script>
+
+  <!-- popup_detail member join -->
+
+  <button type="button" class="btn_close" onclick="closeLoginPage()">창닫기</button>
+  <div class="popup_head">
+    <h1><b>CLUBMETA APP</b>에 로그인</h1>
+  </div>
+  <div class="popup_member">
+    <div class="member_btn_area">
+      <button type="button" class="btn_email" onclick="fn_goLogin('PHONE');">전화번호 또는 이메일 로그인</button>
+      <button type="button" class="btn_kakao" onclick="fn_goLogin('KAKAO');">카카오로 로그인</button>
+      <button type="button" class="btn_naver" onclick="fn_goLogin('NAVER');">네이버로 로그인</button>
+      <button type="button" class="btn_google" onclick="fn_goLogin('GOOGLE');">구글로 로그인</button>
+      <!-- 			<button type="button" class="btn_apple">애플로 로그인</button> -->
+    </div>
+    <div class="member_btn_area2">
+      <p class="txt">아직 계정이 없으신가요?</p>
+      <button type="button" class="btn_member" onclick="fn_goJoinPage();">회원가입</button>
+    </div>
+  </div>
+</div>
+<!--// popup_detail member join -->
+
+<div id="div_loginForm">
+  <form id="loginForm" style="height: 100%">
+    <input type="hidden" name="loginTypeCd" value="" />
+  </form>
+
+  <!-- 비밀번호 재설정 방법 팝업 -->
+  <div class="layer_popup pw_reset" style="display: none">
+    <div class="inner">
+      <h1>비밀번호 재설정 방법</h1>
+      <div class="pw_reset_area">
+        <button type="button" onclick="fn_goResetPw('PHONE');">전화번호</button>
+        <button type="button" onclick="fn_goResetPw('EMAIL');">이메일</button>
+        <button type="button" onclick="fn_goResetPw('');" class="btn_cancel">취소</button>
+      </div>
+    </div>
+  </div>
+  <!--// 비밀번호 재설정 방법 팝업 -->
+</div>
+
+<div id="div_findPwForm">
+  <form id="findPwForm" style="height: 100%">
+    <input type="hidden" name="findPwTypeCd" value="" />
+  </form>
+</div>
+
+<div id="div_dormantMemberForm">
+  <form id="dormantMemberForm" style="height: 100%">
+    <input type="hidden" name="dormantWakeTypeCd" value="" />
+    <input type="hidden" name="memberNo" value="" />
+  </form>
+</div>
+
+<div id="div_joinForm">
+  <form id="joinForm" style="height: 100%">
+    <input type="hidden" name="joinTypeCd" value="" />
+    <input type="hidden" name="snsUserId" value="" />
+    <input type="hidden" name="memberNm" value="" />
+  </form>
+</div>

@@ -1,0 +1,127 @@
+<!-- popup_detail view-->
+<div class="popup div_layer" style="z-index: 20" id="inquiry_layer">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // 현재창 열기
+      fn_openInquiryLayer();
+
+      if ($('#inquiry_layer [name=memberNo]').val() != '') {
+        // 회원 번호 값이 있다는건 미 로그인상태 라는거...
+        // 연락처를 남기라는 메시지 표시.
+      }
+
+      // 엔터 방지
+      $('#inquiry_layer input').on('keydown', function (e) {
+        if (e.keyCode == '13') {
+          return false;
+        }
+      });
+
+      // 전송 버튼 클릭
+      $('#inquiry_layer .btn_progress').on('click', function () {
+        $(this).blur();
+        if ($('#inquiry_layer [name=inquiryTitle]').val().trim() == '') {
+          layerAlert('제목을 입력해 주세요').done(function () {
+            $('#inquiry_layer [name=inquiryTitle]').select();
+          });
+          return;
+        }
+        if ($('#inquiry_layer [name=inquiryCont]').val().trim() == '') {
+          layerAlert('내용을 입력해 주세요').done(function () {
+            $('#inquiry_layer [name=inquiryCont]').select();
+          });
+          return;
+        }
+
+        post('/api/inquiry', null, $('#inquiry_layer #inquiryForm').serializeObject())
+          .done(function (result) {
+            layerAlert('등록되었습니다.').done(function () {
+              fn_closeInquiryLayer();
+            });
+          })
+          .fail(function (result) {
+            layerAlert(result.respMsg);
+          });
+      });
+    });
+
+    // 창열기
+    function fn_openInquiryLayer() {
+      $('#inquiry_layer').animate({ bottom: '0' }, 0);
+      $('body').css('overflow', 'hidden');
+      var x = window.scrollX,
+        y = window.scrollY;
+      window.onscroll = function () {
+        window.scrollTo(x, y);
+      };
+    }
+    // 창닫기
+    function fn_closeInquiryLayer() {
+      $('#inquiry_layer').animate({ bottom: '-100%' }, 0, function () {
+        // animation 완료 후
+
+        if ($('.popup:visible').length == 0) {
+          // 다른 팝업이 없으면 원래대로
+          $('body').css('overflow', '');
+          window.onscroll = function () {};
+        }
+
+        if (typeof afterCloseInquiryLayer == 'function') {
+          afterCloseInquiryLayer();
+        }
+
+        if (typeof afterCloseInquiryLayerForSettings == 'function') {
+          afterCloseInquiryLayerForSettings();
+        }
+
+        $(this).remove();
+      });
+    }
+  </script>
+
+  <button type="button" class="btn_close" onclick="fn_closeInquiryLayer();">창닫기</button>
+  <div class="popup_head">
+    <h1>문의 및 건의하기</h1>
+  </div>
+  <div class="popup_body">
+    <div class="qna_content">
+      <form id="inquiryForm">
+        <input type="hidden" name="memberNo" value="" />
+        <!-- 
+				<div class="form_row">
+					<span class="stit">받는 사람</span>
+					<div class="input_wrap">						
+						<input type="search" value="cs@tobemeta.io">
+					</div>
+				</div>
+	
+				<div class="form_row">
+					<span class="stit">보낸 사람</span>
+					<div class="input_wrap">						
+						<input type="search" value="" class="clear">
+						<button class="btn_clear" onClick="clearInput(this)"></button>
+					</div>
+				</div>
+				 -->
+
+        <div class="form_row">
+          <span class="stit">제목</span>
+          <div class="input_wrap">
+            <input type="text" value="" class="clear" name="inquiryTitle" />
+            <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+          </div>
+        </div>
+
+        <div class="form_row">
+          <span class="stit">내용</span>
+          <div class="input_wrap">
+            <textarea name="inquiryCont"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <button type="button" class="btn_progress">전송</button>
+  </div>
+</div>
+<!--// popup_detail view-->
