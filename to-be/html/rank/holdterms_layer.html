@@ -1,0 +1,129 @@
+<!-- 챌린지 개최 이용약관 -->
+<div class="popup div_layer" id="divChallengeTermsOfUse">
+  <!-- 퍼블확인용 스타일 추가 -->
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // 로그인 체크
+      //fn_checkLoginYn();
+
+      //약관 보여주기
+      getTerms();
+
+      // 전체 선택 / 해제
+      $('#divChallengeTermsOfUse #agree_all')
+        .off('click')
+        .on('click', function () {
+          if ($(this).prop('checked')) {
+            $('#divChallengeTermsOfUse input[type=checkbox]').prop('checked', true);
+          } else {
+            $('#divChallengeTermsOfUse input[type=checkbox]').prop('checked', false);
+          }
+        });
+    });
+
+    $(document).on('change', '#divChallengeTermsOfUse input[type=checkbox]', function () {
+      if ($(this).attr('id') != 'agree_all' && !$(this).prop('checked')) {
+        $('#divChallengeTermsOfUse #agree_all').prop('checked', false);
+      }
+
+      // 필수 체크 확인
+      var isOk = true;
+      $('#divChallengeTermsOfUse input[type=checkbox]').each(function () {
+        if ($(this).data('reqYn') == 'Y' && $(this).prop('checked') == false) {
+          isOk = false;
+          return false;
+        }
+      });
+
+      if (isOk) {
+        $('#divChallengeTermsOfUse #btn-hold-chlg').prop('disabled', false);
+      } else {
+        $('#divChallengeTermsOfUse #btn-hold-chlg').prop('disabled', true);
+      }
+    });
+
+    // 약관 목록 조회 및 화면 세팅
+    function getTerms() {
+      get('/api/terms/TERMS20/list', '').done(function (result) {
+        var list = result.data.list;
+        var html = '';
+        for (var i = 0; i < result.data.list.length; i++) {
+          var req = new XMLHttpRequest();
+          req.open('get', list[i].termsFilePathUrl, false);
+          req.send();
+          var termsText = req.responseText;
+
+          html += '<div class="agree_box" id="div_agree_' + i + '">';
+          html += '	<input type="checkbox" id="agree_' + i + '" data-req-yn="' + list[i].reqYn + '" data-terms-no="' + list[i].termsNo + '">';
+          html += '	<label for="agree_' + i + '"><span></span><em id="em_agreeTitle_' + i + '">' + list[i].termsDivNm + '</em></label>';
+          html += '	<div class="agree_txt" id="div_agreeCont_' + i + '">' + termsText + '</div>';
+          html += '</div>';
+        }
+        $('#divChallengeTermsOfUse #termsDiv').append(html);
+      });
+    }
+
+    //닫기
+    function closeHoldTermsPage() {
+      $('#divChallengeTermsOfUse').hide();
+      /* 		$("#divChallengeTermsOfUse").animate({bottom:"-100%"}, 300);
+      $('body').css('overflow','');
+      window.onscroll=function(){};	 */
+    }
+
+    //다음
+    function openHoldPage() {
+      var isOk = true;
+
+      // 필수 체크 확인
+      $('#divChallengeTermsOfUse input[type=checkbox]').each(function () {
+        if ($(this).data('reqYn') == 'Y' && $(this).prop('checked') == false) {
+          isOk = false;
+          var agreeTitle = $(this).closest('div.agree_box').find('[id^=em_agreeTitle_]').html();
+          layerAlert('사용 약관에 동의해 주세요.', '[' + agreeTitle + ']');
+          return false;
+        }
+      });
+
+      if (isOk) {
+        closeHoldTermsPage();
+        getPageAjax('../rank/hold_layer.html', '').done(function (result) {
+          $('.wrap').hide();
+          $('body').append(result);
+
+          //challengeForm에 이용약관 셋팅
+          var termsNoArray = new Array();
+          var agreeYnArray = new Array();
+          $('#divChallengeTermsOfUse .agree_box input[id^=agree_]').each(function (i) {
+            if ($(this).prop('checked') == true) {
+              termsNoArray.push($(this).data('termsNo'));
+              agreeYnArray.push('Y');
+            } else {
+              termsNoArray.push($(this).data('termsNo'));
+              agreeYnArray.push('N');
+            }
+          });
+          $('#challengeForm #termsNoArray').val(termsNoArray);
+          $('#challengeForm #agreeYnArray').val(agreeYnArray);
+
+          $('#divChallengeTermsOfUse').hide();
+        });
+      }
+    }
+  </script>
+  <button type="button" class="btn_close" onclick="closeHoldTermsPage()">창닫기</button>
+  <div class="popup_head">
+    <h1>챌린지 개최 이용약관</h1>
+  </div>
+  <div class="popup_body">
+    <div class="agree_check_area">
+      <input type="checkbox" id="agree_all" />
+      <label for="agree_all"><span></span>전체 동의</label>
+
+      <div id="termsDiv"></div>
+    </div>
+
+    <button type="button" id="btn-hold-chlg" class="btn_progress" onclick="openHoldPage()" disabled="disabled">다음</button>
+  </div>
+</div>
+<!--// 챌린지 개최 이용약관-->

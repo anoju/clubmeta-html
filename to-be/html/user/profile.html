@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <title>CLUBMETA | 클럽메타</title>
-    <script class="__include" src="../include/head.js"></script>
+    <script class="__include" src="/to-be/html/include/head.js"></script>
 
     <style type="text/css">
       .wrap:not(#div_userProfile) {
@@ -256,7 +256,7 @@
             return;
           }
           $('#div_userProfile #memberId').html(data.memberId);
-          $('#div_userProfile #profileImg').css('background-image', 'url(' + data.profileImgUrl + '), url(/rsc/front/images/common/ico_mypage.png)');
+          $('#div_userProfile #profileImg').css('background-image', 'url(' + data.profileImgUrl + '), url(/to-be/rsc/front/images/common/ico_mypage.png)');
           $('#div_userProfile #videoCnt').html(fn_getCommaNumber(data.videoCnt));
           $('#div_userProfile #followerCnt').html(fn_getCommaNumber(data.followerCnt));
           $('#div_userProfile #followingCnt').html(fn_getCommaNumber(data.followingCnt));

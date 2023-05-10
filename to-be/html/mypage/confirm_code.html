@@ -1,0 +1,313 @@
+<div class="wrap div_layer" id="divConfirmCode">
+  <script type="text/javascript">
+    // 코드 만료시간
+    var codeExpTimeSec = '<%= request.getParameter("certiNoExpSec") %>';
+
+    // 인증 구분 (join/findPw)
+    var confirmType = '<%= request.getParameter("type") %>';
+
+    // 인증 번호가 발송된 email 주소 혹은 전화번호 (검증 and 재전송 처리용)
+    var certiNoSendId = '';
+
+    $(document).ready(function () {
+      // 전송 이메일/휴대폰 번호 표시
+      fn_displaySendId();
+
+      // 만료 시간 처리
+      fn_setConfirmCodeTimeout();
+
+      // 맨 앞부터 입력 가능하도록
+      $('#divConfirmCode #div_certiNoInput input.certiNoInput').on('focus', function () {
+        if ($(this).prev('.certiNoInput').length > 0 && $(this).prev('.certiNoInput').val() == '') {
+          $(this).prev('.certiNoInput').focus();
+        }
+      });
+
+      // 인증 번호 입력시 커서 이동 처리 및 전체 입력시 처리
+      $('#divConfirmCode #div_certiNoInput input.certiNoInput').on('input', function (e) {
+        // 뭔가 입력하면 잘못 입력했다는 메시지는 숨기기
+        $('#divConfirmCode #p_errMsg_invalidCode').hide();
+
+        if ($(this).val().length > 1) {
+          $(this).val(e.target.old);
+        } else {
+          e.target.old = $(this).val();
+        }
+
+        // 값 입력시 다음칸으로 이동
+        if ($(this).val() != '') {
+          $(this).next().focus();
+        }
+
+        if (codeExpTimeSec > 0) {
+          // 인증 시간 만료 안된 경우
+          // 전체 입력시 인증번호 체크
+          var inputCertiNo = '';
+          $('#divConfirmCode #div_certiNoInput input.certiNoInput').each(function () {
+            if ($(this).val() == '') return false;
+
+            inputCertiNo += $(this).val();
+            if (inputCertiNo.length == 6) {
+              // 6자리 다 입력했으면 인증 번호 검증
+              get('/api/checkCertiNo', 'sendId=' + certiNoSendId + '&certiNo=' + inputCertiNo)
+                .done(function (result) {
+                  if (result.data.matchYn == 'Y') {
+                    // 인증 번호 일치하면
+
+                    if (confirmType == 'updateMobile') {
+                      //전화번호 수정일 때
+                      // 인증 번호 form에 등록
+                      $('#divPhoneAuth [name=certiNo]').val(inputCertiNo);
+
+                      post('/api/changeMobileNo', null, $('#mobileForm').serializeObject())
+                        .done(function (result) {
+                          openToastPop('전화번호가 수정되었습니다.').done(function () {
+                            //설정페이지 휴대폰번호 변경하고 창닫기
+                            if (typeof getMyInfo == 'function') {
+                              getMyInfo();
+                            }
+                            $('#settingsWrap').show();
+                            $('#divConfirmCode, #divPhoneAuth').remove();
+                          });
+                        })
+                        .fail(function (result) {
+                          layerAlert(result.respMsg);
+                        });
+                    } else if (confirmType == 'updateEmail') {
+                      //이메일 수정일 때
+                      // 인증 번호 form에 등록
+                      $('#divEmailAuth [name=certiNo]').val(inputCertiNo);
+                      /*
+										// 이메일 프로모션 동의여부 체크
+										if($("#emailForm #agree_marketing").is(":checked")){
+											$("#emailForm [name=emailPrmtAgreeYn]").val("Y");
+										}else{
+											$("#emailForm [name=emailPrmtAgreeYn]").val("N");
+										}
+										*/
+
+                      post('/api/changeEmail', null, $('#emailForm').serializeObject())
+                        .done(function (result) {
+                          openToastPop('이메일이 수정되었습니다.').done(function () {
+                            //설정페이지 이메일 변경하고 창닫기
+                            if (typeof getMyInfo == 'function') {
+                              getMyInfo();
+                            }
+                            $('#settingsWrap').show();
+                            $('#divConfirmCode, #divEmailAuth').remove();
+                          });
+                        })
+                        .fail(function (result) {
+                          layerAlert(result.respMsg);
+                        });
+                    } else if (confirmType == 'delete') {
+                      //비활성화 및 삭제일 때
+
+                      if ($('#memberDeleteForm #authType').val() == 'PHONE') {
+                        $('#memberDeleteForm [name=emailCertiYn]').val('Y');
+                        //$("#memberDeletePhoneForm [name=certiNo]").val(inputCertiNo);
+                      } else {
+                        $('#memberDeleteForm [name=mobileCertiYn]').val('Y');
+                        //$("#memberDeleteEmailForm [name=certiNo]").val(inputCertiNo);
+                      }
+
+                      //계정 비활성화 및 삭제
+                      var withdrawReasonContId = $('#memberDeleteForm input:radio[name=id_set]:checked').prop('id');
+                      var withdrawReasonCont = $('#memberDeleteForm [for=' + withdrawReasonContId + ']').text();
+                      $('#memberDeleteForm #withdrawReasonCont').val(withdrawReasonCont);
+                      post('/api/withdraw', null, $('#memberDeleteForm').serializeObject())
+                        .done(function (result) {
+                          openToastPop('탈퇴가 완료 되었습니다.').done(function () {
+                            //reqToApp("InitApp");
+                            //로그아웃 후 initApp호출
+                            fn_removeToken().done(function () {
+                              reqToApp('InitApp');
+                            });
+                          });
+                        })
+                        .fail(function (result) {
+                          layerAlert(result.respMsg);
+                        });
+                    } else if (confirmType == 'challengePtcp') {
+                      //챌린지 참가일 때
+                      // 인증 번호 form에 등록
+                      $('#divPhoneAuth [name=certiNo]').val(inputCertiNo);
+
+                      post('/api/changeMobileNo', null, $('#mobileForm').serializeObject())
+                        .done(function (result) {
+                          openToastPop('전화번호가 수정되었습니다.').done(function () {
+                            $('#challengeWrap').show();
+                            $('#divConfirmCode, #divPhoneAuth').remove();
+                          });
+                        })
+                        .fail(function (result) {
+                          layerAlert(result.respMsg);
+                        });
+                    }
+                  } else {
+                    // 불일치시 오류 메시지 표시
+                    $('#divConfirmCode #p_errMsg_invalidCode').show();
+                  }
+                })
+                .fail(function (result) {
+                  // 인증시간 초과 또는 기타 오류
+                  layerAlert(result.respMsg);
+                });
+            }
+          });
+        }
+      });
+      // 삭제시 앞칸으로 커서 이동 처리
+      $('#divConfirmCode #div_certiNoInput input.certiNoInput').on('keydown', function (e) {
+        if (e.keyCode == '8' && $(this).val() == '') {
+          // 빈칸에서 삭제 누르면 앞칸으로 이동해서 삭제
+          $(this).prev().val('');
+          $(this).prev().focus();
+        }
+      });
+
+      // 코드 재전송 버튼 이벤트 처리
+      $('#divConfirmCode .btn_send_code').on('click', function () {
+        // 잘못 입력했다는 메시지는 숨기기
+        $('#divConfirmCode #p_errMsg_invalidCode').hide();
+
+        var body = {};
+        var url = '';
+
+        if (confirmType == 'updateMobile') {
+          //전화번호 수정일 때
+          url = '/api/sendSmsCertiNo';
+          body = { countryCd: $('#divPhoneAuth #mobileForm [name=countryCd]').val(), mobileNo: $('#divPhoneAuth #mobileForm [name=mobileNo]').val() };
+        } else if (confirmType == 'updateEmail') {
+          //이메일 수정일 때
+          url = '/api/sendEmailCertiNo';
+          body = { email: $('#emailForm [name=email]').val() };
+        } else if (confirmType == 'challengePtcp') {
+          //챌린지 참가일 때
+          url = '/api/sendSmsCertiNo';
+          body = { countryCd: $('#divPhoneAuth #mobileForm [name=countryCd]').val(), mobileNo: $('#divPhoneAuth #mobileForm [name=mobileNo]').val() };
+        }
+        post(url, null, body)
+          .done(function (result) {
+            // 인증 만료시간 다시 설정
+            codeExpTimeSec = result.data.certiNoExpSec * 1;
+            // 만료 시간 이벤트 처리
+            fn_setConfirmCodeTimeout();
+            // 메시지 숨기기
+            $('#divConfirmCode #p_errMsg_timeover').hide();
+            $('#divConfirmCode .btn_send_code').hide();
+            // 입력 값 지우기
+            $('#divConfirmCode #div_certiNoInput input.certiNoInput').val('');
+          })
+          .fail(function (result) {
+            layerAlert(result.respMsg);
+          });
+      });
+    });
+
+    // 전송 이메일/휴대폰 번호 표시
+    function fn_displaySendId() {
+      var sendId = '';
+
+      if (confirmType == 'updateMobile') {
+        // 전화번호 수정일 떄
+        sendId = '+' + $('#mobileForm [name=countryCd]').val() + ' ' + $('#mobileForm [name=mobileNo]').val(); // 화면 표시용
+        certiNoSendId = $('#mobileForm [name=mobileNo]').val();
+      } else if (confirmType == 'updateEmail') {
+        // 이메일 수정일 떄
+        sendId = $('#emailForm [name=email]').val(); // 화면 표시용
+        certiNoSendId = sendId;
+      } else if (confirmType == 'delete') {
+        //계정삭제일 때
+        if ($('#memberDeleteForm #authType').val() == 'PHONE') {
+          sendId = '+' + $('#memberDeletePhoneForm [name=countryCd]').val() + ' ' + $('#memberDeletePhoneForm [name=mobileNo]').val(); // 화면 표시용
+          certiNoSendId = $('#memberDeletePhoneForm [name=mobileNo]').val();
+        } else {
+          sendId = $('#memberDeleteEmailForm [name=email]').val(); // 화면 표시용
+          certiNoSendId = sendId;
+        }
+      } else if (confirmType == 'challengePtcp') {
+        //챌린지 참가일 때
+        sendId = '+' + $('#mobileForm [name=countryCd]').val() + ' ' + $('#mobileForm [name=mobileNo]').val(); // 화면 표시용
+        certiNoSendId = $('#mobileForm [name=mobileNo]').val();
+      }
+      $('#em_sendId').html(sendId);
+    }
+
+    // 만료시간 처리
+    function fn_setConfirmCodeTimeout() {
+      // 남은 시간 표시
+      var remainMin = parseInt(codeExpTimeSec / 60);
+      var remainSec = codeExpTimeSec % 60;
+      if (remainMin < 10) remainMin = '0' + remainMin;
+      if (remainSec < 10) remainSec = '0' + remainSec;
+      $('#divConfirmCode #p_codeRemainTime').html(remainMin + ':' + remainSec);
+
+      if ($('#divConfirmCode').length == 0) return;
+
+      if (codeExpTimeSec == 0) {
+        // 남은 시간이 0이면
+        // 시간 초과 메시지 표시
+        $('#divConfirmCode #p_errMsg_timeover').show();
+        // 코드 재전송 버튼 활성화
+        $('#divConfirmCode .btn_send_code').show();
+      } else {
+        // 남은 시간이 있으면
+        // 1초 빼주고
+        codeExpTimeSec -= 1;
+        // 다시 timeout걸어주기
+        setTimeout(fn_setConfirmCodeTimeout, 1000);
+      }
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="back()">이전으로</button>
+    <h1>
+      <c:if test="${param.type eq 'updateMobile' }">전화번호 수정</c:if>
+      <c:if test="${param.type eq 'updateEmail' }">이메일 수정</c:if>
+    </h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <h2 class="joinus">6자리 코드입력</h2>
+    <div class="joinus_form">
+      <div class="form_row code">
+        <span class="stit">코드는 <em id="em_sendId"></em>(으)로 전송되었습니다.</span>
+        <div class="input_wrap" id="div_certiNoInput">
+          <input type="hidden" name="certiNo" />
+          <!-- 
+					<input class="certiNoInput" type="text" value="" maxlength="1">
+					<input class="certiNoInput" type="text" value="" maxlength="1">
+					<input class="certiNoInput" type="text" value="" maxlength="1">
+					<input class="certiNoInput" type="text" value="" maxlength="1">
+					<input class="certiNoInput" type="text" value="" maxlength="1">
+					<input class="certiNoInput" type="text" value="" maxlength="1">
+					 -->
+          <input class="certiNoInput" type="number" value="" />
+          <input class="certiNoInput" type="number" value="" />
+          <input class="certiNoInput" type="number" value="" />
+          <input class="certiNoInput" type="number" value="" />
+          <input class="certiNoInput" type="number" value="" />
+          <input class="certiNoInput" type="number" value="" />
+        </div>
+        <!-- 시간 제한 -->
+        <p class="warning_txt" id="p_codeRemainTime">01:00</p>
+
+        <!-- 시간초과 및 잘못입력시 -->
+        <p class="warning_txt" id="p_errMsg_timeover" style="display: none">인증시간이 초과되었습니다.</p>
+        <p class="warning_txt" id="p_errMsg_invalidCode" style="display: none">잘못 입력하셨습니다.</p>
+      </div>
+    </div>
+    <button type="button" class="btn_send_code" style="display: none">코드 재전송</button>
+  </div>
+  <!--// contents -->
+
+  <input type="hidden" name="mobileCertiYn" />
+  <input type="hidden" name="emailCertiYn" />
+
+  <!-- <div class="toast" style="display:none;"></div> -->
+</div>

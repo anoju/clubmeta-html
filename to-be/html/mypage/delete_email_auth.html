@@ -1,0 +1,91 @@
+<div class="wrap div_layer" id="memberDeleteEmailWrap">
+  <script type="text/javascript">
+    // 회원번호
+    var memberNo = $('#dormantMemberForm [name=memberNo]').val();
+
+    $(document).ready(function () {
+      $('#memberDeleteForm #authType').val('EMAIL');
+
+      // 이메일 입력시 처리
+      $('#memberDeleteEmailWrap [name=email]').on('input', function () {
+        // 코드 받기 버튼 비활성
+        $('#memberDeleteEmailWrap .btn_send_code').prop('disabled', true);
+
+        if (!fn_checkValid('email', $(this).val())) {
+          // 오류 메시지 표시
+          $('#memberDeleteEmailWrap .warning_txt').html('정확한 이메일 주소를 입력해 주세요.');
+          $('#memberDeleteEmailWrap .warning_txt').show();
+          // 성공 메시지 숨기기
+          //$("#memberDeleteEmailWrap .check_ok_txt").hide();
+        } else {
+          // 오류 메시지 숨기기
+          $('#memberDeleteEmailWrap .warning_txt').hide();
+          // 성공 메시지 표시
+          //$("#memberDeleteEmailWrap .check_ok_txt").show();
+          // 코드 받기 버튼 활성화
+          $('#memberDeleteEmailWrap .btn_send_code').prop('disabled', false);
+        }
+      });
+
+      // 코드 전송 버튼 클릭
+      $('#memberDeleteEmailWrap .btn_send_code').on('click', function () {
+        var body = { email: $('#memberDeleteEmailWrap [name=email]').val() };
+
+        post('/api/sendEmailCertiNo', null, body)
+          .done(function (result) {
+            getPageAjax('../mypage/confirm_code.html', 'type=delete&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+              $('body').append(result); // 인증 코드 입력 화면 붙이고
+              $('#memberDeleteEmailWrap').hide(); // 현재화면 (이메일인증) 숨기기
+            });
+          })
+          .fail(function (result) {
+            layerAlert(result.respMsg);
+          });
+      });
+
+      // 전화번호 인증으로 이동
+      $('#memberDeleteEmailWrap #a_phone').on('click', function () {
+        getPageAjax('../mypage/delete_phone_auth.html', null).done(function (result) {
+          $('body').append(result); // 전화번호 인증 화면 붙이고
+          $('#memberDeleteEmailWrap').remove(); // 현재 화면(이메일인증) 제거
+        });
+      });
+    });
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="back()">이전으로</button>
+    <h1>계정 인증</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <form id="memberDeleteEmailForm">
+      <div class="tabs_menu">
+        <a id="a_phone">전화</a>
+        <a class="active">이메일</a>
+      </div>
+
+      <div class="joinus_form">
+        <div class="form_row">
+          <span class="stit">이메일</span>
+          <div class="input_wrap">
+            <input type="hidden" name="certiNo" value="" />
+            <input type="email" name="email" value="" class="clear" />
+            <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+          </div>
+          <!-- 입력 오류시 -->
+          <p class="warning_txt" style="display: none">정확한 메일 주소를 입력해주세요.</p>
+
+          <!-- 가능확인 -->
+          <p class="check_ok_txt" style="display: none">사용가능한 이메일입니다.</p>
+        </div>
+      </div>
+
+      <button type="button" class="btn_send_code" disabled>코드 전송</button>
+    </form>
+  </div>
+  <!--// contents -->
+</div>

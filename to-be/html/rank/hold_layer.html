@@ -1,0 +1,710 @@
+<div class="wrap" id="chlgHoldWrap">
+  <style>
+    #chlgHoldWrap {
+      height: 100%;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <script type="text/javascript">
+    var animation = null;
+    var isLoading = true;
+    //챌린지 기간 입력 등록 다음날 09:00 ~ 14일 뒤 09:00
+    $(document).ready(function () {
+      var today = new Date();
+      var startDay = new Date(today.setDate(today.getDate() + 1)); //ex)2022.08.01
+      var endDay = new Date(today.setDate(today.getDate() + 14)); //ex)2022.08.15
+
+      $('#challengeForm #challegeDt').text(getFormatDate(startDay) + ' 09:00 ~ ' + getFormatDate(endDay) + ' 09:00');
+      $('#challengeForm #startDt').val(getFormatDate(startDay).replace(/\./g, '') + '0900');
+      $('#challengeForm #endDt').val(getFormatDate(endDay).replace(/\./g, '') + '0900');
+
+      //비디오 선택 시
+      $('#challengeForm #videoId')
+        .off('input')
+        .on('input', function () {
+          availableSubmitButton();
+        });
+
+      //챌린지 상금 입력 시
+      $('#challengeForm input[name=prize]')
+        .off('input')
+        .on('input', function () {
+          availableSubmitButton();
+        });
+
+      //상금지급금액 입력 시
+      $('#challengeForm input[name=winPoint]')
+        .off('input')
+        .on('input', function () {
+          availableSubmitButton();
+        });
+
+      animation = bodymovin.loadAnimation({
+        container: document.getElementById('loading'), // Required
+        path: '/rsc/front/lottieSrc/loading.json', // URL 직접 입력
+        renderer: 'svg', // Required
+        loop: true, // Optional
+        autoplay: true // Optional
+      });
+    });
+
+    function getFormatDate(date) {
+      var year = date.getFullYear();
+      var month = 1 + date.getMonth();
+      month = month >= 10 ? month : '0' + month;
+      var day = date.getDate();
+      day = day >= 10 ? day : '0' + day;
+      return year + '.' + month + '.' + day;
+    }
+
+    //챌린지 개최 닫기
+    function closeHoldPage(e) {
+      $('body').find('.wrap').last().remove();
+      $('body').find('.wrap').last().show();
+
+      $('#divChallengeTermsOfUse').show();
+    }
+
+    //챌린지 이름 중복 체크
+    function duplicateChallengeName(e) {
+      if ($('#challengeForm #chlgName').val().length > 1) {
+        var param = $('#challengeForm').serialize();
+        get('/api/challenge/getDulicatedName', param)
+          .done(function (result) {
+            $('#challengeForm .warning_txt').text(result.data.msg);
+            $('#checkChallengeName').val(result.data.dupYn);
+            availableSubmitButton();
+          })
+          .fail(function (result) {
+            layerAlert(result.respMsg);
+          });
+      }
+    }
+
+    //챌린지 이름에 포커스 시 해시태그 입력
+    function putHashTag(e) {
+      if ($(e).val().length == 0) {
+        $(e).val('#');
+      }
+    }
+
+    //챌린지 이름 지우기
+    function clearInput(e) {
+      $('#challengeForm #chlgName').val('');
+      availableSubmitButton();
+    }
+
+    //챌린지 이름 입력 시
+    $(document).on('keyup', '#challengeForm #chlgName', function () {
+      //var reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
+      //var reg = /[`~!@#$%^&*()|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
+      // 입력받는 문자열에 # 제외
+      var reg = /[#]/gim;
+      var name = $(this).val().replace(reg, '');
+      var pattern = new RegExp('^#');
+
+      if (!pattern.test(name)) {
+        $(this).val('#' + name);
+      }
+
+      duplicateChallengeName();
+    });
+
+    //챌린지 상금수여 버튼 클릭 시
+    $(document).on('click', "#challengeForm input[type='checkbox'][name='chlgRanking']", function () {
+      if (!$(this).is(':checked')) {
+        //클릭하면 항상 checked처리
+        $(this).prop('checked', true);
+      }
+      var priority = $(this).val();
+
+      var index = 1;
+      $("#challengeForm input[type='checkbox'][name='chlgRanking']").each(function () {
+        if ($(this).val() > priority) {
+          $(this).prop('checked', false);
+          //$("#challengeForm #winPrizeDiv"+index).hide();
+          $('#challengeForm #winPrizeDiv' + index).addClass('disabled');
+          $('#challengeForm #winPoint' + index).prop('disabled', true);
+        } else {
+          $(this).prop('checked', true);
+          //$("#challengeForm #winPrizeDiv"+index).show();
+          $('#challengeForm #winPrizeDiv' + index).removeClass('disabled');
+          $('#challengeForm #winPoint' + index).prop('disabled', false);
+        }
+        index++;
+      });
+    });
+
+    //개최하기 버튼 활성화
+    function availableSubmitButton() {
+      //내가입력한 상금 금액과 상금지급금액 합계가 같아야함
+      var totalWinPoint = 0;
+      $("#challengeForm input[name='winPoint']").each(function () {
+        if (!$(this).prop('disabled')) {
+          totalWinPoint += Number($(this).val());
+        }
+      });
+
+      //챌린지명중복체크성공 && 비디오선택 && 상금이랑 상금지급금액합계와 같아야 함
+      if ($('#challengeForm #chlgName').val().length > 2 && $('#challengeForm #checkChallengeName').val() == 'N' && $('#challengeForm #videoId').val().length > 0 && totalWinPoint == $('#challengeForm #prize').val()) {
+        $('#challengeForm .btn_progress').prop('disabled', false);
+      } else {
+        $('#challengeForm .btn_progress').prop('disabled', true);
+      }
+    }
+
+    //챌린지 개최하기
+    function onChallengeSubmit() {
+      if (prize != supplyPoint) {
+        layerAlert('지급 상금과 챌린지 상금이 같아야합니다.');
+        return false;
+      }
+
+      if ($('#chlgName').val().length < 3) {
+        layerAlert('챌린지 이름을 2글자 이상 입력하세요.');
+        return false;
+      }
+      if ($('#checkChallengeName').val() == 'Y') {
+        layerAlert('중복된 챌린지 이름입니다.');
+        return false;
+      }
+      if (!$('#challengeForm #holdCost').val()) {
+        layerAlert('챌린지 개최비용을 입력하세요.');
+        return false;
+      }
+      if (!$('#challengeForm #prize').val()) {
+        layerAlert('챌린지 상금을 입력하세요.');
+        return false;
+      }
+      if (!$('#challengeForm #videoId').val()) {
+        layerAlert('챌린지 영상을 선택하세요.');
+        return false;
+      }
+      if (!$('#challengeForm #musicId').val()) {
+        layerAlert('챌린지 음악을 선택하세요.');
+        return false;
+      }
+      if (!$('#challengeForm #startDt').val()) {
+        layerAlert('챌린지 시작일을 입력하세요.');
+        return false;
+      }
+      if (!$('#challengeForm #endDt').val()) {
+        layerAlert('챌린지 종료일을 입력하세요.');
+        return false;
+      }
+      //내가입력한 상금 금액과 상금지급금액 합계가 같아야함
+      var prize = $('#challengeForm #prize').val();
+      var supplyPoint = 0;
+      $("#challengeForm input[name='winPoint']").each(function () {
+        if (!$(this).prop('disabled')) {
+          supplyPoint += Number($(this).val());
+        }
+      });
+
+      //chlgRanking 배열로 담기
+      var array = new Array();
+      $("#challengeForm input[name='chlgRanking']:checked").each(function () {
+        array.push($(this).val());
+      });
+      $('#challengeForm #chlgRankingArray').val(array);
+
+      //winPoint 배열로 담기
+      var totalWinPoin = 0;
+      var array = new Array();
+      $("#challengeForm input[name='winPoint']").each(function () {
+        if (!$(this).prop('disabled')) {
+          array.push($(this).val());
+          totalWinPoin += Number($(this).val());
+        }
+      });
+      $('#challengeForm #winPointArray').val(array);
+
+      //상금이랑 상금지급금액합계와 같아야 함
+      if (totalWinPoin != $('#challengeForm #prize').val()) {
+        layerAlert('상금 지급 금액을 확인해 주세요.');
+        return false;
+      }
+
+      /* 
+				//분석영상URL 생성 요청 성공시에만 챌린지 저장
+				playLoading();
+				
+				reqToApp("RequestVideoAnalyUrl", JSON.stringify({videoUrl: $("#challengeForm #videoUrl").val()}))
+	 			.done(function(result) {
+	 				console.log("RequestVideoAnalyUrl result", result);
+	 				var data = JSON.parse(result);
+	 				if(data == null || data == "") {
+	 					stopLoading();
+	 				}else{
+	 					if(data.result == true){
+							post("/api/challenge/insert", null, $("#challengeForm").serializeObject())
+							.done(function(result) {
+								window.location.href = "/rank/rank";
+							}).fail(function (result) {
+								stopLoading();
+								layerAlert(result.respMsg);
+							});
+	 					}else{
+	 						stopLoading();
+	 						layerAlert("영상 분석 URL생성중에 오류가 발생하였습니다.\n관리자에게 문의하세요.");
+	 					}
+	 				}
+	 			});
+ */
+      post('/api/challenge/insert', null, $('#challengeForm').serializeObject())
+        .done(function (result) {
+          window.location.href = '/rank/rank';
+        })
+        .fail(function (result) {
+          layerAlert(result.respMsg);
+        });
+    }
+
+    /*********************** 챌린지 상금 ***********************/
+
+    //챌린지 상금 열기
+    function openChallengePrize(e) {
+      getMyPoinnt();
+
+      $('#holdWrap').hide();
+      $('#prizeWrap').show();
+    }
+
+    //챌린지 상금 닫기
+    function closeChallengePrize(e) {
+      $('#prizeWrap').hide();
+      $('#holdWrap').show();
+    }
+
+    //비용설명 열기
+    function openPrizePopup() {
+      $('#prize-popup').show();
+      //$("#prizeWrap").hide();
+    }
+
+    //비용설명 닫기
+    function closePrizePopup() {
+      $('#prize-popup').hide();
+      //$("#prizeWrap").show();
+    }
+
+    //내포인트 가져오기
+    function getMyPoinnt() {
+      get('/api/getMemberPoint', '')
+        .done(function (result) {
+          $('#challengePrizePoint').val($('#challengeForm #prize').val());
+
+          var point = result.data.memberPoint;
+          $('#prizeWrap #myPoint em').text(withcomma(point.toString()));
+          //개최비용
+          $('#prizeWrap #holdPoint em').text('${CommonConstants.HOLD_COST }');
+          //총지불금액
+          var totalPoint = withcomma((Number(uncomma($('#prizeWrap #prizePoint em').text())) + Number(uncomma($('#prizeWrap #holdPoint em').text()))).toString());
+          $('#prizeWrap #totalPoint em').text(totalPoint);
+        })
+        .fail(function (result) {
+          layerAlert(result.respMsg);
+        });
+    }
+
+    //개최비용 변경 시
+    $('#prizeWrap #challengePrizePoint')
+      .off('input')
+      .on('input', function () {
+        //총상금 + 개최비용 = 총 지불금이 보유 포인트 넘지 않도록
+        var availablePrizePoint = Number(uncomma($('#prizeWrap #myPoint em').text())) - Number(uncomma($('#prizeWrap #holdPoint em').text()));
+        if (Number($(this).val()) > availablePrizePoint) {
+          $('#prizeWrap #challengePrizePoint').val(availablePrizePoint);
+          return false;
+        }
+
+        $('#prizeWrap #prizePoint em').text(withcomma($('#prizeWrap #challengePrizePoint').val()));
+        var myPoint = uncomma($('#prizeWrap #myPoint em').text());
+        var prizePoint = uncomma($('#prizeWrap #prizePoint em').text());
+        var holdPoint = uncomma($('#prizeWrap #holdPoint em').text());
+        var totalPoint = Number(prizePoint) + Number(holdPoint);
+        $('#prizeWrap #totalPoint em').text(withcomma(totalPoint.toString()));
+      });
+
+    //개최비용 버튼 클릭 시
+    function addPrizePoint(type, point) {
+      if (type == 'point') {
+        $('#prizeWrap #challengePrizePoint').val(Number($('#prizeWrap #challengePrizePoint').val()) + Number(point));
+      } else if ((type = 'max')) {
+        //최대=보유포인트-개최비용
+        var myPoint = uncomma($('#prizeWrap #myPoint em').text());
+        var holdPoint = uncomma($('#prizeWrap #holdPoint em').text());
+        var maxPoint = Number(myPoint) - Number(holdPoint);
+        $('#prizeWrap #challengePrizePoint').val(maxPoint);
+      }
+    }
+
+    //확인
+    function onSubmit() {
+      var prizePoint = Number(uncomma($('#prizeWrap #prizePoint em').text()));
+      var holdPoint = Number(uncomma($('#prizeWrap #holdPoint em').text()));
+      var ptcpPoint = '${CommonConstants.PTCP_COST }';
+
+      if (prizePoint == null || prizePoint == 'undefined') {
+        layerAlert('총 상금을 입력하세요.');
+        return;
+      }
+
+      /* 			if(prizePoint >= 0){
+					layerAlert("총 상금은 0원 이상만 등록가능 합니다.");
+					return;
+				} */
+
+      $('#challengeForm #prize').val(prizePoint);
+      $('#challengeForm #holdCost').val(holdPoint);
+      $('#challengeForm #ptcpCost').val(ptcpPoint);
+      $('#challengeForm .set_shoe em').text(withcomma(prizePoint.toString()));
+
+      //닫기
+      closeChallengePrize();
+    }
+
+    //콤마찍기
+    function withcomma(number) {
+      const parts = number.toString().split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return parts.join('.');
+    }
+
+    //콤마제거
+    function uncomma(str) {
+      str = String(str);
+      return str.replace(/[^\d]+/g, '');
+    }
+    /***********************챌린지 상금 ***********************/
+
+    /*********************** 챌린지 영상 ***********************/
+
+    //챌린지 영상 열기
+    function openVideoList() {
+      if (isLoading) {
+        getPage('1');
+      }
+
+      $('#video-popup').show();
+    }
+
+    //챌린지 영상 닫기
+    function closeVideoList() {
+      $('#video-popup').hide();
+    }
+
+    $(document).ready(function () {
+      $('#videoBodyPop').on('scroll', function () {
+        if ($('#videoForm #nowPage').val() == $('#videoForm #lastPage').val()) return;
+        if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+          $('#videoForm #nowPage').val(Number($('#videoForm #nowPage').val()) + 1);
+          getPage($('#videoForm #nowPage').val());
+        }
+      });
+    });
+
+    //챌린지 영상 선택 시
+    $(document).on('change', '#videoForm input[type=checkbox]', function () {
+      //기존 체크 된 내역 해제 후 현재 선택한 것 체크처리
+      $('#videoForm input[type=checkbox]').prop('checked', false);
+      $(this).prop('checked', true);
+
+      $('#challengeForm #videoId').val($(this).data('videoId'));
+      $('#challengeForm #musicId').val($(this).data('musicId'));
+      $('#challengeForm #musicInfo').text($(this).data('musicInfo'));
+      $('#challengeForm #videoUrl').val($(this).data('videoUrl'));
+      $('#challengeForm #videoAnalyUrl').val($(this).data('videoUrl').replace('.mp4', '.json'));
+
+      closeVideoList();
+    });
+
+    function getPage(nowPage) {
+      var param = $('#videoForm').serialize();
+      get('/api/videoList', param)
+        .done(function (result) {
+          var list = result.data.list;
+          var html = '';
+          for (var i = 0; i < list.length; i++) {
+            html += '<div class="thumb">';
+            html += '	<input type="checkbox" id="thumb_select' + list[i].videoNo + '" data-video-id="' + list[i].videoId + '" data-music-id="' + list[i].musicId + '" data-music-info="' + list[i].musicInfo + '" data-video-url="' + list[i].videoUrl + '">';
+            html += '	<label for="thumb_select' + list[i].videoNo + '"><span></span><img src="' + list[i].videoThumbUrl + '" alt=""></label>';
+            html += '</div>';
+          }
+          $('#videoForm #videoListPop').append(html);
+          //$("#videoForm #nowPage").val(Number($("#videoForm #nowPage").val())+1);
+          $('#videoForm #lastPage').val(result.data.lastPage);
+          if (isLoading) {
+            isLoading = false;
+          }
+        })
+        .fail(function (result) {
+          layerAlert(result.respMsg);
+        });
+    }
+    /*********************** 챌린지 영상 ***********************/
+
+    (function ($) {
+      var originalVal = $.fn.val;
+      $.fn.val = function (value) {
+        var res = originalVal.apply(this, arguments);
+
+        if (this.is('input:text') && arguments.length >= 1) {
+          // this is input type=text setter
+          this.trigger('input');
+        }
+        if (this.is('input:hidden') && arguments.length >= 1) {
+          // this is input type=text setter
+          this.trigger('input');
+        }
+
+        return res;
+      };
+    })(jQuery);
+
+    //로딩띄우기
+    function playLoading() {
+      animation.play();
+      $('#loading').show();
+    }
+
+    //로딩닫기
+    function stopLoading() {
+      animation.stop();
+      $('#loading').hide();
+    }
+  </script>
+
+  <!-- 챌린지 개최 -->
+  <div id="holdWrap" class="div_layer">
+    <form id="challengeForm">
+      <input type="hidden" id="termsNoArray" name="termsNoArray" value="" />
+      <input type="hidden" id="agreeYnArray" name="agreeYnArray" value="" />
+      <input type="hidden" id="prize" name="prize" value="0" />
+      <input type="hidden" id="holdCost" name="holdCost" value="${CommonConstants.HOLD_COST }" />
+      <input type="hidden" id="ptcpCost" name="ptcpCost" value="${CommonConstants.PTCP_COST }" />
+      <input type="hidden" id="chlgRankingArray" name="chlgRankingArray" value="" />
+      <input type="hidden" id="winPointArray" name="winPointArray" value="" />
+      <input type="hidden" id="videoId" name="videoId" value="" />
+      <input type="hidden" id="musicId" name="musicId" value="" />
+      <input type="hidden" id="videoUrl" name="videoUrl" value="" />
+      <input type="hidden" id="videoAnalyUrl" name="videoAnalyUrl" value="" />
+      <input type="hidden" id="startDt" name="startDt" value="" />
+      <input type="hidden" id="endDt" name="endDt" value="" />
+      <!-- header -->
+      <header>
+        <button type="button" class="btn_go_prev" onclick="closeHoldPage(this)">이전으로</button>
+        <h1>챌린지 개최</h1>
+      </header>
+      <!--// header -->
+
+      <!-- contents -->
+      <div class="contents">
+        <div class="challenge_open">
+          <div class="form_row">
+            <span class="stit">챌린지 이름</span>
+            <div class="input_wrap">
+              <input type="search" class="clear" placeholder="#해시태그" id="chlgName" name="chlgName" onfocus="putHashTag(this);" maxlength="30" />
+              <!-- <input type="search" class="clear" placeholder="#해시태그" id="chlgName" name="chlgName" onkeyup="duplicateChallengeName(this);" onfocus="putHashTag(this);" maxlength="30"> -->
+              <input type="hidden" id="checkChallengeName" name="checkChallengeName" value="Y" />
+              <button type="button" class="btn_clear" onClick="clearInput(this)"></button>
+              <p class="warning_txt"></p>
+            </div>
+          </div>
+
+          <div class="form_row" id="opentest">
+            <span class="stit">챌린지 상금</span>
+            <label for="set_shoe" class="set_shoe" onclick="openChallengePrize(this)"><em>0</em>Shoe</label>
+          </div>
+
+          <div class="form_row">
+            <span class="stit">챌린지 영상</span>
+            <button type="button" class="upload" onclick="openVideoList()">비디오 선택</button>
+          </div>
+
+          <div class="form_row">
+            <span class="stit">챌린지 음악</span>
+            <div class="input_wrap">
+              <div class="music_info" id="musicInfo"></div>
+            </div>
+          </div>
+
+          <div class="form_row">
+            <span class="stit">상금 수여 가능 등수</span>
+            <div class="input_vote">
+              <div class="checkbox_area" id="winPrizeDiv1">
+                <input type="checkbox" id="vote1" name="chlgRanking" value="1" checked />
+                <label for="vote1">1위</label>
+              </div>
+
+              <div class="checkbox_area">
+                <input type="checkbox" id="vote2" name="chlgRanking" value="2" />
+                <label for="vote2">2위</label>
+              </div>
+
+              <div class="checkbox_area">
+                <input type="checkbox" id="vote3" name="chlgRanking" value="3" />
+                <label for="vote3">3위</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form_row">
+            <span class="stit">상금 지급 비율</span>
+            <div class="input_vote_wrap" id="winPrizeDiv1">
+              <input type="number" id="winPoint1" name="winPoint" value="0" />
+              <span class="stit">1위</span>
+            </div>
+
+            <div class="input_vote_wrap disabled" id="winPrizeDiv2" disabled>
+              <input type="number" id="winPoint2" name="winPoint" value="0" disabled="disabled" />
+              <span class="stit">2위</span>
+            </div>
+
+            <div class="input_vote_wrap disabled" id="winPrizeDiv3" disabled>
+              <input type="number" id="winPoint3" name="winPoint" value="0" disabled="disabled" />
+              <span class="stit">3위</span>
+            </div>
+          </div>
+
+          <div class="form_row">
+            <span class="stit">챌린지 기간</span>
+            <div class="input_wrap">
+              <div class="time" id="challegeDt"></div>
+              <p class="time_txt">챌린지 기간은 업로드 다음날 오전 9시부터 2주간 진행됩니다.</p>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn_progress" onclick="onChallengeSubmit();" disabled="disabled">개최하기</button>
+      </div>
+      <!--// contents -->
+    </form>
+    <!-- 챌린지 개최 -->
+  </div>
+
+  <!-- 챌린지 상금 -->
+  <div id="prizeWrap" class="div_layer" style="display: none">
+    <!-- header -->
+    <header>
+      <button type="button" class="btn_go_prev" onclick="closeChallengePrize(this)">이전으로</button>
+      <h1>챌린지 개최 비용</h1>
+      <button type="button" class="btn_information" onclick="openPrizePopup()">?</button>
+    </header>
+    <!--// header -->
+
+    <!-- contents -->
+    <div class="contents">
+      <div class="challenge_shoe">
+        <div class="shoe_list">
+          <div class="box opened">
+            <i class="ico_shoe"></i>
+            <span>Shoe</span>
+          </div>
+
+          <div class="box lock">
+            <i class="ico_lock"></i>
+            <span>Coming soon</span>
+          </div>
+
+          <div class="box lock">
+            <i class="ico_lock"></i>
+            <span>Coming soon</span>
+          </div>
+        </div>
+
+        <div class="buy_shoe">
+          <span class="tit">Shoe</span>
+          <!-- <input type="text" id="challengePrizePoint" value="0" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"> -->
+          <input type="text" id="challengePrizePoint" value="0" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" readonly="readonly" />
+        </div>
+
+        <div class="buy_shoe_btn">
+          <!-- 	                <button type="button" onclick="addPrizePoint('point', '1');">+1 shoe</button>
+	                <button type="button" onclick="addPrizePoint('point', '5');">+5 shoe</button>
+	                <button type="button" onclick="addPrizePoint('point', '10');">+10 shoe</button>
+	                <button type="button" onclick="addPrizePoint('max', '');">최대</button> -->
+          <button type="button" onclick="addPrizePoint('point', '1');" disabled="disabled">+1 shoe</button>
+          <button type="button" onclick="addPrizePoint('point', '5');" disabled="disabled">+5 shoe</button>
+          <button type="button" onclick="addPrizePoint('point', '10');" disabled="disabled">+10 shoe</button>
+          <button type="button" onclick="addPrizePoint('max', '');" disabled="disabled">최대</button>
+        </div>
+
+        <div class="my_shoe">
+          <span>보유 Shoe</span>
+          <div class="point" id="myPoint"><em>0</em> Shoe</div>
+          <!-- <button type="button" class="btn_checkout"><i></i>구매</button> -->
+        </div>
+
+        <div class="shoe_checkout">
+          <div class="row">
+            <span>총 상금</span>
+            <div class="point" id="prizePoint"><em>0</em>Shoe</div>
+          </div>
+          <div class="row">
+            <span>개최 비용</span>
+            <div class="point" id="holdPoint"><em>0</em>Shoe</div>
+          </div>
+          <div class="row total">
+            <span>총 지불 금</span>
+            <div class="point" id="totalPoint"><em>0</em>Shoe</div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn_progress" onclick="onSubmit();">확인</button>
+    </div>
+    <!--// contents -->
+  </div>
+  <!-- //챌린지 상금 -->
+
+  <!-- 챌린지 개최 비용 -->
+  <div class="popup div_layer" id="prize-popup" style="display: none">
+    <button type="button" class="btn_close" onclick="closePrizePopup()">창닫기</button>
+    <div class="popup_head">
+      <h1>챌린지 개최 비용이란?</h1>
+    </div>
+    <div class="popup_body">
+      <div class="popup_img">
+        <img src="/to-be/rsc/front/images/vote_desc.png" alt="" />
+      </div>
+    </div>
+  </div>
+  <!-- //챌린지 개최 비용 -->
+
+  <!-- 챌린지 영상 -->
+  <div class="popup div_layer" id="video-popup" style="display: none">
+    <form id="videoForm" style="height: 100%">
+      <input type="hidden" id="rowsPerPage" name="rowsPerPage" value="15" />
+      <input type="hidden" id="nowPage" name="nowPage" value="1" />
+      <input type="hidden" id="lastPage" name="lastPage" value="1" />
+      <input type="hidden" id="videoDivCd" name="videoDivCd" value="${CommonConstants.VIDEO_DIV_CD_NORMAL }" />
+      <input type="hidden" id="videoStatusCd" name="videoStatusCd" value="${CommonConstants.VIDEO_STATUS_CD_POST }" />
+      <input type="hidden" id="createChlgYn" name="createChlgYn" value="Y" />
+
+      <button type="button" class="btn_close" onclick="closeVideoList()">창닫기</button>
+      <div class="popup_head">
+        <h1>챌린지 영상 선택</h1>
+        <div class="challege_movie_txt">클럽메타 앱에서 일반 촬영된 영상을 챌린지 기준 영상으로 사용할 수 있습니다.</div>
+      </div>
+      <div class="popup_body">
+        <div class="my_list_scroll" id="videoBodyPop">
+          <div class="my_list" id="videoListPop"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!-- //챌린지영상 -->
+</div>
+
+<div id="loading" style="display: none"></div>

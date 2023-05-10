@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="/to-be/html/include/head.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        var urlParams = new URL(location.href).searchParams;
+        var videoNo = urlParams.get('videoNo');
+        //영상신고팝업열기
+        openReportPopup('VIDEO', videoNo);
+      });
+
+      //취소 (팝업닫기)
+      function closeVideoReportPop() {
+        reqToApp('ClosePopupUrl', null);
+      }
+      /* 
+      //영상 신고 열기
+      function openVideoReportPopup(reportType, key){
+        getPageAjax("/report/video", null)
+        .done(function(result) {
+          $("body").append(result);
+          $("#reportForm #reportType").val(reportType);
+          $("#reportForm #videoNo").val(key);
+          $("#reportPop").show();
+        });
+      }
+      //댓글 신고 열기
+      function openCmmtReportPopup(reportType, key){
+        getPageAjax("/report/cmmt", null)
+        .done(function(result) {
+          $("body").append(result);
+          $("#reportForm #reportType").val(reportType);
+          $("#reportForm #cmmtNo").val(key);
+          $("#reportPop").show();
+        });
+      } */
+    </script>
+  </head>
+  <body></body>
+</html>

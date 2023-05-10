@@ -1,0 +1,40 @@
+<!-- 신고하기 팝업 -->
+<div class="layer_popup" id="reportPop">
+  <script type="text/javascript">
+    //취소 (레이어 지우기)
+    function closeCmmtReportPop() {
+      $('#reportPop').remove();
+    }
+
+    //신고
+    function reportSubmit() {
+      if (!$('#reportForm #rerpotCont').val()) {
+        layerAlert('신고 사유를 등록하세요.');
+        return false;
+      }
+      post('/api/cmmtReport/' + $('#reportForm #cmmtNo').val(), null, $('#reportForm').serializeObject())
+        .done(function (result) {
+          openToastPop('신고 되었습니다.');
+          // 				.done(function() {
+          closeCmmtReportPop();
+          // 				})
+        })
+        .fail(function (result) {
+          layerAlert(result.respMsg);
+        });
+    }
+  </script>
+  <form id="reportForm">
+    <input type="hidden" id="reportType" name="reportType" value="" />
+    <input type="hidden" id="cmmtNo" name="cmmtNo" value="" />
+    <div class="inner">
+      <h1>신고 사유</h1>
+      <textarea id="rerpotCont" name="reportCont" maxlength="150" placeholder="신고 사유"></textarea>
+      <div class="btn_area">
+        <button type="button" onclick="closeCmmtReportPop()">취소</button>
+        <button type="button" class="btn_report" onclick="reportSubmit()">신고</button>
+      </div>
+    </div>
+  </form>
+</div>
+<!--// 신고하기 팝업 -->

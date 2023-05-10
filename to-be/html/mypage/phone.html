@@ -1,0 +1,135 @@
+<div class="wrap div_layer" id="divPhoneAuth">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      //진입코드 (설정, 챌린지참가)
+      var entryType = '<%= request.getParameter("entryType") %>';
+
+      /* 일단 1개라서 주석처리. 여러건일때는 여기 주석 풀고 국가코드 선택할 수 있도록 변경
+			// 국가코드 선택을 위한 wheel-selector init
+			fn_initCountryCdSelector();
+			
+			// 국가 코드 선택하면 하단에 선택화면 띄우기
+			$("#divPhoneAuth #txt_countryCd").on("click", function() {
+				$("#divPhoneAuth .selectboxD").animate({bottom:"0"}, 200);
+			});
+
+			// 화면 클릭시 하단 국가코드 선택창 닫기
+			// 국가코드 선택창을 클릭했을때는 이 이벤트가 안탄다. (lib자체에서 click을 막아둔듯...)
+			$("#divPhoneAuth").on("click", function() {
+				if($("#divPhoneAuth .selectboxD").css("bottom").replace("px", "") * 1 == 0) {
+					$("#divPhoneAuth .selectboxD").animate({bottom:"-100%"}, 200);
+				}
+			});
+			*/
+
+      // 전화번호 입력시 전화번호 형식으로
+      // 전화번호 12~13자리(-포함) 입력시 코드 전송 버튼 활성화
+      $('#divPhoneAuth [name=mobileNo]').on('input', function () {
+        // 코드 받기 버튼 비활성
+        $('#divPhoneAuth .btn_send_code').prop('disabled', true);
+        // 오류 메시지 숨기기
+        $('#divPhoneAuth .warning_txt').hide();
+
+        // 휴대폰 형식으로 변환
+        $(this).val(fn_getHpVal($(this).val()));
+
+        if ($(this).val() == '') return false;
+
+        if (fn_checkValid('hp', $(this).val())) {
+          // 정상인 경우 중복 체크
+          get('/api/member/duplCheck/MOBILE', 'checkValue=' + $(this).val()).done(function (result) {
+            if (result.data.dupYn == 'Y') {
+              // 오류 메시지 표시
+              $('#divPhoneAuth .warning_txt.already_use').show();
+            } else {
+              // 코드 받기 버튼 활성화
+              $('#divPhoneAuth .btn_send_code').prop('disabled', false);
+            }
+          });
+        } else {
+          // 오류 메시지 표시
+          $('#divPhoneAuth .warning_txt.not_valid').show();
+        }
+      });
+
+      // 코드 전송 버튼 클릭
+      $('#divPhoneAuth .btn_send_code').on('click', function () {
+        var body = { countryCd: $('#divPhoneAuth [name=countryCd]').val(), mobileNo: $('#divPhoneAuth [name=mobileNo]').val() };
+
+        post('/api/sendSmsCertiNo', null, body)
+          .done(function (result) {
+            getPageAjax('../mypage/confirm_code.html', 'type=' + entryType + '&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+              $('.wrap').hide(); // 현재화면 (전화번호수정) 숨기기
+              $('body').append(result); // 인증 코드 입력 화면 붙이고
+            });
+          })
+          .fail(function (result) {
+            layerAlert(result.respMsg);
+          });
+      });
+    });
+
+    var countryCdSelector;
+    function fn_initCountryCdSelector() {
+      var countryCdArr = [
+        { value: '82', text: 'KR +82' }
+        // 					, {value: "83", text: "KR +83"}
+        // 					, {value: "84", text: "KR +84"}
+        // 					, {value: "85", text: "KR +85"}
+      ];
+
+      countryCdSelector = new IosSelector({
+        el: '#countryCd',
+        type: 'normal',
+        source: countryCdArr,
+        value: '82',
+        count: 20,
+        sensitivity: 5, // 숫자가 낮을수록 돌렸을때 팽그르르 돌며, 초기 select 할때도 느려진다. 기본값은 0.8
+        onChange: (selected) => {
+          $('#divPhoneAuth #txt_countryCd').val(selected.text);
+          $('#divPhoneAuth [name=countryCd]').val(selected.value);
+        }
+      });
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="back()">이전으로</button>
+    <h1>전화번호 수정</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <form id="mobileForm">
+      <div class="joinus_form">
+        <div class="form_row">
+          <span class="stit">전화번호</span>
+          <div class="input_wrap phone">
+            <input type="text" value="KR +82" id="txt_countryCd" class="select_s" readonly="readonly" />
+            <input type="hidden" name="countryCd" value="82" />
+            <input type="hidden" name="certiNo" value="" />
+            <input type="tel" name="mobileNo" value="" class="clear" maxlength="13" />
+            <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+          </div>
+
+          <!-- 입력 오류시 -->
+          <p class="warning_txt already_use" style="display: none">이미 사용중인 전화번호 입니다.</p>
+          <!-- 입력 오류시 -->
+          <p class="warning_txt not_valid" style="display: none">전화번호 형식이 올바르지 않습니다.</p>
+        </div>
+      </div>
+      <button type="button" class="btn_send_code" disabled>코드 전송</button>
+    </form>
+  </div>
+  <!--// contents -->
+
+  <!-- selectbox -->
+  <div class="selectboxD" style="bottom: -100%">
+    <div class="date-selector">
+      <div id="countryCd" style="width: 80%"></div>
+    </div>
+  </div>
+  <!--// selectbox -->
+</div>

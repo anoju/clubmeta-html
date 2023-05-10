@@ -1,0 +1,101 @@
+<div class="wrap div_layer" id="div_pointHistory" style="height: 100%; overflow: scroll">
+  <script type="text/javascript">
+    // 포인트 이력 조회
+    var nowPage = 0;
+    var lastPage = 1;
+    var rowsPerPage = 9; // 한번에 불러올 개수
+
+    $(document).ready(function () {
+      getAccessToken().done(function (result) {
+        if (result == null || result == '') {
+          openLoginPage();
+        } else {
+          fn_getMemberPoint();
+          fn_getMemberPointHistory();
+        }
+      });
+
+      // 뒤로가기 클릭
+      $('#div_pointHistory .btn_go_prev').on('click', function () {
+        $('body').find('.wrap').last().remove();
+        $('body').find('.wrap').last().show();
+      });
+    });
+
+    // 보유 포인트 조회
+    function fn_getMemberPoint() {
+      get('/api/getMemberPoint').done(function (result) {
+        $('#div_pointHistory #em_memberPoint').html(fn_getCommaNumber(result.data.memberPoint));
+      });
+    }
+
+    function fn_getMemberPointHistory() {
+      nowPage++;
+      get('/api/pointHistory', 'nowPage=' + nowPage + '&rowsPerPage=' + rowsPerPage).done(function (result) {
+        if (nowPage == 1) {
+          lastPage = result.data.lastPage;
+        }
+
+        var list = result.data.list;
+        for (var i = 0; i < list.length; i++) {
+          var data = list[i];
+          var tmplt = $('#div_shoeHistoryTemplate').clone();
+
+          tmplt.find('.tit').html(data.pointDtlDivNm);
+          tmplt.find('.date').html(data.createDt);
+          if (data.pointDivNm == '사용') {
+            tmplt.find('.p_plusMinus').addClass('minus');
+          } else {
+            tmplt.find('.p_plusMinus').addClass('plus');
+          }
+          tmplt.find('.p_plusMinus').html(fn_getCommaNumber(data.point) + ' Shoe');
+          tmplt.find('.p_plusMinus').removeClass('p_plusMinus');
+
+          tmplt.find('.point').html(fn_getCommaNumber(data.restPoint) + ' Shoe');
+
+          tmplt.css('display', '');
+          $('#div_showHistoryList').append(tmplt);
+        }
+      });
+    }
+  </script>
+
+  <div id="div_pointHistory_wrapper">
+    <!-- header -->
+    <header>
+      <button type="button" class="btn_go_prev">이전으로</button>
+      <h1>SHOE</h1>
+    </header>
+    <!--// header -->
+
+    <!-- contents -->
+    <div class="contents">
+      <h2 class="setting">잔고</h2>
+      <div class="shoe_total">
+        <i class="ico_shoe"></i>
+        <div class="shoe_info">
+          <p class="point"><em id="em_memberPoint">0</em>Shoe</p>
+          <!-- 					<span class="txt">1Point = 3KRW(2022.08.01 KST 12:01)</span> -->
+        </div>
+        <!-- 				<button type="button" class="btn_shoe_buy">충전하기</button> -->
+      </div>
+
+      <h2 class="setting">거래 내역</h2>
+
+      <div id="div_shoeHistoryTemplate" class="shoe_history" style="display: none">
+        <div class="left">
+          <p class="tit"></p>
+          <span class="date"></span>
+        </div>
+
+        <div class="right">
+          <p class="p_plusMinus"></p>
+          <span class="point"></span>
+        </div>
+      </div>
+
+      <div id="div_showHistoryList"></div>
+    </div>
+    <!--// contents -->
+  </div>
+</div>

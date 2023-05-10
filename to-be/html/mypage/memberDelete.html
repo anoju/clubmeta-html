@@ -1,0 +1,105 @@
+<div class="wrap div_layer" id="memberDeleteWrap">
+  <style type="text/css">
+    #memberDeleteTermsList {
+      height: 150px;
+      overflow: auto;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+  </style>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      //ID 셋팅
+      $('#memberDelete_Step2 .idset').html($('#settingsWrap #memberId').val() + ' 계정을 삭제하시겠습니까?');
+
+      //약관 셋팅
+      get('/api/terms/TERMS30/list', null).done(function (result) {
+        var list = result.data.list;
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          var req = new XMLHttpRequest();
+          req.open('get', list[i].termsFilePathUrl, false);
+          req.send();
+          var termsText = req.responseText;
+
+          html += '<div class="idset_notice">';
+          html += termsText;
+          html += '</div>';
+        }
+        $('#memberDeleteTermsList').append(html);
+      });
+    });
+
+    //계속 - step1
+    function nextStep1() {
+      $('#memberDelete_Step1').hide();
+      $('#memberDelete_Step2').show();
+    }
+
+    //계속 - step2
+    function nextStep2() {
+      getPageAjax('../mypage/delete_phone_auth.html', null).done(function (result) {
+        $('body').append(result);
+        $('#memberDeleteWrap').hide();
+      });
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="back()">이전으로</button>
+    <h1>계정 비활성화 및 삭제</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents" id="memberDelete_Step1">
+    <form id="memberDeleteForm">
+      <input type="hidden" id="withdrawReasonCont" name="withdrawReasonCont" />
+      <input type="hidden" id="authType" name="authType" />
+      <input type="hidden" id="emailCertiYn" name="emailCertiYn" />
+      <h3 class="idset">계정 비활성화 및 삭제 사유를 선택해주세요.</h3>
+      <!--
+      <div class="input_idset">
+        <input type="radio" id="id_set1" name="id_set" checked />
+        <label for="id_set1">임시 탈퇴</label>
+      </div>
+      -->
+
+      <div class="input_idset">
+        <input type="radio" id="id_set2" name="id_set" />
+        <label for="id_set2">앱 내 문제 발생</label>
+      </div>
+
+      <div class="input_idset">
+        <input type="radio" id="id_set3" name="id_set" />
+        <label for="id_set3">계정이 여러개 있음</label>
+      </div>
+
+      <div class="input_idset">
+        <input type="radio" id="id_set4" name="id_set" />
+        <label for="id_set4">관련 없는 광고 노출</label>
+      </div>
+
+      <div class="input_idset">
+        <input type="radio" id="id_set5" name="id_set" />
+        <label for="id_set5">기타 이유</label>
+      </div>
+
+      <button type="button" class="btn_progress" onclick="nextStep1()">계속</button>
+    </form>
+  </div>
+
+  <div class="contents" id="memberDelete_Step2" style="display: none">
+    <h3 class="idset">{ClubmetaID} 계정을 삭제하시겠습니까?</h3>
+    <div id="memberDeleteTermsList"></div>
+    <!-- 	    <div class="idset_notice">
+	       	 계정 삭제 시 회원 데이터 관리 방안 고지 내용 - 추후 약관 확정 시 추가
+	    </div> -->
+    <p class="idset_txt">계속하시겠습니까?</p>
+
+    <button type="button" class="btn_progress" onclick="nextStep2()">계속</button>
+  </div>
+  <!--// contents -->
+</div>

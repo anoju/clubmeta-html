@@ -29,7 +29,7 @@
 
         post('/api/sendSmsCertiNo', null, body)
           .done(function (result) {
-            getPageAjax('/login/confirm_code', 'type=findPw&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+            getPageAjax('../login/confirm_code.html', 'type=findPw&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
               $('#findPwForm').append(result); // 인증 코드 입력 화면 붙이고
               $('#divFindPwPhoneAuth').hide(); // 현재화면 (전화번호인증) 숨기기
             });

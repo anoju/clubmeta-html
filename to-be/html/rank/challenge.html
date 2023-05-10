@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="/to-be/html/include/head.js"></script>
+    <script type="text/javascript">
+      //url params 받기
+      var urlParams = new URL(location.href).searchParams;
+      var chlgNo = urlParams.get('chlgNo');
+
+      $(document).ready(function () {
+        openChallengeDetail(chlgNo);
+      });
+
+      function closeChallengeDetail() {
+        reqToApp('ClosePopupUrl', null);
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

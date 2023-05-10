@@ -1,0 +1,115 @@
+<div class="wrap div_layer" id="challengePtcpWrap">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      //chlgNo params 받기
+      var chlgNo = '${param.chlgNo}';
+
+      getChallengePtcp(chlgNo);
+      getMyPoint();
+    });
+
+    //뒤로가기
+    function challengePtcpBack() {
+      $('body').find('.wrap').last().remove();
+      $('body').find('.wrap').last().show();
+    }
+
+    //참가비용 가져오기
+    function getChallengePtcp(chlgNo) {
+      get('/api/challenge/select/' + chlgNo, '').done(function (result) {
+        var ptcpCost = result.data.ptcpCost;
+        $('#challengePtcpWrap #ptcpPoint em').text(ptcpCost);
+      });
+    }
+
+    //내포인트 가져오기
+    function getMyPoint() {
+      get('/api/getMemberPoint', '')
+        .done(function (result) {
+          var myPoint = result.data.memberPoint;
+          $('#challengePtcpWrap #myPoint em').text(myPoint);
+        })
+        .fail(function (result) {
+          layerAlert(result.respMsg);
+        });
+    }
+
+    //참가하기
+    function joinSubmit() {
+      console.log('joinSubmit');
+      var ptcpCost = $('#challengePtcpWrap #ptcpPoint em').text();
+      var myPoint = $('#challengePtcpWrap #myPoint em').text();
+
+      if (ptcpCost * 1 > myPoint * 1) {
+        layerAlert('보유 shoe가 부족합니다.');
+        return false;
+      }
+
+      reqToApp('ChooseChallenge', JSON.stringify({ chlgNo: '${param.chlgNo}' }));
+    }
+
+    //챌린지 참가비용 설명 열기
+    function openChallengePtcpPopup() {
+      $('#challenge-ptcp-popup').show();
+    }
+
+    //챌린지 참가비용 설명 닫기
+    function closeChallengePtcpPopup() {
+      $('#challenge-ptcp-popup').hide();
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="challengePtcpBack();">이전으로</button>
+    <h1>챌린지 참가 비용</h1>
+    <button type="button" class="btn_information" onclick="openChallengePtcpPopup();">?</button>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <div class="challenge_shoe">
+      <div class="shoe_list">
+        <div class="box opened">
+          <i class="ico_shoe"></i>
+          <span>Shoe</span>
+        </div>
+
+        <div class="box lock">
+          <i class="ico_lock"></i>
+          <span>Coming soon</span>
+        </div>
+
+        <div class="box lock">
+          <i class="ico_lock"></i>
+          <span>Coming soon</span>
+        </div>
+      </div>
+
+      <div class="join_shoe">
+        <span>참가 비용</span>
+        <div class="point" id="ptcpPoint"><em>0</em> Shoe</div>
+      </div>
+
+      <div class="my_shoe">
+        <span>보유 Shoe</span>
+        <div class="point" id="myPoint"><em>0</em> Shoe</div>
+        <button type="button" class="btn_checkout"><i></i>구매</button>
+      </div>
+    </div>
+
+    <button type="button" class="btn_progress" onclick="joinSubmit()">참가하기</button>
+  </div>
+  <!--// contents -->
+
+  <!-- popup_detail view-->
+  <div class="popup div_layer" id="challenge-ptcp-popup" style="display: none">
+    <button type="button" class="btn_close" onclick="closeChallengePtcpPopup()">창닫기</button>
+    <div class="popup_head">
+      <h1>챌린지 참가비용이란?</h1>
+    </div>
+    <div class="popup_body">챌린지 참가비용 관련 설명</div>
+  </div>
+  <!--// popup_detail view-->
+</div>

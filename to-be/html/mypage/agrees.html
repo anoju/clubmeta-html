@@ -1,0 +1,105 @@
+<div class="wrap joinStep div_layer" id="divMemberId">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      //동의 여부 체크
+      setAgreeYn();
+
+      //체크박스 toggle
+      $('#agreeForm [id^=notice_check]')
+        .off('click')
+        .on('click', function () {
+          var agreeColumn = $(this).data('agreeColumn');
+          var agreeYn = $(this).is(':checked') == true ? 'Y' : 'N';
+
+          $('#agreeForm #agreeColumn').val(agreeColumn);
+          $('#agreeForm #agreeYn').val(agreeYn);
+
+          var msgData = $(this).data('msg');
+          var msgYn = $(this).prop('checked') ? '동의' : '거부';
+
+          //동의여부 수정
+          post('/api/setReceiveAgree', null, $('#agreeForm').serializeObject())
+            .done(function (result) {
+              var now = new Date();
+              var nowMonth = now.getMonth() + 1;
+              if (nowMonth < 10) nowMonth = '0' + nowMonth;
+              var nowDate = now.getDate();
+              if (nowDate < 10) nowDate = '0' + nowDate;
+
+              var msg = now.getFullYear() + '년 ' + nowMonth + '월 ' + nowDate + '일<br/>' + msgData + ' ' + msgYn + ' 하셨습니다.';
+              layerAlert(msg);
+            })
+            .fail(function (result) {
+              $(this).prop('checked', !$(this).is(':checked'));
+              layerAlert(result.respMsg);
+            });
+        });
+    });
+
+    //동의 여부 체크
+    function setAgreeYn() {
+      if ($('#settingsWrap #emailPrmtAgreeYn').val() == 'Y') {
+        $('#agreeForm #notice_check3').prop('checked', true);
+      } else {
+        $('#agreeForm #notice_check3').prop('checked', false);
+      }
+      if ($('#settingsWrap #newsLettAgreeYn').val() == 'Y') {
+        $('#agreeForm #notice_check2').prop('checked', true);
+      } else {
+        $('#agreeForm #notice_check2').prop('checked', false);
+      }
+      if ($('#settingsWrap #prInfoReceiveAgreeYn').val() == 'Y') {
+        $('#agreeForm #notice_check1').prop('checked', true);
+      } else {
+        $('#agreeForm #notice_check1').prop('checked', false);
+      }
+    }
+
+    //닫기
+    function back() {
+      getMyInfo();
+      $('body').find('.wrap').last().remove();
+      $('body').find('.wrap').last().show();
+    }
+  </script>
+
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="back()">이전으로</button>
+    <h1>알림</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <form id="agreeForm">
+      <input type="hidden" id="agreeColumn" name="agreeColumn" value="" />
+      <input type="hidden" id="agreeYn" name="agreeYn" value="" />
+      <h2 class="setting">메시지 알림</h2>
+      <div class="my_info_row">
+        <div class="txt">트렌드 콘텐츠 및 광고성 정보 수신</div>
+        <div class="toggle_checkbox">
+          <input type="checkbox" id="notice_check1" data-agree-column="PR_INFO_RECEIVE_AGREE_YN" data-msg="트렌드 콘텐츠 및 광고성 정보 메시지 수신" />
+          <label for="notice_check1"></label>
+        </div>
+      </div>
+
+      <h2 class="setting">이메일 알림</h2>
+      <div class="my_info_row">
+        <div class="txt">뉴스레터</div>
+        <div class="toggle_checkbox">
+          <input type="checkbox" id="notice_check2" data-agree-column="NEWS_LETT_AGREE_YN" data-msg="뉴스레터 수신" />
+          <label for="notice_check2"></label>
+        </div>
+      </div>
+      <div class="my_info_row">
+        <div class="txt">프로모션</div>
+        <div class="toggle_checkbox">
+          <input type="checkbox" id="notice_check3" data-agree-column="EMAIL_PRMT_AGREE_YN" data-msg="프로모션 수신" />
+          <label for="notice_check3"></label>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!--// contents -->
+</div>

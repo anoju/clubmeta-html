@@ -1,0 +1,421 @@
+<div class="wrap div_layer" id="divFollow" style="height: 100%; overflow: scroll">
+  <script type="text/javascript">
+    var type = "<%= request.getParameter('type') %>";
+    var followMemberNo = "<%= StringUtil.nvl(request.getParameter('followMemberNo')) %>";
+
+    // 목록 관련
+    var followNowPageMap = { FOLLOWING: 0, FOLLOWER: 0 };
+    var followLastPageMap = { FOLLOWING: 1, FOLLOWER: 1 };
+    var followUrlMap = { FOLLOWING: '/api/followingList', FOLLOWER: '/api/followList' };
+    var followRowsPerPage = 10; // 한번에 불러올 개수
+    var mOffset = 0; // 삭제된 개수
+
+    var followIsLoading = false;
+    var nowDispFType = '';
+
+    $(document).ready(function () {
+      // 로그인 체크
+      if (followMemberNo == '') {
+        // 자기꺼 목록일때는 로그인 체크
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            layerAlert('로그인이 필요한 서비스입니다.').done(function () {
+              $('#divFollow .btn_go_prev').trigger('click'); // 레이어창 닫기
+            });
+          } else {
+            initFollow();
+            fn_followMoveTab(type.toUpperCase());
+          }
+        });
+      } else {
+        initFollow();
+        fn_followMoveTab(type.toUpperCase());
+      }
+
+      // 뒤로가기 클릭
+      $('#divFollow .btn_go_prev').on('click', function () {
+        if (typeof resetFollowCnt == 'function') {
+          resetFollowCnt(); // 부모창의 팔로워/팔로잉 수 초기화
+        }
+        $('body').find('.wrap').last().remove();
+        $('body').find('.wrap').last().show();
+      });
+
+      // 내용이 있으면 clear버튼 보이고 내용이 없으면 clear버튼 숨기기
+      $('#divFollow button.btn_clear').each(function () {
+        $(this).hide();
+        $(this)
+          .parent()
+          .find('.clear')
+          .on('input', function () {
+            if ($(this).val() == '') {
+              $(this).parent().find('.btn_clear').hide();
+            } else {
+              $(this).parent().find('.btn_clear').show();
+            }
+          });
+      });
+
+      // follow 클릭시 처리 (로그인 확인부터)
+      $('#divFollow').on('change', '.performer_list .follow_toggle input[type=checkbox]', function () {
+        var checkbox = $(this);
+        var checked = checkbox.prop('checked');
+        var fMemberNo = checkbox.closest('.performer_list').data('memberNo');
+
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            checkbox.prop('checked', !checked); // 체크박스 원래대로
+            openLoginPage();
+          } else {
+            if (checked) {
+              del('/api/followCancel/' + fMemberNo)
+                .done(function (result) {
+                  if (followMemberNo == '') {
+                    // 자기거면 following건수 다시 조회
+                    get('/api/followingCnt').done(function (result) {
+                      $('#divFollow #followingCnt').html(fn_getCommaNumber(result.data.followingCnt));
+                    });
+                  }
+
+                  if (followMemberNo == '' && checkbox.closest('#div_following_list').length > 0) {
+                    // 자기거 && following에 있는것 취소한 경우 목록에서 제거
+                    checkbox.closest('.performer_list').remove();
+                    mOffset += 1;
+                  }
+
+                  /*
+    						// follower/following 다른 탭에 있는 동일 member 도 동일하게 처리
+    						$("#divFollow .performer_list[data-member-no=" + fMemberNo + "] .follow_toggle input[type=checkbox]").prop("checked", checked);
+
+
+    						if(followMemberNo == "" && $("#divFollow #div_following_list .performer_list[data-member-no=" + fMemberNo + "]").length > 0) {
+    							// 자기거 목록 && following에 있는것 취소한 경우 목록에서 제거
+    							$("#divFollow #div_following_list .performer_list[data-member-no=" + fMemberNo + "]").remove();
+    						}
+    						*/
+                })
+                .fail(function (result) {
+                  // 실패시 체크박스 원래대로
+                  checkbox.prop('checked', !checked);
+                });
+            } else {
+              post('/api/follow/' + fMemberNo)
+                .done(function (result) {
+                  if (followMemberNo == '') {
+                    // 자기거면 following건수 다시 조회
+                    get('/api/followingCnt').done(function (result) {
+                      $('#divFollow #followingCnt').html(fn_getCommaNumber(result.data.followingCnt));
+                    });
+                  }
+
+                  /*
+    						// follower/following 다른 탭에 있는 동일 member 도 동일하게 처리
+    						$("#divFollow .performer_list[data-member-no=" + fMemberNo + "] .follow_toggle input[type=checkbox]").prop("checked", checked);
+
+    						if(followMemberNo == "" && $("#divFollow #div_following_list .performer_list[data-member-no=" + fMemberNo + "]").length == 0) {
+    							// 자기거 목록 && following에 없는것 follow한 경우 목록에 추가 (follower에서 복사)
+    							var newFollowing = $("#divFollow #div_follower_list .performer_list[data-member-no=" + fMemberNo + "]").clone();
+    							newFollowing.find(".btn_follow_del").remove();	// 삭제 버튼은 제거
+    							$("#divFollow #div_following_list").append(newFollowing);
+    						}
+    						*/
+                })
+                .fail(function (result) {
+                  // 실패시 체크박스 원래대로
+                  checkbox.prop('checked', !checked);
+                });
+            }
+          }
+        });
+      });
+
+      // 삭제 클릭시 처리 (로그인 확인부터)
+      $('#divFollow').on('click', '.performer_list .btn_follow_del', function () {
+        var fMemberNo = $(this).closest('.performer_list').data('memberNo');
+        var div = $(this).closest('div.performer_list');
+        del('/api/followingCancel/' + fMemberNo)
+          .done(function (result) {
+            div.remove(); // 해당 row 제거
+            // Follwer 수 -1
+            var fCnt = fn_getOnlyNumber($('#divFollow #followerCnt').html());
+            fCnt = fCnt - 1;
+            $('#divFollow #followerCnt').html(fn_getCommaNumber(fCnt));
+
+            mOffset += 1;
+          })
+          .fail(function (result) {});
+      });
+
+      // 스크롤시 추가 데이터 조회
+      $('#divFollow').on('scroll', function (e) {
+        if (followIsLoading) return;
+        if ($('#div_followList_wrapper').height() - ($('#divFollow').height() + $('#divFollow').scrollTop()) < 100) {
+          followIsLoading = true;
+          fn_followUserList(nowDispFType).done(function () {
+            followIsLoading = false;
+          });
+        }
+      });
+
+      // 검색어 입력시
+      $('[name=searchWord]').on('input', function () {
+        fn_followUserList(nowDispFType, true);
+      });
+    });
+
+    // 초기화
+    function initFollow() {
+      // 기본 프로필 정보
+      var url = '';
+      if (followMemberNo == '') {
+        url = '/api/myProfile';
+      } else {
+        url = '/api/userProfile/' + followMemberNo;
+      }
+      get(url).done(function (result) {
+        var data = result.data;
+        $('#divFollow #memberId').html(data.memberId);
+        $('#divFollow #followerCnt').html(fn_getCommaNumber(data.followerCnt));
+        $('#divFollow #followingCnt').html(fn_getCommaNumber(data.followingCnt));
+      });
+    }
+
+    // 탭 이동시
+    function fn_followMoveTab(fType) {
+      if ($('#a_' + fType.toLowerCase()).hasClass('active')) return;
+
+      // 탭에 active 설정
+      $('.tabs_menu a').removeClass('active');
+      $('#a_' + fType.toLowerCase()).addClass('active');
+
+      // 하단 내용 보이기 변경
+      $('#div_follower_list, #div_following_list').hide();
+      $('#div_' + fType.toLowerCase() + '_list').show();
+
+      nowDispFType = fType;
+
+      /*
+    	// 처음이면 목록 조회
+    	if(followNowPageMap[fType] == 0) {
+    		fn_followUserList(fType);
+    	}
+    	*/
+      // 탭 이동시 목록 처음부터 조회
+      fn_followUserList(fType, true);
+    }
+
+    // Following/Follower 목록 조회
+    function fn_followUserList(fType, isFirst) {
+      var dfd = $.Deferred();
+
+      // 검색 등의 경우 isFirst를 true로 넘겨서 처음부터 조회
+      if (isFirst) {
+        mOffset = 0;
+        followNowPageMap[fType] = 0;
+      }
+
+      // 현재 페이지가 마지막 페이지면 조회 안함
+      if (followNowPageMap[fType] >= followLastPageMap[fType]) {
+        dfd.resolve();
+        return dfd.promise();
+      }
+
+      var nowPage = followNowPageMap[fType] + 1;
+
+      followNowPageMap[fType] = nowPage;
+
+      var param = 'rowsPerPage=' + followRowsPerPage;
+      param += '&nowPage=' + nowPage;
+      param += '&mOffset=' + mOffset;
+
+      var searchWord = $('#div_' + fType.toLowerCase() + '_list [name=searchWord]').val();
+      if (searchWord.trim() != '') {
+        param += '&searchWord=' + searchWord;
+      }
+
+      if (followMemberNo != null && followMemberNo != '') {
+        param += '&searchMemberNo=' + followMemberNo;
+      }
+
+      get(followUrlMap[fType], param).done(function (result) {
+        var div = $('#div_' + fType.toLowerCase() + '_list');
+
+        if (nowPage == 1) {
+          followLastPageMap[fType] = result.data.lastPage;
+          div.find('.performer_list.reset').remove();
+        }
+
+        var list = result.data.list;
+        for (var i = 0; i < list.length; i++) {
+          var data = list[i];
+          var tmplt = $('#div_followUserTemplate').clone();
+
+          var targetMemberNo = -1;
+          if (fType == 'FOLLOWER') {
+            targetMemberNo = data.memberNo;
+          } else if (fType == 'FOLLOWING') {
+            targetMemberNo = data.followMemberNo;
+          }
+
+          tmplt.attr('id', '');
+          tmplt.attr('data-member-no', targetMemberNo);
+          if (data.followPicFileUrl != null && data.followPicFileUrl != '') {
+            tmplt.find('.performer').css('background-image', 'url(' + data.followPicFileUrl + '), url(/to-be/rsc/front/images/common/ico_mypage.png)');
+          }
+          tmplt.find('.p_userId').html(data.memberId);
+
+          if (data.meYn == 'Y') {
+            tmplt.find('#follow_0').remove();
+          }
+          if (data.myFollowYn == 'Y') {
+            tmplt.find('#follow_0').prop('checked', false);
+          } else {
+            tmplt.find('#follow_0').prop('checked', true);
+          }
+
+          tmplt.find('#follow_0').attr('id', 'follow_' + fType + '_' + targetMemberNo);
+          tmplt.find('[for=follow_0]').attr('for', 'follow_' + fType + '_' + targetMemberNo);
+
+          if (followMemberNo == '' && fType == 'FOLLOWER') {
+            // 자기 자신거 && follower 목록 일때는 삭제 버튼 보이기
+          } else {
+            // 자기 자신거가 아니거나 자신거라도 following목록이면 삭제 버튼 숨기기
+            $(tmplt).find('.btn_follow_del').remove();
+          }
+
+          $(tmplt)
+            .find('a')
+            .on('click', function () {
+              var memNo = $(this).closest('.performer_list').data('memberNo');
+              viewUserProfile(memNo);
+            });
+
+          tmplt.css('display', '');
+          div.append(tmplt);
+        }
+
+        dfd.resolve();
+      });
+
+      return dfd.promise();
+    }
+
+    /*
+    function pagingTest() {
+    	fn_followUserList(nowDispFType)
+    	.done(function() {
+    		followIsLoading = false;
+    	});
+    }
+    */
+  </script>
+
+  <div id="div_followList_wrapper">
+    <!-- header -->
+    <header>
+      <button type="button" class="btn_go_prev">이전으로</button>
+      <h1 id="memberId">id</h1>
+    </header>
+    <!--// header -->
+
+    <!-- contents -->
+    <div class="contents">
+      <!-- tabs -->
+      <div class="tabs_menu">
+        <a id="a_follower" onclick="fn_followMoveTab('FOLLOWER');"><b id="followerCnt">0</b> 팔로워</a>
+        <a id="a_following" onclick="fn_followMoveTab('FOLLOWING');"><b id="followingCnt">0</b> 팔로잉</a>
+      </div>
+      <!--// tabs -->
+
+      <div class="performer_list reset" id="div_followUserTemplate" style="display: none">
+        <a>
+          <div class="performer" style="background-image: url(/to-be/rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
+        </a>
+        <div class="id">
+          <a>
+            <p class="p_userId">userId</p>
+          </a>
+          <button type="button" class="btn_follow_del">삭제</button>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="follow_0" checked />
+          <label for="follow_0"><span></span></label>
+        </div>
+      </div>
+
+      <div id="div_follower_list" style="display: none">
+        <div class="search_form">
+          <!-- 					<i class="ico_search"></i> -->
+          <div class="input_wrap">
+            <input type="search" placeholder="아이디 검색" name="searchWord" class="clear" />
+            <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+          </div>
+          <button type="button" class="btn_go_search">검색</button>
+        </div>
+      </div>
+
+      <div id="div_following_list" style="display: none">
+        <div class="search_form">
+          <!-- 					<i class="ico_search"></i> -->
+          <div class="input_wrap">
+            <input type="search" placeholder="아이디 검색" name="searchWord" class="clear" />
+            <button class="btn_clear" onClick="clearInput(this); return false;"></button>
+          </div>
+          <button type="button" class="btn_go_search">검색</button>
+        </div>
+      </div>
+
+      <!-- 			<button type="button" onclick="pagingTest();">더보기</button> -->
+      <!--
+      <div class="performer_list reset">
+        <a href="">
+          <div class="performer" style="background-image: url(../images/@performer02.jpg)"></div>
+        </a>
+        <div class="id">
+          <a href="">
+            <p>userName</p>
+          </a>
+          <button type="button" class="btn_follow_del">삭제</button>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="follow1" checked />
+          <label for="follow1"><span></span></label>
+        </div>
+      </div>
+
+      <div class="performer_list reset">
+        <a href="">
+          <div class="performer" style="background-image: url(../images/@performer03.jpg)"></div>
+        </a>
+        <div class="id">
+          <a href="">
+            <p>userName</p>
+          </a>
+          <button type="button" class="btn_follow_del">삭제</button>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="follow2" />
+          <label for="follow2"><span></span></label>
+        </div>
+      </div>
+
+      <div class="performer_list reset">
+        <a href="">
+          <div class="performer" style="background-image: url(../images/@performer04.png)"></div>
+        </a>
+        <div class="id">
+          <a href="">
+            <p>userName</p>
+          </a>
+          <button type="button" class="btn_follow_del">삭제</button>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="follow3" />
+          <label for="follow3"><span></span></label>
+        </div>
+      </div>
+      -->
+    </div>
+    <!--// contents -->
+  </div>
+</div>

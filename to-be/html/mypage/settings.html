@@ -1,0 +1,288 @@
+<div class="wrap div_layer" id="settingsWrap">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      fn_checkLoginYn('Y');
+
+      setTerms();
+    });
+
+    // 로그인 체크
+    function fn_checkLoginYn(alertYn) {
+      getAccessToken().done(function (result) {
+        if (result == null || result == '') {
+          if (alertYn == 'Y') {
+            openLoginPage();
+            /* 							layerAlert("로그인이 필요한 서비스입니다.")
+            .done(openLoginPage); */
+          } else {
+            openLoginPage();
+          }
+        } else {
+          //내정보 가져오기
+          getMyInfo();
+        }
+      });
+    }
+
+    // 로그인 창이 닫혔을때
+    function afterCloseLoginPage() {
+      // 다시 한번 로그인 체크(로그인 하지 않고 그냥 닫는 경우도 있어서)
+      fn_checkLoginYn('Y');
+    }
+
+    //내정보 가져오기
+    function getMyInfo() {
+      get('/api/userSetting', null).done(function (result) {
+        console.log(result);
+        var mobileNo = '등록된 전화번호가 없습니다.';
+        var email = '등록된 이메일이 없습니다.';
+        var id = '등록된 아이디가 없습니다.';
+
+        var emailPrmtAgreeYn = 'N';
+        var newsLettAgreeYn = 'N';
+        var prInfoReceiveAgreeYn = 'N';
+
+        if (result.data.mobileNo != '' && result.data.mobileNo != null && result.data.mobileNo != 'undefined') {
+          mobileNo = result.data.mobileNo;
+        }
+        if (result.data.email != '' && result.data.email != null && result.data.email != 'undefined') {
+          email = result.data.email;
+        }
+        if (result.data.memberId != '' && result.data.memberId != null && result.data.memberId != 'undefined') {
+          id = result.data.memberId;
+        }
+        if (result.data.emailPrmtAgreeYn == 'Y') {
+          emailPrmtAgreeYn = result.data.emailPrmtAgreeYn;
+        }
+        if (result.data.newsLettAgreeYn == 'Y') {
+          newsLettAgreeYn = result.data.newsLettAgreeYn;
+        }
+        if (result.data.prInfoReceiveAgreeYn == 'Y') {
+          prInfoReceiveAgreeYn = result.data.prInfoReceiveAgreeYn;
+        }
+
+        $('#settingsWrap #myPhone').html(mobileNo);
+        $('#settingsWrap #myEmail').html(email);
+        $('#settingsWrap #myId').html(id);
+
+        $('#settingsWrap #memberId').val(id);
+        $('#settingsWrap #emailPrmtAgreeYn').val(emailPrmtAgreeYn);
+        $('#settingsWrap #newsLettAgreeYn').val(newsLettAgreeYn);
+        $('#settingsWrap #prInfoReceiveAgreeYn').val(prInfoReceiveAgreeYn);
+      });
+    }
+
+    //전화번호 변경
+    function setMobileNo() {
+      getPageAjax('../mypage/phone.html', 'entryType=updateMobile').done(function (result) {
+        $('body').find('.wrap').hide();
+        $('body').append(result);
+      });
+    }
+
+    //이메일 변경
+    function setEmail() {
+      getPageAjax('../mypage/email.html', null).done(function (result) {
+        $('body').find('.wrap').hide();
+        $('body').append(result);
+      });
+    }
+
+    //ID 변경
+    function setMemberId() {
+      getPageAjax('../mypage/memberId.html', null).done(function (result) {
+        $('body').find('.wrap').hide();
+        $('body').append(result);
+      });
+    }
+
+    //계정 비활성화 및 삭제
+    function setMemberDelete() {
+      getPageAjax('../mypage/memberDelete.html', null).done(function (result) {
+        $('body').find('.wrap').hide();
+        $('body').append(result);
+      });
+    }
+
+    //알림 설정
+    function setAgrees() {
+      getPageAjax('../mypage/agrees.html', null).done(function (result) {
+        $('body').find('.wrap').hide();
+        $('body').append(result);
+      });
+    }
+
+    //문의하기
+    function setInquiry() {
+      getPageAjax('../inquiry/inquiry_layer.html').done(function (result) {
+        var $result = $(result);
+        //$result.find("[name=memberNo]").val(msg.memberNo);
+        $('body').append($result);
+      });
+    }
+
+    //문의하기 닫기
+    function afterCloseInquiryLayerForSettings() {
+      $('body').css('overflow', '');
+      window.onscroll = function () {};
+    }
+
+    //약관셋팅
+    function setTerms() {
+      get('/api/terms/TERMS10/list', 'reqYn=Y').done(function (result) {
+        var list = result.data.list;
+        var html = '';
+        for (var i = 0; i < list.length; i++) {
+          html += '<div class="my_info_row" onclick="openTermsContentPop(\'' + list[i].termsDivNm + "', '" + list[i].termsFilePathUrl + '\')">';
+          html += '	<div class="txt">' + list[i].termsDivNm + '</div>';
+          html += '	<button class="btn_view">상세</button>';
+          html += '</div>';
+        }
+        $('#termsList').append(html);
+      });
+    }
+
+    //약관내용팝업 열기
+    function openTermsContentPop(termsDivNm, termsFilePathUrl) {
+      $('#termsContent .popup_head h1').text('');
+      $('#termsContent .popup_body pre').html('');
+
+      $('#termsContent .popup_head h1').text(termsDivNm);
+      $('#termsContent .popup_body pre').load(termsFilePathUrl);
+
+      $('#termsContent').show();
+      /* 			    $("#termsContent").animate({bottom:"0"}, 300);
+        $('body').css('overflow','hidden');
+          var x=window.scrollX, y=window.scrollY;
+          window.onscroll=function(){window.scrollTo(x, y)}; */
+    }
+
+    //약관내용팝업 닫기
+    function closeTermsContentPop() {
+      $('#termsContent').hide();
+      /* 			    $("#termsContent").animate({bottom:"-100%"}, 300);
+        $('body').css('overflow','');
+        window.onscroll=function(){}; */
+    }
+
+    //로그아웃
+    function logout() {
+      fn_removeToken().done(function () {
+        reqToApp('InitApp');
+      });
+    }
+
+    //닫기
+    function back() {
+      //탈퇴페이지 step2페이지이면 step1페이지 보여주기, 그 외 페이지는 마지막요소 wrap지우고 마지막요소 wrap보여주기
+      if ($('#memberDeleteWrap #memberDelete_Step2').is(':visible')) {
+        $('#memberDeleteWrap #memberDelete_Step2').hide();
+        $('#memberDeleteWrap #memberDelete_Step1').show();
+      } else {
+        $('body').find('.wrap').last().remove();
+        $('body').find('.wrap').last().show();
+      }
+    }
+
+    function openOuterLink(url) {
+      reqToApp('OpenPopupBackURL', JSON.stringify({ url: url }));
+      /*  				var html = '';
+        html += '<div class="wrap div_layer" id="outerLinkWrap">';
+        html += '	<header>';
+        html += '		<button type="button" class="btn_go_prev" onclick="back();">이전으로</button>';
+        html += '		<h1>'+title+'</h1>';
+        html += '	</header>';
+        html += '	<div class="contents">';
+        html += '		<iframe src="'+url+'" title="'+title+'"></iframe>';
+        html += '	</div>';
+        html += '</div>';
+      $("#settingsWrap").hide();
+      $("body").append(html); */
+    }
+  </script>
+  <!-- header -->
+  <header>
+    <button type="button" class="btn_go_prev" onclick="back();">이전으로</button>
+    <h1>설정</h1>
+  </header>
+  <!--// header -->
+
+  <!-- contents -->
+  <div class="contents">
+    <input type="hidden" id="memberId" value="" />
+    <input type="hidden" id="emailPrmtAgreeYn" value="" />
+    <input type="hidden" id="newsLettAgreeYn" value="" />
+    <input type="hidden" id="prInfoReceiveAgreeYn" value="" />
+
+    <h2 class="setting">계정</h2>
+    <div class="my_info_row" onclick="setMobileNo()">
+      <span class="stit">전화번호</span>
+      <div class="txt" id="myPhone"></div>
+      <button class="btn_view">상세</button>
+    </div>
+
+    <div class="my_info_row" onclick="setEmail()">
+      <span class="stit">이메일</span>
+      <div class="txt" id="myEmail"></div>
+      <button class="btn_view">상세</button>
+    </div>
+
+    <div class="my_info_row" onclick="setMemberId()">
+      <span class="stit">아이디</span>
+      <div class="txt" id="myId"></div>
+      <button class="btn_view">상세</button>
+    </div>
+
+    <div class="my_info_row" onclick="setMemberDelete()">
+      <div class="txt">비활성화 또는 계정 삭제</div>
+      <button class="btn_view">상세</button>
+    </div>
+
+    <h2 class="setting">서비스</h2>
+    <div class="my_info_row" onclick="openOuterLink('https://tobemeta.notion.site/78fcf36bc7aa4b4c8b10bcad947e818d');">
+      <div class="txt">공지사항</div>
+      <button class="btn_view">상세</button>
+    </div>
+    <div class="my_info_row" onclick="openOuterLink('https://tobemeta.notion.site/FAQ-b87a60a2f20e45a69a7583527ecc65f6');">
+      <div class="txt">FAQ</div>
+      <button class="btn_view">상세</button>
+    </div>
+    <div class="my_info_row" onclick="setAgrees()">
+      <div class="txt">알림</div>
+      <button class="btn_view">상세</button>
+    </div>
+    <div class="my_info_row" onclick="setInquiry()">
+      <div class="txt">문의하기</div>
+      <button class="btn_view">상세</button>
+    </div>
+
+    <h2 class="setting">약관</h2>
+    <div class="my_info_row" onclick="openOuterLink('https://tobemeta.notion.site/b4a8cd98d58f433daa36cc95da5b1120');">
+      <div class="txt">서비스 이용약관</div>
+      <button class="btn_view">상세</button>
+    </div>
+    <div class="my_info_row" onclick="openOuterLink('https://tobemeta.notion.site/98aafa9551d7448fa7f50c0b67cf5c0e');">
+      <div class="txt">개인정보 처리방침</div>
+      <button class="btn_view">상세</button>
+    </div>
+    <div id="termsList" style="display: none"></div>
+
+    <div class="my_info_row open" onclick="reqToApp('OpenSourceLicense');">
+      <div class="txt">오픈소스 라이브러리</div>
+      <button class="btn_view">상세</button>
+    </div>
+    <button type="button" class="btn_logout" onclick="logout()">로그아웃</button>
+  </div>
+  <!--// contents -->
+  <!-- popup_detail view-->
+  <div class="popup div_layer" id="termsContent" style="display: none">
+    <button type="button" class="btn_close" onclick="closeTermsContentPop()">창닫기</button>
+    <div class="popup_head">
+      <h1></h1>
+    </div>
+    <div class="popup_body">
+      <pre></pre>
+    </div>
+  </div>
+  <!--// popup_detail view-->
+</div>

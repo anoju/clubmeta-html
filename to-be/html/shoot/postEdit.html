@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="/to-be/html/include/head.js"></script>
+  </head>
+  <body>
+    <div class="wrap div_layer">
+      <form id="shootForm">
+        <input type="hidden" id="videoNo" name="videoNo" value="" />
+        <input type="hidden" id="cmmtAllowYn" name="cmmtAllowYn" value="" />
+        <input type="hidden" id="videoStatusCd" name="videoStatusCd" value="" />
+
+        <!-- 		<input type="hidden" id="aiScore" name="aiScore" value="">
+		<input type="hidden" id="videoDivCd" name="videoDivCd" value="">
+		<input type="hidden" id="chlgNo" name="chlgNo" value="">
+		<input type="hidden" id="chlgName" name="chlgName" value="">
+		<input type="hidden" id="videoId" name="videoId" value="">
+		<input type="hidden" id="videoStatusCd" name="videoStatusCd" value="">
+		<input type="hidden" id="musicId" name="musicId" value=""> -->
+        <!-- header -->
+        <header>
+          <button type="button" class="btn_go_prev" onclick="back();">이전으로</button>
+          <h1>게시</h1>
+        </header>
+        <!--// header -->
+
+        <!-- contents -->
+        <div class="contents">
+          <div class="movie_upload" id="challengeInfo" style="display: none">
+            <div class="name" id="challengeName">#</div>
+            <div class="count" id="aiScoreText"><i class="ico_ai"></i>점수 <em>0</em></div>
+          </div>
+
+          <div class="upload_setting">
+            <div class="form_row">
+              <span class="stit">내용</span>
+              <div class="input_wrap">
+                <textarea class="clear" id="videoDesc" name="videoDesc" placeholder="#hashtag, @mention..." maxlength="150"></textarea>
+                <button type="button" class="btn_clear" onClick="clearInput(this)"></button>
+              </div>
+            </div>
+
+            <div class="upload_setting_row" id="divVideoAccess" onclick="openAccessPop()">
+              <div class="txt"><i class="ico_lock"></i>이 동영상을 시청할 수 있는 사람</div>
+              <span class="access" id="accessNm">모두</span>
+              <button type="button" class="btn_view" id="btnViewAll"></button>
+            </div>
+
+            <div class="upload_setting_row">
+              <div class="txt"><i class="ico_reply"></i>댓글허용</div>
+              <div class="toggle_checkbox">
+                <input type="checkbox" id="viewer_level" value="Y" checked="checked" />
+                <label for="viewer_level"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="upload_setting_btn">
+            <!-- <button type="button" class="btn_save" onclick="tempSave()">임시저장</button> -->
+            <!-- <button type="button" class="btn_save" onclick="back()">취소</button> -->
+            <button type="button" class="btn_upload" onclick="formSubmit()">수정</button>
+          </div>
+        </div>
+        <!--// contents -->
+        <!-- popup 영상 보기 권한 설정 -->
+        <div class="layer_access active" id="accessPop" style="display: none">
+          <div class="inner">
+            <h1>이 동영상을 시청할 수 있는 사람</h1>
+            <button type="button" class="btn_close" onclick="closeAccessPop()">닫기</button>
+
+            <div class="input_access">
+              <input type="radio" id="viewer_me" name="videoAccessDivCd" value="${CommonConstants.VIDEO_ACCESS_DIV_CD_ME }" />
+              <label for="viewer_me">나만</label>
+
+              <input type="radio" id="viewer_follower" name="videoAccessDivCd" value="${CommonConstants.VIDEO_ACCESS_DIV_CD_FOLLOW }" />
+              <label for="viewer_follower">팔로워</label>
+
+              <input type="radio" id="viewer_all" name="videoAccessDivCd" value="${CommonConstants.VIDEO_ACCESS_DIV_CD_ALL }" />
+              <label for="viewer_all">모두</label>
+            </div>
+          </div>
+        </div>
+        <!--// popup 영상 보기 권한 설정 -->
+      </form>
+    </div>
+
+    <script type="text/javascript">
+      //http://localhost:8080/shoot/post?videoDivCd=CHALLENGE&chlgNo=23&aiScore=88&chlgName=%EB%AA%A8%EB%B0%94%EC%9D%BC%EB%A1%9C%EC%B1%8C%EB%A6%B0%EC%A7%80&videoId=video0079&musicId=music004
+      //http://localhost:8080/shoot/post?videoDivCd=NORMAL&chlgNo=&aiScore=&chlgName=&videoId=video0079&musicId=music004
+
+      $(document).ready(function () {
+        // 로그인 체크
+        fn_checkLoginYn();
+
+        //url params 받기
+        var urlParams = new URL(location.href).searchParams;
+        var videoNo = urlParams.get('videoNo');
+
+        if (videoNo != '' && videoNo != null && videoNo != 'undefined') {
+          //영상정보 조회
+          get('/api/selectVideo/' + videoNo, '')
+            .done(function (result) {
+              var data = result.data;
+              $('#shootForm #videoNo').val(data.videoNo);
+              $('#shootForm #videoDesc').val(data.videoDesc);
+
+              $('#shootForm #cmmtAllowYn').val(data.cmmtAllowYn);
+              if ($('#shootForm #cmmtAllowYn').val() == 'Y') {
+                $('input:checkbox[id="viewer_level"]').attr('checked', true);
+              } else {
+                $('input:checkbox[id="viewer_level"]').attr('checked', false);
+              }
+
+              if (data.videoDivCd == 'CHALLENGE') {
+                var defulaAccess = '${CommonConstants.VIDEO_ACCESS_DIV_CD_ALL }'; //모두
+                $("input:radio[name='videoAccessDivCd']:input[value='" + defulaAccess + "']").attr('checked', true);
+                $("input:radio[name='videoAccessDivCd']:input[value='" + defulaAccess + "']").trigger('change');
+                $('#divVideoAccess').css('pointer-events', 'none'); //영상 접근 구분란 클릭 안되게
+              } else {
+                $("input:radio[name='videoAccessDivCd']:input[value='" + data.videoAccessDivCd + "']").attr('checked', true);
+                $("input:radio[name='videoAccessDivCd']:input[value='" + data.videoAccessDivCd + "']").trigger('change');
+              }
+
+              $('#shootForm #videoStatusCd').val(data.videoStatusCd);
+
+              if (data.videoDivCd == '${CommonConstants.VIDEO_DIV_CD_CHALLENGE}') {
+                $('#challengeName').text(data.chlgName);
+                $('#aiScoreText em').text(data.aiScore);
+                $('#challengeInfo').show();
+                //모두 '>'버튼 숨김
+                $('#btnViewAll').hide();
+              }
+            })
+            .fail(function (result) {
+              layerAlert(result.respMsg);
+            });
+        }
+
+        //영상접근권한 값 변경 시 text가져와서 변경 후 팝업닫기
+        $(document)
+          .off('change', "[name ='videoAccessDivCd']")
+          .on('change', "[name ='videoAccessDivCd']", function () {
+            $('#accessNm').text($("label[for='" + $(this).prop('id') + "']").text());
+            closeAccessPop();
+          });
+      });
+
+      //동영잡 접근 여부 팝업 오픈
+      function openAccessPop() {
+        $('#accessPop').show();
+      }
+      //동영잡 접근 여부 팝업 닫기
+      function closeAccessPop() {
+        $('#accessPop').hide();
+      }
+
+      //게시
+      function formSubmit() {
+        // 로그인 체크
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            openLoginPage();
+          } else {
+            // 로그인 되어 있으면
+            //댓글허용여부
+            if ($('#viewer_level').is(':checked')) {
+              $('#shootForm #cmmtAllowYn').val('Y');
+            } else {
+              $('#shootForm #cmmtAllowYn').val('N');
+            }
+            $('#shootForm #videoStatusCd').val('${CommonConstants.VIDEO_STATUS_CD_POST}'); //영상상태:게시
+
+            var videoNo = $('#shootForm #videoNo').val();
+            post('/api/videoPostEdit/' + videoNo, null, JSON.stringify($('#shootForm').serializeObject()))
+              .done(function (result) {
+                reqToApp('EditVideoSuccess', JSON.stringify({ videoNo: videoNo }));
+              })
+              .fail(function (result) {
+                layerAlert(result.respMsg);
+              });
+          }
+        });
+      }
+
+      //닫기
+      function back() {
+        reqToApp('ClosePopupUrl', null);
+      }
+
+      //textarea 내용 지우기
+      function clearInput() {
+        $('textarea').val('');
+      }
+
+      // 로그인 창이 닫혔을때
+      function afterCloseLoginPage() {
+        // 다시 한번 로그인 체크(로그인 하지 않고 그냥 닫는 경우도 있어서)
+        //fn_checkLoginYn("Y");
+      }
+
+      function fn_checkLoginYn(alertYn) {
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            if (alertYn == 'Y') {
+              openLoginPage();
+              /* 					layerAlert("로그인이 필요한 서비스입니다.")
+                .done(openLoginPage); */
+            } else {
+              openLoginPage();
+            }
+          } else {
+            // 로그인 되어 있으면
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
