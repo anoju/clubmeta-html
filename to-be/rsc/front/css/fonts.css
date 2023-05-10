@@ -1,0 +1,36 @@
+/* SB Agg */
+@font-face {
+  font-family: 'SB Aggro';
+  src: url('fonts/SBAggroB.eot');
+  src: url('fonts/SBAggroB.eot?#iefix') format('embedded-opentype'),
+      url('fonts/SBAggroB.woff2') format('woff2'),
+      url('fonts/SBAggroB.woff') format('woff'),
+      url('fonts/SBAggroB.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SB Aggro';
+  src: url('fonts/SBAggroM.eot');
+  src: url('fonts/SBAggroM.eot?#iefix') format('embedded-opentype'),
+      url('fonts/SBAggroM.woff2') format('woff2'),
+      url('fonts/SBAggroM.woff') format('woff'),
+      url('fonts/SBAggroM.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SB Aggro';
+  src: url('fonts/SBAggroL.eot');
+  src: url('fonts/SBAggroL.eot?#iefix') format('embedded-opentype'),
+      url('fonts/SBAggroL.woff2') format('woff2'),
+      url('fonts/SBAggroL.woff') format('woff'),
+      url('fonts/SBAggroL.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}

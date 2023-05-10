@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>CLUBMETA | 클럽메타</title>
+    <script class="__include" src="../include/head.js"></script>
+
+    <style type="text/css">
+      .wrap:not(#div_userProfile) {
+        position: absolute;
+        width: 100%;
+        top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap div_layer" id="div_userProfile">
+      <header>
+        <button type="button" class="btn_go_prev" onclick="fn_closeProfile();">이전으로</button>
+        <h1>
+          <span id="memberId">UserId</span>
+          <i class="ico_perfomer" style="display: none">퍼포머</i>
+        </h1>
+        <button type="button" class="btn_troble" onclick="fn_userReport();">신고하기</button>
+        <!-- 			<button type="button" class="btn_close" onclick="fn_closeProfile();">창닫기</button> -->
+      </header>
+
+      <!-- contents -->
+      <div class="contents">
+        <div class="profile" id="profileImg" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221121/1669022377579.jpg), url(../../rsc/front/images/common/ico_mypage.png)"></div>
+
+        <div class="my_follow">
+          <div class="box">
+            <em id="videoCnt">0</em>
+            비디오
+          </div>
+          <a class="box" onclick="fn_goFollowerList();">
+            <em id="followerCnt">0</em>
+            팔로워
+          </a>
+          <a class="box" onclick="fn_goFollowingList();">
+            <em id="followingCnt">0</em>
+            팔로잉
+          </a>
+        </div>
+
+        <div class="follow_toggle user">
+          <input type="checkbox" id="chk_follow" checked />
+          <label for="chk_follow"><span></span></label>
+        </div>
+
+        <div class="mymenu_slider">
+          <div class="swiper-wrapper">
+            <a class="swiper-slide all active" onclick="fn_moveTab('ALL');">전체</a>
+            <a class="swiper-slide challenge" onclick="fn_moveTab('CHALLENGE');">챌린지</a>
+            <a class="swiper-slide normal" onclick="fn_moveTab('NORMAL');"><i class="ico_lock"></i>일반</a>
+          </div>
+        </div>
+
+        <div class="my_list" id="all_video_list">
+          <div class="thumb" data-video-no="324">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221207_105050.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="323">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221207_104931.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="321">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221201_023122.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="320">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221201_021607.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="292">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221125_060636.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="291">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221125_055802.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="251">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221122_113750.png" alt="" />
+            </a>
+          </div>
+        </div>
+        <div class="my_list" id="challenge_video_list" style="display: none">
+          <div class="thumb" data-video-no="324">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221207_105050.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="323">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221207_104931.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="321">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221201_023122.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="320">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221201_021607.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="292">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221125_060636.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="291">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221125_055802.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" data-video-no="251">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221122_113750.png" alt="" />
+            </a>
+          </div>
+        </div>
+        <div class="my_list" id="normal_video_list" style="display: none"></div>
+      </div>
+      <!--// contents -->
+    </div>
+
+    <script type="text/javascript">
+      var memberNo = 10113;
+      var nowDisplayVideoDivCd = 'ALL';
+      var isLoading = false;
+
+      $(document).ready(function () {
+        if (memberNo == null || memberNo == '' || memberNo == 'null') {
+          layerAlert('잘못된 접근입니다.').done(function () {
+            reqToApp('ClosePopupUrl');
+          });
+          return;
+        }
+
+        initProfile();
+        getVideo('ALL');
+
+        // 팔로우 클릭시
+        $('#div_userProfile #chk_follow').on('change', function () {
+          var checked = $(this).prop('checked');
+          /*
+          getAccessToken().done(function (result) {
+            if (result == null || result == '') {
+              // 로그인 안된 경우
+              // 체크박스 원래대로
+              $('#div_userProfile #chk_follow').prop('checked', !checked);
+
+              openLoginPage();
+            } else {
+              // 로그인 된 경우
+              if (checked) {
+                // 선택 된건 팔로우 해제
+                del('/api/followCancel/' + memberNo)
+                  .done(function (result) {
+                    // 기존 follow 숫자에서 -1
+                    var cnt = fn_getOnlyNumber($('#div_userProfile #followerCnt').html()) * 1;
+                    $('#div_userProfile #followerCnt').html(fn_getCommaNumber(cnt - 1));
+                  })
+                  .fail(function (result) {
+                    // 실패시 체크박스 원래대로
+                    $('#div_userProfile #chk_follow').prop('checked', !checked);
+                  });
+              } else {
+                // 선택 안된건 팔로우
+                post('/api/follow/' + memberNo)
+                  .done(function (result) {
+                    // 기존 follow 숫자에서 +1
+                    var cnt = fn_getOnlyNumber($('#div_userProfile #followerCnt').html()) * 1;
+                    $('#div_userProfile #followerCnt').html(fn_getCommaNumber(cnt + 1));
+                  })
+                  .fail(function (result) {
+                    // 실패시 체크박스 원래대로
+                    $('#div_userProfile #chk_follow').prop('checked', !checked);
+                  });
+              }
+            }
+          });
+          */
+        });
+
+        var Myswiper = new Swiper('.mymenu_slider', {
+          freeMode: false,
+          slidesPerView: 'auto',
+          spaceBetween: 14
+        });
+      });
+
+      // 스크롤시 추가 데이터 조회
+      $(document).on('scroll', function (e) {
+        if (isLoading) return;
+        if ($(document).height() - ($(document).scrollTop() + $(window).height()) < 100) {
+          isLoading = true;
+          getVideo(nowDisplayVideoDivCd).done(function () {
+            isLoading = false;
+          });
+        }
+      });
+
+      // 영상 탭 변경
+      function fn_moveTab(videoDivCd) {
+        if (videoDivCd == 'NORMAL') {
+          openToastPop('서비스 준비중 입니다.');
+          return;
+        }
+
+        // 현재 탭이면 return;
+        if ($('#div_userProfile .swiper-wrapper .swiper-slide.' + videoDivCd.toLowerCase()).hasClass('active')) return;
+        if (videoDivCd == 'TEMP') {
+          // 임시는 앱 호출
+          // 			reqToApp("TempVideoList");
+          // 			alert("앱 호출 - 임시저장 비디오 목록");
+          return;
+        }
+        // 전체 active 지우고
+        $('#div_userProfile .swiper-wrapper .swiper-slide').removeClass('active');
+        // 선택한 곳에 active
+        $('#div_userProfile .swiper-wrapper .swiper-slide.' + videoDivCd.toLowerCase()).addClass('active');
+        // 전체 영상 목록 탭 숨기고
+        $('#div_userProfile .my_list').hide();
+        $('#div_userProfile #' + videoDivCd.toLowerCase() + '_video_list').css('display', '');
+
+        nowDisplayVideoDivCd = videoDivCd;
+
+        // 처음 이동이면 페이지 조회
+        if (nowPageMap[videoDivCd] == 0) {
+          getVideo(videoDivCd);
+        }
+      }
+
+      // 화면 초기화
+      function initProfile() {
+        // 기본 프로필 정보
+        /*
+        get('/api/userProfile/' + memberNo).done(function (result) {
+          var data = result.data;
+          if (data.memberStatusCd == 'M20' || data.memberStatusCd == 'M99') {
+            layerAlert('접근 할 수 없는 사용자 프로필 입니다.').done(function () {
+              reqToApp('ClosePopupUrl');
+            });
+            return;
+          }
+          $('#div_userProfile #memberId').html(data.memberId);
+          $('#div_userProfile #profileImg').css('background-image', 'url(' + data.profileImgUrl + '), url(/rsc/front/images/common/ico_mypage.png)');
+          $('#div_userProfile #videoCnt').html(fn_getCommaNumber(data.videoCnt));
+          $('#div_userProfile #followerCnt').html(fn_getCommaNumber(data.followerCnt));
+          $('#div_userProfile #followingCnt').html(fn_getCommaNumber(data.followingCnt));
+
+          if (data.memberGrdCd == 'PERFORMER') {
+            $('#div_userProfile .ico_perfomer').show();
+          }
+
+          if (data.followYn == 'Y') {
+            $('#div_userProfile #chk_follow').prop('checked', false);
+          }
+        });
+        */
+      }
+
+      // 비디오 목록 조회
+      var nowPageMap = { ALL: 0, NORMAL: 0, CHALLENGE: 0 };
+      var lastPageMap = { ALL: 1, NORMAL: 1, CHALLENGE: 1 };
+      var rowsPerPage = 9; // 한번에 불러올 개수
+      function getVideo(videoDivCd) {
+        var dfd = $.Deferred();
+
+        // 현재 페이지가 마지막 페이지면 조회 안함
+        if (nowPageMap[videoDivCd] >= lastPageMap[videoDivCd]) {
+          dfd.resolve();
+          return dfd.promise();
+        }
+
+        var nowPage = nowPageMap[videoDivCd] + 1;
+
+        nowPageMap[videoDivCd] = nowPage;
+
+        paramVideoDivCd = videoDivCd;
+        if (paramVideoDivCd == 'ALL') {
+          // ALL 일때는 빈값으로 넘김
+          paramVideoDivCd = '';
+        }
+        /*
+        get('/api/memberVideoList/' + memberNo, 'videoDivCd=' + paramVideoDivCd + '&videoStatusCd=POST&rowsPerPage=' + rowsPerPage + '&nowPage=' + nowPage).done(function (result) {
+          if (nowPage == 1) lastPageMap[videoDivCd] = result.data.lastPage;
+
+          var div = $('#' + videoDivCd.toLowerCase() + '_video_list');
+          var list = result.data.list;
+          for (var i = 0; i < list.length; i++) {
+            var data = list[i];
+            var tmplt = $('#videoList_template').clone();
+            tmplt.attr('data-video-no', data.videoNo);
+            tmplt.find('img').attr('src', data.videoThumbUrl);
+            tmplt.on('click', function () {
+              var videoParam = {};
+              videoParam.type = 'userVideo';
+              videoParam.videoNo = $(this).data('videoNo');
+              videoParam.rowsPerPage = rowsPerPage;
+              videoParam.nowPage = nowPage;
+              videoParam.videoDivCd = paramVideoDivCd;
+              videoParam.regMemberNo = memberNo;
+              reqToApp('PlayVideo', JSON.stringify(videoParam));
+            });
+            tmplt.show();
+            div.append(tmplt);
+          }
+
+          dfd.resolve();
+        });
+        */
+        return dfd.promise();
+      }
+
+      // follower 목록 화면
+      function fn_goFollowerList() {
+        getPageAjax('/mypage/follow', 'type=follower&followMemberNo=' + memberNo).done(function (result) {
+          $('#div_userProfile').hide();
+          $('body').append(result);
+        });
+      }
+
+      // following 목록 화면
+      function fn_goFollowingList() {
+        getPageAjax('/mypage/follow', 'type=following&followMemberNo=' + memberNo).done(function (result) {
+          $('#div_userProfile').hide();
+          $('body').append(result);
+        });
+      }
+
+      // 창 닫기
+      function fn_closeProfile() {
+        reqToApp('ClosePopupUrl');
+      }
+
+      // 로그인 창 닫을때
+      function afterCloseLoginPage() {
+        // 로그인 다시 체크
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            // 로그인 안된 경우
+          } else {
+            // 로그인 된 경우
+            initProfile();
+          }
+        });
+      }
+
+      // 로그인 체크해서 신고하기 버튼 보이기/숨기기
+      function fn_checkReportUserBtn() {
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            $('#div_userProfile .btn_troble').hide();
+          } else {
+            $('#div_userProfile .btn_troble').show();
+          }
+        });
+      }
+
+      // 사용자 신고하기
+      function fn_userReport() {
+        // 		openReportPopup("USER", memberNo);
+        fn_checkLoginYn(
+          'N',
+          () => {
+            openReportPopup('USER', memberNo);
+          },
+          null
+        );
+      }
+
+      // 로그인 체크 해서 로그인 안했으면 로그인 창
+      function fn_checkLoginYn(alertYn, callback, noLoginCallback) {
+        getAccessToken().done(function (result) {
+          if (result == null || result == '') {
+            if (alertYn == 'Y') {
+              layerAlert('로그인이 필요한 서비스입니다.').done(openLoginPage);
+            } else {
+              openLoginPage();
+            }
+            if (noLoginCallback) noLoginCallback();
+          } else {
+            if (callback) {
+              callback();
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
