@@ -45,16 +45,18 @@
       $('#divDormantEmailAuth .btn_send_code').on('click', function () {
         var body = { email: $('#divDormantEmailAuth [name=email]').val() };
 
-        post('/api/sendEmailCertiNo', null, body)
-          .done(function (result) {
-            getPageAjax('../login/confirm_code.html', 'type=dormant&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
-              $('#dormantMemberForm').append(result); // 인증 코드 입력 화면 붙이고
-              $('#divDormantEmailAuth').hide(); // 현재화면 (이메일인증) 숨기기
-            });
-          })
-          .fail(function (result) {
-            layerAlert(result.respMsg);
-          });
+        // post('/api/sendEmailCertiNo', null, body)
+        //   .done(function (result) {
+        // getPageAjax('../login/confirm_code.html', 'type=dormant&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+        getPageAjax('../login/confirm_code.html').done(function (result) {
+          setUrlParams({ type: 'dormant', certiNoExpSec: 180 });
+          $('#dormantMemberForm').append(result); // 인증 코드 입력 화면 붙이고
+          $('#divDormantEmailAuth').hide(); // 현재화면 (이메일인증) 숨기기
+        });
+        // })
+        // .fail(function (result) {
+        //   layerAlert(result.respMsg);
+        // });
       });
 
       // 전화번호 인증으로 이동

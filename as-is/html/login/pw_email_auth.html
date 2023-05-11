@@ -30,23 +30,25 @@
       $('#divFindPwEmailAuth .btn_send_code').on('click', function () {
         var body = { email: $('#divFindPwEmailAuth [name=email]').val(), checkExistsYn: 'Y' };
 
-        post('/api/sendEmailCertiNo', null, body)
-          .done(function (result) {
-            getPageAjax('../login/confirm_code.html', 'type=findPw&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
-              $('#findPwForm').append(result); // 인증 코드 입력 화면 붙이고
-              $('#divFindPwEmailAuth').hide(); // 현재화면 (이메일인증) 숨기기
-            });
-          })
-          .fail(function (result) {
-            if (result.respCode == '<%= CommonConstants.ERR_CD_NOT_EXISTS_MEMBER %>') {
-              $('#divFindPwEmailAuth .warning_txt').html(result.respMsg);
-              $('#divFindPwEmailAuth .warning_txt').show();
-              // 코드 받기 버튼 비활성화
-              $('#divFindPwEmailAuth .btn_send_code').prop('disabled', true);
-            } else {
-              layerAlert(result.respMsg);
-            }
-          });
+        // post('/api/sendEmailCertiNo', null, body)
+        //   .done(function (result) {
+        // getPageAjax('../login/confirm_code.html', 'type=findPw&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+        getPageAjax('../login/confirm_code.html').done(function (result) {
+          setUrlParams({ type: 'findPw', certiNoExpSec: 180 });
+          $('#findPwForm').append(result); // 인증 코드 입력 화면 붙이고
+          $('#divFindPwEmailAuth').hide(); // 현재화면 (이메일인증) 숨기기
+        });
+        // })
+        // .fail(function (result) {
+        //   if (result.respCode == '<%= CommonConstants.ERR_CD_NOT_EXISTS_MEMBER %>') {
+        //     $('#divFindPwEmailAuth .warning_txt').html(result.respMsg);
+        //     $('#divFindPwEmailAuth .warning_txt').show();
+        //     // 코드 받기 버튼 비활성화
+        //     $('#divFindPwEmailAuth .btn_send_code').prop('disabled', true);
+        //   } else {
+        //     layerAlert(result.respMsg);
+        //   }
+        // });
       });
     });
   </script>
