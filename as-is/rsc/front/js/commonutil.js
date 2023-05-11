@@ -248,7 +248,7 @@ function getPageAjax(url, param) {
     data: param
   })
     .done(function (result, textStatus, jqXHR) {
-      dfd.resolve(result);
+      dfd.resolve(result, textStatus);
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
       dfd.reject();
@@ -643,3 +643,40 @@ function fn_back() {
   // 보이는 .div_layer 중에 맨 뒤에 있는 화면의 뒤로가기/닫기 버튼 클릭
   $('.div_layer:visible').last().find('.btn_go_prev,.btn_close,.btn_okay').trigger('click');
 }
+
+/** 안효주 추가 */
+const getUrlParams = function () {
+  const params = {};
+  window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (str, key, value) {
+    params[key] = value;
+  });
+  return params;
+};
+
+const setUrlParams = function (obj) {
+  const newUrl = new URL(window.location.href);
+  // newUrl.searchParams.set('type', 'join');
+  // newUrl.searchParams.append('type', 'join');
+  $.each(obj, function (key, value) {
+    newUrl.searchParams.append('' + key, '' + value);
+  });
+  window.history.pushState({}, '', newUrl);
+};
+
+const removeUrlParams = function (array) {
+  var urlParams = new URLSearchParams(window.location.search);
+
+  // "type" 파라미터 삭제
+  if (typeof array === 'string') {
+    urlParams.delete(array);
+  } else {
+    $.each(array, function () {
+      console.log(this);
+      urlParams.delete(this);
+    });
+  }
+
+  // 변경된 URL 업데이트
+  var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + urlParams.toString();
+  window.history.pushState({}, '', newUrl);
+};

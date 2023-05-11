@@ -1,14 +1,10 @@
 <div class="wrap joinStep findPwStep dormantStep div_layer" id="divConfirmCode">
   <script type="text/javascript">
     // 코드 만료시간
-    // var codeExpTimeSec = '<%= request.getParameter("certiNoExpSec") %>';
-    var codeExpTimeSec = getUrlParams().certiNoExpSec;
+    var codeExpTimeSec = '<%= request.getParameter("certiNoExpSec") %>';
 
     // 인증 구분 (join/findPw)
-    //var confirmType = '<%= request.getParameter("type") %>';
-    var confirmType = getUrlParams().type;
-
-    removeUrlParams(['type', 'certiNoExpSec']);
+    var confirmType = '<%= request.getParameter("type") %>';
 
     // 인증 번호가 발송된 email 주소 혹은 전화번호 (검증 and 재전송 처리용)
     var certiNoSendId = '';
@@ -53,72 +49,69 @@
             inputCertiNo += $(this).val();
             if (inputCertiNo.length == 6) {
               // 6자리 다 입력했으면 인증 번호 검증
-              // get('/api/checkCertiNo', 'sendId=' + certiNoSendId + '&certiNo=' + inputCertiNo)
-              //   .done(function (result) {
-              //     if (result.data.matchYn == 'Y') {
-              // 인증 번호 일치하면
+              get('/api/checkCertiNo', 'sendId=' + certiNoSendId + '&certiNo=' + inputCertiNo)
+                .done(function (result) {
+                  if (result.data.matchYn == 'Y') {
+                    // 인증 번호 일치하면
 
-              if (confirmType == 'join') {
-                // 회원가입 일때
-                // 인증 번호 form에 등록
-                $('#joinForm [name=certiNo]').val(inputCertiNo);
+                    if (confirmType == 'join') {
+                      // 회원가입 일때
+                      // 인증 번호 form에 등록
+                      $('#joinForm [name=certiNo]').val(inputCertiNo);
 
-                // 이메일인증여부/휴대폰인증여부 넣어주기
-                var joinTypeCd = $('#joinForm [name=joinTypeCd]').val();
-                if (joinTypeCd == 'EMAIL') {
-                  $('#joinForm [name=emailCertiYn]').val('Y');
-                } else if (joinTypeCd == 'PHONE') {
-                  $('#joinForm [name=mobileCertiYn]').val('Y');
-                }
+                      // 이메일인증여부/휴대폰인증여부 넣어주기
+                      var joinTypeCd = $('#joinForm [name=joinTypeCd]').val();
+                      if (joinTypeCd == 'EMAIL') {
+                        $('#joinForm [name=emailCertiYn]').val('Y');
+                      } else if (joinTypeCd == 'PHONE') {
+                        $('#joinForm [name=mobileCertiYn]').val('Y');
+                      }
 
-                // 다음 화면
-                getPageAjax('../login/password.html', 'type=join').done(function (result) {
-                  setUrlParams({ type: 'join' });
-                  $('#joinForm').append(result); // 비밀번호 입력 화면 붙이고
-                  $('#divConfirmCode').hide(); // 현재 화면(인증코드확인) 숨기기
+                      // 다음 화면
+                      getPageAjax('../login/password.html', 'type=join').done(function (result) {
+                        $('#joinForm').append(result); // 비밀번호 입력 화면 붙이고
+                        $('#divConfirmCode').hide(); // 현재 화면(인증코드확인) 숨기기
+                      });
+                    } else if (confirmType == 'findPw') {
+                      // 비밀번호 찾기 일때
+                      // 인증 번호 form에 등록
+                      $('#findPwForm [name=certiNo]').val(inputCertiNo);
+
+                      // 다음 화면
+                      getPageAjax('../login/password.html', 'type=findPw').done(function (result) {
+                        $('#findPwForm').append(result); // 비밀번호 입력 화면 붙이고
+                        $('#divConfirmCode').hide(); // 현재 화면(인증코드확인) 숨기기
+                      });
+                    } else if (confirmType == 'dormant') {
+                      // 휴면회원 해제 일때
+                      // 인증 번호 form에 등록
+                      $('#dormantMemberForm [name=certiNo]').val(inputCertiNo);
+
+                      // 이메일인증여부/휴대폰인증여부 넣어주기
+                      var dormantWakeTypeCd = $('#dormantMemberForm [name=dormantWakeTypeCd]').val();
+                      if (dormantWakeTypeCd == 'EMAIL') {
+                        $('#dormantMemberForm [name=emailCertiYn]').val('Y');
+                      } else if (dormantWakeTypeCd == 'PHONE') {
+                        $('#dormantMemberForm [name=mobileCertiYn]').val('Y');
+                      }
+
+                      post('/api/awakeDormant', null, $('#dormantMemberForm').serializeObject())
+                        .done(function (result) {
+                          afterDormantWake(); // 휴면 해제 완료 실행
+                        })
+                        .fail(function (result) {
+                          layerAlert(result.respMsg);
+                        });
+                    }
+                  } else {
+                    // 불일치시 오류 메시지 표시
+                    $('#divConfirmCode #p_errMsg_invalidCode').show();
+                  }
+                })
+                .fail(function (result) {
+                  // 인증시간 초과 또는 기타 오류
+                  layerAlert(result.respMsg);
                 });
-              } else if (confirmType == 'findPw') {
-                // 비밀번호 찾기 일때
-                // 인증 번호 form에 등록
-                $('#findPwForm [name=certiNo]').val(inputCertiNo);
-
-                // 다음 화면
-                // getPageAjax('../login/password.html', 'type=findPw').done(function (result) {
-                getPageAjax('../login/password.html').done(function (result) {
-                  setUrlParams({ type: 'findPw' });
-                  $('#findPwForm').append(result); // 비밀번호 입력 화면 붙이고
-                  $('#divConfirmCode').hide(); // 현재 화면(인증코드확인) 숨기기
-                });
-              } else if (confirmType == 'dormant') {
-                // 휴면회원 해제 일때
-                // 인증 번호 form에 등록
-                $('#dormantMemberForm [name=certiNo]').val(inputCertiNo);
-
-                // 이메일인증여부/휴대폰인증여부 넣어주기
-                var dormantWakeTypeCd = $('#dormantMemberForm [name=dormantWakeTypeCd]').val();
-                if (dormantWakeTypeCd == 'EMAIL') {
-                  $('#dormantMemberForm [name=emailCertiYn]').val('Y');
-                } else if (dormantWakeTypeCd == 'PHONE') {
-                  $('#dormantMemberForm [name=mobileCertiYn]').val('Y');
-                }
-
-                post('/api/awakeDormant', null, $('#dormantMemberForm').serializeObject())
-                  .done(function (result) {
-                    afterDormantWake(); // 휴면 해제 완료 실행
-                  })
-                  .fail(function (result) {
-                    layerAlert(result.respMsg);
-                  });
-              }
-              //   } else {
-              //     // 불일치시 오류 메시지 표시
-              //     $('#divConfirmCode #p_errMsg_invalidCode').show();
-              //   }
-              // })
-              // .fail(function (result) {
-              //   // 인증시간 초과 또는 기타 오류
-              //   layerAlert(result.respMsg);
-              // });
             }
           });
         }

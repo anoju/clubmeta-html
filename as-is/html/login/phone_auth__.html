@@ -18,15 +18,15 @@
 
         if (fn_checkValid('hp', $(this).val())) {
           // 정상 휴대폰 번호인 경우 중복 체크
-          // get('/api/member/duplCheck/MOBILE', 'checkValue=' + $(this).val()).done(function (result) {
-          //   if (result.data.dupYn == 'Y') {
-          //     // 오류 메시지 표시
-          //     $('#divPhoneAuth .warning_txt.already_use').show();
-          //   } else {
-          // 코드 받기 버튼 활성화
-          $('#divPhoneAuth .btn_send_code').prop('disabled', false);
-          //   }
-          // });
+          get('/api/member/duplCheck/MOBILE', 'checkValue=' + $(this).val()).done(function (result) {
+            if (result.data.dupYn == 'Y') {
+              // 오류 메시지 표시
+              $('#divPhoneAuth .warning_txt.already_use').show();
+            } else {
+              // 코드 받기 버튼 활성화
+              $('#divPhoneAuth .btn_send_code').prop('disabled', false);
+            }
+          });
         } else {
           $('#divPhoneAuth .warning_txt.not_valid').show();
         }
@@ -36,18 +36,16 @@
       $('#divPhoneAuth .btn_send_code').on('click', function () {
         var body = { countryCd: $('#divPhoneAuth [name=countryCd]').val(), mobileNo: $('#divPhoneAuth [name=mobileNo]').val() };
 
-        // post('/api/sendSmsCertiNo', null, body)
-        //   .done(function (result) {
-        // getPageAjax('../login/confirm_code.html', 'type=join&certiNoExpSec=' + result.data.certiNoExpSec).done
-        getPageAjax('../login/confirm_code.html').done(function (result) {
-          setUrlParams({ type: 'join', certiNoExpSec: 180 });
-          $('#joinForm').append(result); // 인증 코드 입력 화면 붙이고
-          $('#divPhoneAuth').hide(); // 현재화면 (전화번호인증) 숨기기
-        });
-        // })
-        // .fail(function (result) {
-        //   layerAlert(result.respMsg);
-        // });
+        post('/api/sendSmsCertiNo', null, body)
+          .done(function (result) {
+            getPageAjax('../login/confirm_code.html', 'type=join&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+              $('#joinForm').append(result); // 인증 코드 입력 화면 붙이고
+              $('#divPhoneAuth').hide(); // 현재화면 (전화번호인증) 숨기기
+            });
+          })
+          .fail(function (result) {
+            layerAlert(result.respMsg);
+          });
       });
 
       // 이메일 인증으로 이동

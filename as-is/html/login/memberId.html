@@ -26,28 +26,28 @@
         }
 
         // 중복 체크
-        get('/api/member/duplCheck/MEMBERID', 'checkValue=' + $('#divMemberId [name=memberId]').val()).done(function (result) {
-          if (result.data.dupYn == 'Y') {
-            // 오류 메시지 표시
-            $('#divMemberId #p_errMsg_dupId').show();
-            return;
-          } else {
-            // 오류 메시지 숨기기
-            $('#divMemberId #p_errMsg_dupId').hide();
-            // 완료 버튼 활성화
-            $('#divMemberId .btn_progress').prop('disabled', false);
-          }
-        });
+        // get('/api/member/duplCheck/MEMBERID', 'checkValue=' + $('#divMemberId [name=memberId]').val()).done(function (result) {
+        //   if (result.data.dupYn == 'Y') {
+        //     // 오류 메시지 표시
+        //     $('#divMemberId #p_errMsg_dupId').show();
+        //     return;
+        //   } else {
+        // 오류 메시지 숨기기
+        $('#divMemberId #p_errMsg_dupId').hide();
+        // 완료 버튼 활성화
+        $('#divMemberId .btn_progress').prop('disabled', false);
+        //   }
+        // });
       });
 
       // 완료 버튼 클릭시
       $('#divMemberId .btn_progress').on('click', function () {
-        post('/api/joinMember', null, $('#joinForm').serializeObject())
-          .done(function (result) {
-            $('#join_layer').remove();
-            $('#div_joinForm').removeClass('div_joinForm');
-            $('#joinForm > div').remove();
-            /*
+        // post('/api/joinMember', null, $('#joinForm').serializeObject())
+        //   .done(function (result) {
+        $('#join_layer').remove();
+        $('#div_joinForm').removeClass('div_joinForm');
+        $('#joinForm > div').remove();
+        /*
 					layerAlert("가입이 완료 되었습니다.")
 					.done(function() {
 						$("#join_layer").remove();
@@ -55,31 +55,31 @@
 						$("#joinForm > div").remove();
 					});
 					*/
-          })
-          .fail(function (result) {
-            if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_DUPL_EMAIL %>') {
-              // 이메일 중복
-              layerAlert('이미 사용중인 이메일 주소 입니다.').done(function () {
-                fn_backToJoinStep('divEmailAuth'); // 이메일 입력 화면으로 이동
-                $('#divEmailAuth [name=email]').trigger('input'); // 이벤트 발생으로 validation체크 다시 하도록 처리
-              });
-            } else if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_DUPL_MOBILE_NO %>') {
-              // 휴대폰 번호 중복
-              layerAlert('이미 사용중인 전화번호 입니다.').done(function () {
-                fn_backToJoinStep('divPhoneAuth'); // 전화번호 입력 화면으로 이동
-                $('#divPhoneAuth [name=mobileNo]').trigger('input'); // 이벤트 발생으로 validation체크 다시 하도록 처리
-              });
-            } else if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_INVALID_BIRTHDAY %>') {
-              // 생년월일 형식 오류
-              layerAlert('올바르지 않은 날짜 형식 입니다.').done(function () {
-                fn_backToJoinStep('divBirthday');
-              });
-            } else if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_DUPL_MEMBER_ID %>') {
-              // 사용자ID 중복
-              // 현재 화면이므로 다시 체크 하도록 input trigger
-              $('#divMemberId [name=memberId]').trigger('input');
-            }
-          });
+        // })
+        // .fail(function (result) {
+        //   if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_DUPL_EMAIL %>') {
+        //     // 이메일 중복
+        //     layerAlert('이미 사용중인 이메일 주소 입니다.').done(function () {
+        //       fn_backToJoinStep('divEmailAuth'); // 이메일 입력 화면으로 이동
+        //       $('#divEmailAuth [name=email]').trigger('input'); // 이벤트 발생으로 validation체크 다시 하도록 처리
+        //     });
+        //   } else if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_DUPL_MOBILE_NO %>') {
+        //     // 휴대폰 번호 중복
+        //     layerAlert('이미 사용중인 전화번호 입니다.').done(function () {
+        //       fn_backToJoinStep('divPhoneAuth'); // 전화번호 입력 화면으로 이동
+        //       $('#divPhoneAuth [name=mobileNo]').trigger('input'); // 이벤트 발생으로 validation체크 다시 하도록 처리
+        //     });
+        //   } else if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_INVALID_BIRTHDAY %>') {
+        //     // 생년월일 형식 오류
+        //     layerAlert('올바르지 않은 날짜 형식 입니다.').done(function () {
+        //       fn_backToJoinStep('divBirthday');
+        //     });
+        //   } else if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_DUPL_MEMBER_ID %>') {
+        //     // 사용자ID 중복
+        //     // 현재 화면이므로 다시 체크 하도록 input trigger
+        //     $('#divMemberId [name=memberId]').trigger('input');
+        //   }
+        // });
       });
     });
   </script>

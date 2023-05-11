@@ -10,7 +10,8 @@
   <script src="/as-is/rsc/front/js/restutil.js"></script>
   <script src="/as-is/rsc/front/js/commonutil.js"></script>
   <script type="text/javascript" src="/as-is/rsc/front/js/plugins/swiper-6.7.5.min.js"></script>
-  <script type="text/javascript" src="/as-is/rsc/front/js/plugins/lottie.min.js"></script>`;
+  <script type="text/javascript" src="/as-is/rsc/front/js/plugins/lottie.min.js"></script>
+  <script type="text/javascript" src="/as-is/rsc/front/js/plugins/ios-selector.js"></script>`;
   document.write(str);
   const $include = document.querySelector('.__include');
   if ($include) $include.remove();

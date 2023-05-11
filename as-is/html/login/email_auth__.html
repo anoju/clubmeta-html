@@ -19,22 +19,22 @@
           // 성공 메시지 숨기기
           $('#divEmailAuth .check_ok_txt').hide();
         } else {
-          // get('/api/member/duplCheck/EMAIL', 'checkValue=' + $(this).val()).done(function (result) {
-          //   if (result.data.dupYn == 'Y') {
-          // 오류 메시지 표시
-          // $('#divEmailAuth .warning_txt').html('이미 사용중인 이메일 주소 입니다.');
-          // $('#divEmailAuth .warning_txt').show();
-          // // 성공 메시지 숨기기
-          // $('#divEmailAuth .check_ok_txt').hide();
-          //   } else {
-          // 오류 메시지 숨기기
-          $('#divEmailAuth .warning_txt').hide();
-          // 성공 메시지 표시
-          $('#divEmailAuth .check_ok_txt').show();
-          // 코드 받기 버튼 활성화
-          $('#divEmailAuth .btn_send_code').prop('disabled', false);
-          //   }
-          // });
+          get('/api/member/duplCheck/EMAIL', 'checkValue=' + $(this).val()).done(function (result) {
+            if (result.data.dupYn == 'Y') {
+              // 오류 메시지 표시
+              $('#divEmailAuth .warning_txt').html('이미 사용중인 이메일 주소 입니다.');
+              $('#divEmailAuth .warning_txt').show();
+              // 성공 메시지 숨기기
+              $('#divEmailAuth .check_ok_txt').hide();
+            } else {
+              // 오류 메시지 숨기기
+              $('#divEmailAuth .warning_txt').hide();
+              // 성공 메시지 표시
+              $('#divEmailAuth .check_ok_txt').show();
+              // 코드 받기 버튼 활성화
+              $('#divEmailAuth .btn_send_code').prop('disabled', false);
+            }
+          });
         }
       });
 
@@ -42,18 +42,16 @@
       $('#divEmailAuth .btn_send_code').on('click', function () {
         var body = { email: $('#divEmailAuth [name=email]').val() };
 
-        // post('/api/sendEmailCertiNo', null, body)
-        //   .done(function (result) {
-        //getPageAjax('../login/confirm_code.html', 'type=join&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
-        getPageAjax('../login/confirm_code.html').done(function (result) {
-          setUrlParams({ type: 'join', certiNoExpSec: 180 });
-          $('#joinForm').append(result); // 인증 코드 입력 화면 붙이고
-          $('#divEmailAuth').hide(); // 현재화면 (이메일인증) 숨기기
-        });
-        // })
-        // .fail(function (result) {
-        //   layerAlert(result.respMsg);
-        // });
+        post('/api/sendEmailCertiNo', null, body)
+          .done(function (result) {
+            getPageAjax('../login/confirm_code.html', 'type=join&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+              $('#joinForm').append(result); // 인증 코드 입력 화면 붙이고
+              $('#divEmailAuth').hide(); // 현재화면 (이메일인증) 숨기기
+            });
+          })
+          .fail(function (result) {
+            layerAlert(result.respMsg);
+          });
       });
 
       // 전화번호 인증으로 이동
