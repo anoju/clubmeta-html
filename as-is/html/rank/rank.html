@@ -27,7 +27,10 @@
         <h2>이벤트<i class="ico_event"></i></h2>
         <!-- slider evnet -->
         <div class="event_slider">
-          <div class="swiper-wrapper" id="eventList"></div>
+          <div class="swiper-wrapper" id="eventList">
+            <a href="javascript:openEventPopup('4')" class="swiper-slide"><img src="http://app-dev.club-meta.io/upload/20221012/banner3.png" alt="이벤트" onerror="this.src='/rsc/front/images/common/no_img.jpg'" /></a>
+            <a href="javascript:openEventPopup('2')" class="swiper-slide"><img src="http://app-dev.club-meta.io/upload/20221012/banner0.png" alt="이벤트" onerror="this.src='/rsc/front/images/common/no_img.jpg'" /></a>
+          </div>
 
           <div class="swiper-pagination"></div>
         </div>
@@ -37,14 +40,59 @@
           <h2>인기 챌린지<i class="ico_hit"></i></h2>
           <button type="button" class="btn_open_challenge" onclick="openHold()" style="display: none">개최</button>
         </div>
-        <div id="hotChallengeList"></div>
-        <button type="button" class="btn_more_challenge" onclick="searchChallenge()" style="display: none">더 많은 챌린지 찾기</button>
+        <div id="hotChallengeList">
+          <div class="hit_challenge">
+            <div class="tit_more">
+              <h3 onclick="openChallengeDetail('52')">#테스트챌린지2</h3>
+              <a href="javascript:openChallengeDetail('52');" class="btn_view_more">더 보기</a>
+            </div>
+            <a href="javascript:playVideo('playChlgVideo', 'http://stream-dev.club-meta.io:8989/video/challenge/1.mp4', null, null, null, null, null);" class="thumb"> <span class="play"></span> <img src="http://stream-dev.club-meta.io:8989/video/challenge/1.png" alt="#테스트챌린지2" onerror="this.src='/rsc/front/images/common/no_img.jpg'" /> </a>
+          </div>
+        </div>
+        <button type="button" class="btn_more_challenge" onclick="searchChallenge()">더 많은 챌린지 찾기</button>
 
         <div class="tit_more">
           <h2>퍼포머 랭킹<i class="ico_ranking"></i></h2>
           <a href="javascript:searchClubber()" id="viewMoreClubber" class="btn_view_more">더 보기</a>
         </div>
-        <div id="topClubberList"></div>
+        <div id="topClubberList">
+          <div class="performer_list ranking first">
+            <a href="javascript:viewUserProfile('10113');">
+              <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221121/1669022377579.jpg), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_1">1</i></div>
+            </a>
+            <div class="id">
+              <p>@Faker</p>
+              <span>1 Win</span>
+            </div>
+            <div class="follow_toggle">
+              <input type="checkbox" id="follow_10113" checked="" data-member-no="10113" value="N" /> <label for="follow_10113"><span></span></label>
+            </div>
+          </div>
+          <div class="performer_list ranking second">
+            <a href="javascript:viewUserProfile('10139');">
+              <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_2">2</i></div>
+            </a>
+            <div class="id">
+              <p>@Juhuyck</p>
+              <span>1 Win</span>
+            </div>
+            <div class="follow_toggle">
+              <input type="checkbox" id="follow_10139" checked="" data-member-no="10139" value="N" /> <label for="follow_10139"><span></span></label>
+            </div>
+          </div>
+          <div class="performer_list ranking third">
+            <a href="javascript:viewUserProfile('10141');">
+              <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221122/1669100099479.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_3">3</i></div>
+            </a>
+            <div class="id">
+              <p>@바셀2</p>
+              <span>1 Win</span>
+            </div>
+            <div class="follow_toggle">
+              <input type="checkbox" id="follow_10141" checked="" data-member-no="10141" value="N" /> <label for="follow_10141"><span></span></label>
+            </div>
+          </div>
+        </div>
       </div>
       <!--// contents -->
     </div>
@@ -55,7 +103,9 @@
       <div class="popup_head">
         <h1>이벤트</h1>
       </div>
-      <div class="popup_body">이벤트 상세설명</div>
+      <div class="popup_body">
+        <div class="popup_img"><img src="http://app-dev.club-meta.io/upload/20221012/banner0_desc.png" alt="" /></div>
+      </div>
     </div>
     <!--// popup_detail view-->
 
@@ -79,63 +129,59 @@
         getEventList();
 
         //인기챌린지
-        getHotChallengeList();
+        // getHotChallengeList();
 
         //퍼포머 랭킹
-        getTopClubberList();
+        //getTopClubberList();
       });
 
       //이벤트
       function getEventList() {
-        get('/api/eventList', null).done(function (result) {
-          var list = result.data.list;
-          var html = '';
-          if (list.length > 0) {
-            for (var i = 0; i < list.length; i++) {
-              html += '<a href="javascript:openEventPopup(\'' + list[i].eventNo + '\')" class="swiper-slide"><img src="' + list[i].eventThumbFileUrl + '" alt="' + list[i].eventTitle + '" onerror="this.src=\'/rsc/front/images/common/no_img.jpg\'"></a>';
-            }
-          } else {
-          }
-          $('#eventList').append(html);
+        // get('/api/eventList', null).done(function (result) {
+        //   var list = result.data.list;
+        //   var html = '';
+        //   if (list.length > 0) {
+        //     for (var i = 0; i < list.length; i++) {
+        //       html += '<a href="javascript:openEventPopup(\'' + list[i].eventNo + '\')" class="swiper-slide"><img src="' + list[i].eventThumbFileUrl + '" alt="' + list[i].eventTitle + '" onerror="this.src=\'/rsc/front/images/common/no_img.jpg\'"></a>';
+        //     }
+        //   } else {
+        //   }
+        //   $('#eventList').append(html);
 
-          EVTswiper = new Swiper('.event_slider', {
-            freeMode: false,
-            slidesPerView: 1,
-            spaceBetween: 7,
-            centeredSlides: true,
-            autoplay: {
-              delay: 5000
-            },
-            pagination: {
-              el: '.event_slider .swiper-pagination',
-              hide: true
-            },
-            breakpoints: {
-              413: {
-                slidesPerView: 'auto',
-                spaceBetween: 40
-              }
+        EVTswiper = new Swiper('.event_slider', {
+          freeMode: false,
+          slidesPerView: 1,
+          spaceBetween: 7,
+          centeredSlides: true,
+          autoplay: {
+            delay: 5000
+          },
+          pagination: {
+            el: '.event_slider .swiper-pagination',
+            hide: true
+          },
+          breakpoints: {
+            413: {
+              slidesPerView: 'auto',
+              spaceBetween: 40
             }
-          });
+          }
         });
+        //});
       }
 
       //이벤트 상세팝업 열기
       function openEventPopup(eventNo) {
-        $('#eventPop .popup_head h1').text('');
-        $('#eventPop .popup_body').text('');
+        // $('#eventPop .popup_head h1').text('');
+        // $('#eventPop .popup_body').text('');
 
-        get('/api/eventDetail/' + eventNo, null).done(function (result) {
-          var data = result.data;
-          $('#eventPop .popup_head h1').text(data.eventTitle);
-          $('#eventPop .popup_body').html(data.eventCont);
+        // get('/api/eventDetail/' + eventNo, null).done(function (result) {
+        //   var data = result.data;
+        //   $('#eventPop .popup_head h1').text(data.eventTitle);
+        //   $('#eventPop .popup_body').html(data.eventCont);
 
-          $('#eventPop').show();
-          /* 		    $("#eventPop").animate({bottom:"0"}, 300);
-            $('body').css('overflow','hidden');
-              var x=window.scrollX, y=window.scrollY;
-              window.onscroll=function(){window.scrollTo(x, y)}; */
-        });
+        $('#eventPop').show();
+        //});
       }
 
       //이벤트 상세팝업 닫기

@@ -45,6 +45,7 @@
 
     //검색 버튼 클릭 시
     function search() {
+      return;
       $('#searchChallengeForm #nowPage').val('1');
       $('#searchChallengeForm #lastPage').val('1');
       $('#challengeList').empty();
@@ -57,7 +58,8 @@
       var dfd = $.Deferred();
 
       var param = $('#searchChallengeForm').serialize();
-      get('/api/challenge/search', param).done(function (result) {
+      // get('/api/challenge/search', param).done(function (result) {
+      /*
         var list = result.data.list;
         var html = '';
         var isSwiper = false;
@@ -150,27 +152,27 @@
         $('#challengeList').append(html);
         $('#searchChallengeForm #lastPage').val(result.data.lastPage);
         $('#searchChallengeForm #rowsPerPage').val('20');
-
-        CRswiper = new Swiper('.ranking_slider', {
-          freeMode: false,
-          slidesPerView: 'auto',
-          spaceBetween: 13,
-          observer: true,
-          on: {
-            reachEnd: function () {},
-            activeIndexChange: function () {
-              var chlgNo = this.$el[0].dataset.chlgNo;
-              var activeIndex = this.activeIndex;
-              var realIndex = $('#swiper-wrapper-' + chlgNo).children().length;
-              //슬라이드 중간쯤 active되면 다음페이지 가져오기
-              if (activeIndex >= Number(realIndex) - 5) {
-                getChallengerVideoList(chlgNo);
-              }
+        */
+      CRswiper = new Swiper('.ranking_slider', {
+        freeMode: false,
+        slidesPerView: 'auto',
+        spaceBetween: 13,
+        observer: true,
+        on: {
+          reachEnd: function () {},
+          activeIndexChange: function () {
+            var chlgNo = this.$el[0].dataset.chlgNo;
+            var activeIndex = this.activeIndex;
+            var realIndex = $('#swiper-wrapper-' + chlgNo).children().length;
+            //슬라이드 중간쯤 active되면 다음페이지 가져오기
+            if (activeIndex >= Number(realIndex) - 5) {
+              // getChallengerVideoList(chlgNo);
             }
           }
-        });
-        dfd.resolve();
+        }
       });
+      dfd.resolve();
+      // });
       return dfd.promise();
     }
 
@@ -261,7 +263,516 @@
         <button type="button" class="btn_go_search" onclick="search()">검색</button>
       </div>
     </form>
-    <div id="challengeList"></div>
+    <div id="challengeList">
+      <div class="challenge_list" id="challenge_58" data-chlg-no="58">
+        <div class="tit_more">
+          <h2>#곰세마리챌린지</h2>
+          <span class="l_waiting">발표 대기</span> <a href="javascript:openChallengeDetail('58');" class="btn_view_more">더 보기</a>
+        </div>
+      </div>
+      <div class="challenge_no">
+        <i class="ico_empty"></i> 순위에 든 퍼포머가 없네요!<br />
+        챌린지에 참여하고 우승해 랭킹에 올라보세요.
+      </div>
+      <div class="challenge_list" id="challenge_52" data-chlg-no="52">
+        <div class="tit_more">
+          <h2>#테스트챌린지2</h2>
+          <span class="l_ing">진행 중</span> <a href="javascript:openChallengeDetail('52');" class="btn_view_more">더 보기</a>
+        </div>
+        <div class="ranking_slider" data-chlg-no="52">
+          <div class="swiper-wrapper" id="swiper-wrapper-52">
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10154');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '302', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10154/10154_20221129_105708.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10154');">@baekdama</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>3 표</span> <span><i class="ico_ai"></i>28 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '327', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10134/10134_20230105_014758.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10134');">@clubmeta_kakao</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>31 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '326', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10134/10134_20230104_052503.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10134');">@clubmeta_kakao</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>31 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '306', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10116/10116_20221129_021052.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10116');">@기타기타</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>3 표</span> <span><i class="ico_ai"></i>22 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10166');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '308', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10166/10166_20221129_024350.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10166');">@TOBETEST</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>24 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10168');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '309', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10168/10168_20221129_024522.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10168');">@ljm</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>23 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="javascript:void(0);" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221129/1669694114585.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '304', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10162/10162_20221129_010350.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10162');">탈퇴회원</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>4 표</span> <span><i class="ico_ai"></i>17 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10164');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '305', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10164/10164_20221129_015041.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10164');">@투비비빅</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>4 표</span> <span><i class="ico_ai"></i>9 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10170');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '313', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10170/10170_20221129_035242.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10170');">@ttssssaerifj</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>13 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '314', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10141/10141_20221129_041400.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10141');">@바셀2</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>10 점</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+        </div>
+      </div>
+      <div class="challenge_list" id="challenge_53" data-chlg-no="53">
+        <form id="challengerForm_53"><input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" /> <input type="hidden" id="nowPage" name="nowPage" value="1" /> <input type="hidden" id="lastPage" name="lastPage" value="1" /> <input type="hidden" id="chlgNo" name="chlgNo" value="53" /></form>
+        <div class="tit_more">
+          <h2>#test222</h2>
+          <span class="l_ended">종료</span> <a href="javascript:openChallengeDetail('53');" class="btn_view_more">더 보기</a>
+        </div>
+      </div>
+      <div class="challenge_no">
+        <i class="ico_empty"></i> 순위에 든 퍼포머가 없네요!<br />
+        챌린지에 참여하고 우승해 랭킹에 올라보세요.
+      </div>
+      <div class="challenge_list" id="challenge_54" data-chlg-no="54">
+        <form id="challengerForm_54"><input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" /> <input type="hidden" id="nowPage" name="nowPage" value="1" /> <input type="hidden" id="lastPage" name="lastPage" value="1" /> <input type="hidden" id="chlgNo" name="chlgNo" value="54" /></form>
+        <div class="tit_more">
+          <h2>#test4444</h2>
+          <span class="l_ended">종료</span> <a href="javascript:openChallengeDetail('54');" class="btn_view_more">더 보기</a>
+        </div>
+      </div>
+      <div class="challenge_no">
+        <i class="ico_empty"></i> 순위에 든 퍼포머가 없네요!<br />
+        챌린지에 참여하고 우승해 랭킹에 올라보세요.
+      </div>
+      <div class="challenge_list" id="challenge_55" data-chlg-no="55">
+        <form id="challengerForm_55"><input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" /> <input type="hidden" id="nowPage" name="nowPage" value="1" /> <input type="hidden" id="lastPage" name="lastPage" value="1" /> <input type="hidden" id="chlgNo" name="chlgNo" value="55" /></form>
+        <div class="tit_more">
+          <h2>#test5555</h2>
+          <span class="l_ended">종료</span> <a href="javascript:openChallengeDetail('55');" class="btn_view_more">더 보기</a>
+        </div>
+      </div>
+      <div class="challenge_no">
+        <i class="ico_empty"></i> 순위에 든 퍼포머가 없네요!<br />
+        챌린지에 참여하고 우승해 랭킹에 올라보세요.
+      </div>
+      <div class="challenge_list" id="challenge_49" data-chlg-no="49">
+        <div class="tit_more">
+          <h2>#TOBE_Challenge1</h2>
+          <span class="l_ended">종료</span> <a href="javascript:openChallengeDetail('49');" class="btn_view_more">더 보기</a>
+        </div>
+        <div class="ranking_slider" data-chlg-no="49">
+          <div class="swiper-wrapper" id="swiper-wrapper-49">
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '324', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221207_105050.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10113');">@Faker</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>100 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '321', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221201_023122.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10113');">@Faker</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>94 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '320', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221201_021607.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10113');">@Faker</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>74 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '323', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221207_104931.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10113');">@Faker</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>71 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '292', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221125_060636.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10113');">@Faker</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>48 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '289', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221125_053202.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>45 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '294', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221126_031943.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>38 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '297', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221126_032353.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>37 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10152');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '322', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10152/10152_20221205_034934.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10152');">@</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>0 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '325', '10', '1', '49', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221213_103920.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>0 점</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+        </div>
+      </div>
+      <div class="challenge_list" id="challenge_50" data-chlg-no="50">
+        <div class="tit_more">
+          <h2>#TOBE_Challenge2</h2>
+          <span class="l_ended">종료</span> <a href="javascript:openChallengeDetail('50');" class="btn_view_more">더 보기</a>
+        </div>
+        <div class="ranking_slider" data-chlg-no="50">
+          <div class="swiper-wrapper" id="swiper-wrapper-50">
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '291', '10', '1', '50', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221125_055802.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10113');">@Faker</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>91 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '295', '10', '1', '50', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221126_032103.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>27 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '299', '10', '1', '50', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221126_035630.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>20 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '298', '10', '1', '50', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221126_032906.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>0 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '296', '10', '1', '50', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221126_032303.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>0 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '290', '10', '1', '50', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10124/10124_20221125_053442.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10124');">@naverTest</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>0 점</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+        </div>
+      </div>
+      <div class="challenge_list" id="challenge_51" data-chlg-no="51">
+        <div class="tit_more">
+          <h2>#테스트챌린지</h2>
+          <span class="l_waiting">발표 대기</span> <a href="javascript:openChallengeDetail('51');" class="btn_view_more">더 보기</a>
+        </div>
+      </div>
+      <div class="challenge_no">
+        <i class="ico_empty"></i> 순위에 든 퍼포머가 없네요!<br />
+        챌린지에 참여하고 우승해 랭킹에 올라보세요.
+      </div>
+      <div class="challenge_list" id="challenge_48" data-chlg-no="48">
+        <div class="tit_more">
+          <h2>#상금챌린지2</h2>
+          <span class="l_ended">종료</span> <a href="javascript:openChallengeDetail('48');" class="btn_view_more">더 보기</a>
+        </div>
+        <div class="ranking_slider" data-chlg-no="48">
+          <div class="swiper-wrapper" id="swiper-wrapper-48">
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10139');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '264', '10', '1', '48', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10139/10139_20221123_015929.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10139');">@Juhuyck</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>59 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10149');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '266', '10', '1', '48', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10149/10149_20221123_021343.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10149');">@kk</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>36 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '263', '10', '1', '48', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10116/10116_20221123_010837.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10116');">@기타기타</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>2 표</span> <span><i class="ico_ai"></i>22 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10136');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '265', '10', '1', '48', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10136/10136_20221123_020847.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10136');">@123</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>0 점</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+        </div>
+      </div>
+      <div class="challenge_list" id="challenge_46" data-chlg-no="46">
+        <div class="tit_more">
+          <h2>#상금챌린지</h2>
+          <span class="l_ended">종료</span> <a href="javascript:openChallengeDetail('46');" class="btn_view_more">더 보기</a>
+        </div>
+        <div class="ranking_slider" data-chlg-no="46">
+          <div class="swiper-wrapper" id="swiper-wrapper-46">
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '251', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10113/10113_20221122_113750.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10113');">@Faker</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>8 표</span> <span><i class="ico_ai"></i>76 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '260', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10141/10141_20221122_040322.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10141');">@바셀2</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>50 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="javascript:void(0);" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '254', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10128/10128_20221122_033108.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10128');">탈퇴회원</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>48 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '259', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10141/10141_20221122_040149.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10141');">@바셀2</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>39 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10126');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '253', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10126/10126_20221122_032022.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10126');">@iii</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>38 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="javascript:void(0);" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221122/1669100196096.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '257', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10122/10122_20221122_035107.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10122');">탈퇴회원</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>34 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10147');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '258', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10147/10147_20221122_040053.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10147');">@엉뚱이</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>35 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10121');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '250', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10121/10121_20221122_113647.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10121');">@hook</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>5 표</span> <span><i class="ico_ai"></i>25 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '261', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10116/10116_20221122_051419.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10116');">@기타기타</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>32 점</span>
+                </div>
+              </div>
+            </div>
+            <div class="challenger_list swiper-slide">
+              <div class="performer" onclick="viewUserProfile('10126');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <a href="javascript:playVideo('rankVideo', '256', '10', '1', '46', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10126/10126_20221122_034113.png" alt="" /> </a>
+              <div class="id">
+                <p onclick="viewUserProfile('10126');">@iii</p>
+                <div class="point_area">
+                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>28 점</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+        </div>
+      </div>
+    </div>
   </div>
   <!--// contents -->
 </div>
