@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="like_toggle">
-          <input type="checkbox" id="" onclick="fn_cmmtLike(event);" />
+          <input type="checkbox" onclick="fn_cmmtLike(event);" />
           <label for=""><span></span><em class="em_likeCnt"></em></label>
         </div>
       </div>
@@ -49,11 +49,54 @@
       </div>
 
       <div class="reply_body" id="div_replyList_wrapper">
-        <div id="div_replyList"></div>
+        <div id="div_replyList">
+          <div class="reply_list" data-member-no="10183" data-cmmt-no="350" data-my-cmmt-yn="Y">
+            <a onclick="fn_goUserProfile(event);">
+              <div class="performer" style="background-image: url('//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png'), url('/as-is/rsc/front/images/common/ico_mypage.png')"></div>
+            </a>
+            <div class="id">
+              <a onclick="fn_goUserProfile(event);">
+                <p class="p_memberId">TARAN_PUB</p>
+              </a>
+
+              <div class="txt replyCont">댓글 테스트22</div>
+              <div class="info">
+                <span class="time">58초 전</span>
+
+                <a class="a_delReply" onclick="fn_deleteCmmt(event);">삭제</a>
+              </div>
+            </div>
+            <div class="like_toggle">
+              <input type="checkbox" id="like350" onclick="fn_cmmtLike(event);" />
+              <label for="like350"><span></span><em class="em_likeCnt">0</em></label>
+            </div>
+          </div>
+          <div class="reply_list" data-member-no="10183" data-cmmt-no="349" data-my-cmmt-yn="Y">
+            <a onclick="fn_goUserProfile(event);">
+              <div class="performer" style="background-image: url('//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png'), url('/as-is/rsc/front/images/common/ico_mypage.png')"></div>
+            </a>
+            <div class="id">
+              <a onclick="fn_goUserProfile(event);">
+                <p class="p_memberId">TARAN_PUB</p>
+              </a>
+
+              <div class="txt replyCont">댓글 테스트1</div>
+              <div class="info">
+                <span class="time">1분 전</span>
+
+                <a class="a_delReply" onclick="fn_deleteCmmt(event);">삭제</a>
+              </div>
+            </div>
+            <div class="like_toggle">
+              <input type="checkbox" id="like349" onclick="fn_cmmtLike(event);" />
+              <label for="like349"><span></span><em class="em_likeCnt">0</em></label>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="reply_btm">
-        <div class="performer" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
+        <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
         <div class="reply_form">
           <input type="text" name="cmmtCont" style="font-weight: 300" />
           <button onclick="fn_insertReply(event);" id="btnInsertReply">전송</button>
@@ -82,6 +125,7 @@
         //$(".reply_form [name=cmmtCont]").focus();	// 이건 웹뷰에서는 안먹음.(사용자 Action이 뭔가 있어야 한다고 함.)
 
         // 댓글 가능 여부 확인
+        /*
         get('/api/selectVideo/' + videoNo).done(function (result) {
           if (result.data.cmmtAllowYn != 'Y') {
             $('.reply_form [name=cmmtCont]').val('');
@@ -95,6 +139,7 @@
             };
           }
         });
+        */
 
         // 스크롤시 추가 데이터 조회
         $('#div_replyList_wrapper').on('scroll', function (e) {
@@ -112,9 +157,11 @@
         // 로그인 했으면 프로필 이미지 세팅
         getAccessToken().done(function (result) {
           if (result != null && result != '') {
+            /*
             get('/api/myProfile').done(function (result) {
               $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
             });
+            */
           }
         });
       });
@@ -133,6 +180,7 @@
       function fn_getPage(lastCmmtNo) {
         var dfd = $.Deferred();
         if (lastCmmtNo == null) lastCmmtNo = '';
+        /*
         get('/api/replyList/' + videoNo, 'lastCmmtNo=' + lastCmmtNo).done(function (result) {
           restCnt = result.data.restCnt * 1;
           if (lastCmmtNo == null || lastCmmtNo == '') {
@@ -146,6 +194,7 @@
           });
           dfd.resolve();
         });
+        */
 
         return dfd.promise();
       }
@@ -225,6 +274,7 @@
             $('.reply_form [name=cmmtCont]').select();
           });
         } else {
+          /*
           post('/api/replyPost/' + videoNo, null, { cmmtCont: cmmtCont })
             .done(function (result) {
               // 입력한거 지우고
@@ -237,6 +287,7 @@
             .fail(function (result) {
               layerAlert(result.respMsg);
             });
+            */
         }
       }
       // 댓글 좋아요
@@ -336,9 +387,11 @@
             // 다시 조회
             fn_getFirstPage();
             // 프로필 이미지 표시
+            /*
             get('/api/myProfile').done(function (result) {
               $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
             });
+            */
           }
         });
       }
