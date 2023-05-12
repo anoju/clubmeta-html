@@ -28,8 +28,8 @@
         <!-- slider evnet -->
         <div class="event_slider">
           <div class="swiper-wrapper" id="eventList">
-            <a href="javascript:openEventPopup('4')" class="swiper-slide"><img src="http://app-dev.club-meta.io/upload/20221012/banner3.png" alt="이벤트" onerror="this.src='/rsc/front/images/common/no_img.jpg'" /></a>
-            <a href="javascript:openEventPopup('2')" class="swiper-slide"><img src="http://app-dev.club-meta.io/upload/20221012/banner0.png" alt="이벤트" onerror="this.src='/rsc/front/images/common/no_img.jpg'" /></a>
+            <a href="javascript:openEventPopup('4')" class="swiper-slide"><img src="http://app-dev.club-meta.io/upload/20221012/banner3.png" alt="이벤트" onerror="this.src='/as-is/rsc/front/images/common/no_img.jpg'" /></a>
+            <a href="javascript:openEventPopup('2')" class="swiper-slide"><img src="http://app-dev.club-meta.io/upload/20221012/banner0.png" alt="이벤트" onerror="this.src='/as-is/rsc/front/images/common/no_img.jpg'" /></a>
           </div>
 
           <div class="swiper-pagination"></div>
@@ -46,7 +46,7 @@
               <h3 onclick="openChallengeDetail('52')">#테스트챌린지2</h3>
               <a href="javascript:openChallengeDetail('52');" class="btn_view_more">더 보기</a>
             </div>
-            <a href="javascript:playVideo('playChlgVideo', 'http://stream-dev.club-meta.io:8989/video/challenge/1.mp4', null, null, null, null, null);" class="thumb"> <span class="play"></span> <img src="http://stream-dev.club-meta.io:8989/video/challenge/1.png" alt="#테스트챌린지2" onerror="this.src='/rsc/front/images/common/no_img.jpg'" /> </a>
+            <a href="javascript:playVideo('playChlgVideo', 'http://stream-dev.club-meta.io:8989/video/challenge/1.mp4', null, null, null, null, null);" class="thumb"> <span class="play"></span> <img src="http://stream-dev.club-meta.io:8989/video/challenge/1.png" alt="#테스트챌린지2" onerror="this.src='/as-is/rsc/front/images/common/no_img.jpg'" /> </a>
           </div>
         </div>
         <button type="button" class="btn_more_challenge" onclick="searchChallenge()">더 많은 챌린지 찾기</button>
@@ -335,13 +335,16 @@
           var followYn = $(this).val();
           var $this = $('#rankWrap #topClubberList #follow_' + memberNo);
 
+          if ($this.prop('checked')) {
+            layerAlert('팔로잉 취소');
+          } else {
+            layerAlert('팔로잉');
+          }
+          /*
           getAccessToken().done(function (result) {
             if (result == null || result == '') {
               $this.prop('checked', !$this.is(':checked'));
               openLoginPage();
-              /* 				$this.prop("checked", !$this.is(":checked"));
-            layerAlert("로그인이 필요한 서비스입니다.")
-            .done(openLoginPage); */
             } else {
               if (followYn == 'Y') {
                 del('/api/followCancel/' + memberNo, null, null)
@@ -362,6 +365,7 @@
               }
             }
           });
+          */
         });
 
       // 로그인 창이 닫혔을때 (개최페이지, 랭크 팔로우, 퍼포머 랭킹팔로우에서 공통으로 사용)

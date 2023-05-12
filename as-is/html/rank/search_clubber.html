@@ -50,7 +50,7 @@
     function clubberSearch() {
       $('#searchTopClubberForm #nowPage').val('1');
       $('#searchTopClubberForm #lastPage').val('1');
-      $('#clubberList').empty();
+      // $('#clubberList').empty();
 
       getClubberList();
     }
@@ -60,7 +60,7 @@
       var dfd = $.Deferred();
 
       var param = $('#searchTopClubberForm').serialize() + '&memberGrdCd=PERFORMER';
-
+      return;
       get('/api/challenge/topClubberList', param).done(function (result) {
         var list = result.data.list;
         var html = '';
@@ -129,13 +129,16 @@
         var followYn = $(this).val();
         var $this = $('#searchClubberWrap #clubberList #clbFollow_' + memberNo);
 
+        if ($this.prop('checked')) {
+          layerAlert('팔로잉 취소');
+        } else {
+          layerAlert('팔로잉');
+        }
+        /*
         getAccessToken().done(function (result) {
           if (result == null || result == '') {
             $this.prop('checked', !$this.is(':checked'));
             openLoginPage();
-            /* 	   	 				$this.prop("checked", !$this.is(":checked"));
-              layerAlert("로그인이 필요한 서비스입니다.")
-              .done(openLoginPage); */
           } else {
             if (followYn == 'Y') {
               del('/api/followCancel/' + memberNo, null, null)
@@ -156,6 +159,7 @@
             }
           }
         });
+        */
       });
 
     // 로그인 창이 닫혔을때
@@ -213,7 +217,288 @@
         <button type="button" class="btn_go_search" onclick="clubberSearch()">검색</button>
       </div>
     </form>
-    <div class="all_ranking" id="clubberList"></div>
+    <div class="all_ranking" id="clubberList">
+      <div class="performer_list ranking first">
+        <a href="javascript:viewUserProfile('10113');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221121/1669022377579.jpg), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_1">1</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10113');">
+            <p>@Faker</p>
+            <span>1 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10113" checked="" data-member-no="10113" value="N" /> <label for="clbFollow_10113"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking second">
+        <a href="javascript:viewUserProfile('10139');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_2">2</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10139');">
+            <p>@Juhuyck</p>
+            <span>1 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10139" checked="" data-member-no="10139" value="N" /> <label for="clbFollow_10139"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking third">
+        <a href="javascript:viewUserProfile('10141');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221122/1669100099479.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_3">3</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10141');">
+            <p>@바셀2</p>
+            <span>1 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10141" checked="" data-member-no="10141" value="N" /> <label for="clbFollow_10141"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10136');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">4</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10136');">
+            <p>@123</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10136" checked="" data-member-no="10136" value="N" /> <label for="clbFollow_10136"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10154');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">5</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10154');">
+            <p>@baekdama</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10154" checked="" data-member-no="10154" value="N" /> <label for="clbFollow_10154"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10134');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221129/1669710708696.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">6</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10134');">
+            <p>@clubmeta_kakao</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10134" checked="" data-member-no="10134" value="N" /> <label for="clbFollow_10134"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10120');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">7</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10120');">
+            <p>@comnik</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10120" checked="" data-member-no="10120" value="N" /> <label for="clbFollow_10120"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10121');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221122/1669085174830.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">8</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10121');">
+            <p>@hook</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10121" checked="" data-member-no="10121" value="N" /> <label for="clbFollow_10121"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10126');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221122/1669098146506.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">9</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10126');">
+            <p>@iii</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10126" checked="" data-member-no="10126" value="N" /> <label for="clbFollow_10126"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10149');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221123/1669180735269.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">10</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10149');">
+            <p>@kk</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10149" checked="" data-member-no="10149" value="N" /> <label for="clbFollow_10149"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10168');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">11</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10168');">
+            <p>@ljm</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10168" checked="" data-member-no="10168" value="N" /> <label for="clbFollow_10168"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10124');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">12</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10124');">
+            <p>@naverTest</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10124" checked="" data-member-no="10124" value="N" /> <label for="clbFollow_10124"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10166');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">13</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10166');">
+            <p>@TOBETEST</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10166" checked="" data-member-no="10166" value="N" /> <label for="clbFollow_10166"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10114');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">14</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10114');">
+            <p>@Tobetest1</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10114" checked="" data-member-no="10114" value="N" /> <label for="clbFollow_10114"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10170');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221129/1669701682835.jpg), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">15</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10170');">
+            <p>@ttssssaerifj</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10170" checked="" data-member-no="10170" value="N" /> <label for="clbFollow_10170"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10060');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/20221024/1666584857094.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">16</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10060');">
+            <p>@wizard94</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10060" checked="" data-member-no="10060" value="N" /> <label for="clbFollow_10060"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10116');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221130/1669768181993.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">17</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10116');">
+            <p>@기타기타</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10116" checked="" data-member-no="10116" value="N" /> <label for="clbFollow_10116"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10167');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221129/1669702305575.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">18</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10167');">
+            <p>@남자다</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10167" checked="" data-member-no="10167" value="N" /> <label for="clbFollow_10167"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10147');">
+          <div class="performer" style="background-image: url(http://app-dev.club-meta.io/upload/profile/20221122/1669100912145.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">19</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10147');">
+            <p>@엉뚱이</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10147" checked="" data-member-no="10147" value="N" /> <label for="clbFollow_10147"><span></span></label>
+        </div>
+      </div>
+      <div class="performer_list ranking">
+        <a href="javascript:viewUserProfile('10164');">
+          <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge">20</i></div>
+        </a>
+        <div class="id">
+          <a href="javascript:viewUserProfile('10164');">
+            <p>@투비비빅</p>
+            <span>0 회우승</span>
+          </a>
+        </div>
+        <div class="follow_toggle">
+          <input type="checkbox" id="clbFollow_10164" checked="" data-member-no="10164" value="N" /> <label for="clbFollow_10164"><span></span></label>
+        </div>
+      </div>
+    </div>
   </div>
   <!--// contents -->
 </div>
