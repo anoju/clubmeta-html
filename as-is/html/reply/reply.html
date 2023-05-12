@@ -50,20 +50,30 @@
 
       <div class="reply_body" id="div_replyList_wrapper">
         <div id="div_replyList">
+          <div class="reply_list">
+            <a>
+              <div class="performer" style="background-image: url('/as-is/rsc/front/images/common/ico_mypage.png')"></div>
+            </a>
+            <div class="id">
+              <a>
+                <p class="p_memberId">정지회원</p>
+              </a>
+              <div class="txt reported">해당 댓글은 신고로 인해 삭제처리 된 댓글입니다.</div>
+            </div>
+          </div>
           <div class="reply_list" data-member-no="10183" data-cmmt-no="350" data-my-cmmt-yn="Y">
             <a onclick="fn_goUserProfile(event);">
               <div class="performer" style="background-image: url('//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png'), url('/as-is/rsc/front/images/common/ico_mypage.png')"></div>
             </a>
             <div class="id">
               <a onclick="fn_goUserProfile(event);">
-                <p class="p_memberId">TARAN_PUB</p>
+                <p class="p_memberId">TARAN_PUB2</p>
               </a>
 
               <div class="txt replyCont">댓글 테스트22</div>
               <div class="info">
                 <span class="time">58초 전</span>
-
-                <a class="a_delReply" onclick="fn_deleteCmmt(event);">삭제</a>
+                <a class="a_reportReply" onclick="fn_cmmtReport(event);">신고</a>
               </div>
             </div>
             <div class="like_toggle">
