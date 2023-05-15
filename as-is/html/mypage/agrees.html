@@ -18,21 +18,25 @@
           var msgYn = $(this).prop('checked') ? '동의' : '거부';
 
           //동의여부 수정
+          /*
           post('/api/setReceiveAgree', null, $('#agreeForm').serializeObject())
             .done(function (result) {
-              var now = new Date();
-              var nowMonth = now.getMonth() + 1;
-              if (nowMonth < 10) nowMonth = '0' + nowMonth;
-              var nowDate = now.getDate();
-              if (nowDate < 10) nowDate = '0' + nowDate;
+              */
+          var now = new Date();
+          var nowMonth = now.getMonth() + 1;
+          if (nowMonth < 10) nowMonth = '0' + nowMonth;
+          var nowDate = now.getDate();
+          if (nowDate < 10) nowDate = '0' + nowDate;
 
-              var msg = now.getFullYear() + '년 ' + nowMonth + '월 ' + nowDate + '일<br/>' + msgData + ' ' + msgYn + ' 하셨습니다.';
-              layerAlert(msg);
+          var msg = now.getFullYear() + '년 ' + nowMonth + '월 ' + nowDate + '일<br/>' + msgData + ' ' + msgYn + ' 하셨습니다.';
+          layerAlert(msg);
+          /*
             })
             .fail(function (result) {
               $(this).prop('checked', !$(this).is(':checked'));
               layerAlert(result.respMsg);
             });
+            */
         });
     });
 

@@ -23,9 +23,9 @@
   <body>
     <div class="wrap" id="div_myProfile">
       <header>
-        <button type="button" class="btn_go_prev" style="display: none" onclick="fn_closeProfile();">이전으로</button>
-        <h1 id="memberId">ClubberId</h1>
-        <button type="button" class="btn_setting loginOnly" style="display: none" onclick="fn_goSettings();">설정</button>
+        <button type="button" class="btn_go_prev" onclick="fn_closeProfile();">이전으로</button>
+        <h1 id="memberId">TARAN_PUB</h1>
+        <button type="button" class="btn_setting" onclick="fn_goSettings();">설정</button>
       </header>
 
       <form id="profileImgForm" style="display: none">
@@ -34,8 +34,8 @@
 
       <!-- contents -->
       <div class="contents">
-        <div class="profile" id="profileImg" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)">
-          <button type="button" class="btn_add loginOnly"></button>
+        <div class="profile" id="profileImg" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(/as-is/rsc/front/images/common/ico_mypage.png)">
+          <button type="button" class="btn_add"></button>
         </div>
 
         <div class="my_follow">
@@ -53,15 +53,15 @@
           </a>
         </div>
 
-        <button type="button" class="btn_go_login notLoginOnly" onclick="openLoginPage();">로그인 또는 가입</button>
+        <!-- <button type="button" class="btn_go_login notLoginOnly" onclick="openLoginPage();">로그인 또는 가입</button> -->
 
-        <div class="my_shoe own loginOnly" onclick="fn_goPointHistory();">
+        <div class="my_shoe own" onclick="fn_goPointHistory();">
           <span>보유 Shoe</span>
-          <div class="point"><em id="memberPoint">0</em> Shoe</div>
+          <div class="point"><em id="memberPoint">30</em> Shoe</div>
           <!-- 				<button type="button" class="btn_checkout"><i></i>구매</button> -->
         </div>
 
-        <div class="mymenu_slider loginOnly">
+        <div class="mymenu_slider">
           <div class="swiper-wrapper">
             <a class="swiper-slide all active" onclick="fn_moveTab('ALL');">전체</a>
             <a class="swiper-slide challenge" onclick="fn_moveTab('CHALLENGE');">챌린지</a>
@@ -70,14 +70,40 @@
           </div>
         </div>
 
-        <div class="thumb" id="videoList_template" style="display: none">
-          <a>
-            <img src="" alt="" />
-          </a>
+        <div class="my_list" id="all_video_list">
+          <div class="thumb" style="display: block" data-video-no="339">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230515_021629.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" style="display: block" data-video-no="337">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230512_104616.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" style="display: block" data-video-no="336">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230512_104211.png" alt="" />
+            </a>
+          </div>
         </div>
-
-        <div class="my_list" id="all_video_list"></div>
-        <div class="my_list" id="challenge_video_list" style="display: none"></div>
+        <div class="my_list" id="challenge_video_list" style="display: none">
+          <div class="thumb" style="display: block" data-video-no="339">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230515_021629.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" style="display: block" data-video-no="337">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230512_104616.png" alt="" />
+            </a>
+          </div>
+          <div class="thumb" style="display: block" data-video-no="336">
+            <a>
+              <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230512_104211.png" alt="" />
+            </a>
+          </div>
+        </div>
         <div class="my_list" id="normal_video_list" style="display: none"></div>
       </div>
       <!--// contents -->
@@ -145,6 +171,7 @@
 
       // 로그인 체크
       function fn_checkLoginYn(openLoginPageYn) {
+        /*
         getAccessToken().done(function (result) {
           if (result == null || result == '') {
             // 로그인 안내 표시
@@ -153,22 +180,17 @@
               // 로그인창 띄우기
               openLoginPage();
             }
-            /*
-              if(alertYn == "Y") {
-                layerAlert("로그인이 필요한 서비스입니다.")
-                .done(openLoginPage);
-              } else {
-                openLoginPage();
-              }
-               */
           } else {
-            $('.loginOnly').removeClass('loginOnly');
-            $('.notLoginOnly').hide();
+          */
+        $('.loginOnly').removeClass('loginOnly');
+        $('.notLoginOnly').hide();
 
-            initProfile();
-            getVideo('ALL');
+        initProfile();
+        getVideo('ALL');
+        /*
           }
         });
+        */
       }
 
       // 로그인 창이 닫혔을때
@@ -211,6 +233,7 @@
       // 화면 초기화
       function initProfile() {
         // 기본 프로필 정보
+        /*
         get('/api/myProfile').done(function (result) {
           var data = result.data;
           $('#div_myProfile #memberId').html(data.memberId);
@@ -220,24 +243,29 @@
           $('#div_myProfile #followingCnt').html(fn_getCommaNumber(data.followingCnt));
           $('#div_myProfile #memberPoint').html(fn_getCommaNumber(data.memberPoint));
         });
+        */
       }
 
       // follower 수 초기화
       function resetFollowCnt() {
+        /*
         get('/api/myProfile') // 기본 프로필 정보
           .done(function (result) {
             var data = result.data;
             $('#div_myProfile #followerCnt').html(fn_getCommaNumber(data.followerCnt));
             $('#div_myProfile #followingCnt').html(fn_getCommaNumber(data.followingCnt));
           });
+        */
       }
 
       // 회원 ID 초기화
       function resetMemberId() {
+        /*
         get('/api/myProfile').done(function (result) {
           var data = result.data;
           $('#div_myProfile #memberId').html(data.memberId);
         });
+        */
       }
 
       // 비디오 목록 조회
@@ -261,6 +289,7 @@
           // ALL 일때는 빈값으로 넘김
           paramVideoDivCd = '';
         }
+        /*
         get('/api/videoList', 'allVideoYn=Y&videoDivCd=' + paramVideoDivCd + '&videoStatusCd=POST&rowsPerPage=' + rowsPerPage + '&nowPage=' + nowPage).done(function (result) {
           if (nowPage == 1) lastPageMap[videoDivCd] = result.data.lastPage;
 
@@ -293,6 +322,7 @@
 
           dfd.resolve();
         });
+        */
         return dfd.promise();
       }
 

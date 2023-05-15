@@ -6,14 +6,18 @@
     var rowsPerPage = 9; // 한번에 불러올 개수
 
     $(document).ready(function () {
+      /*
       getAccessToken().done(function (result) {
         if (result == null || result == '') {
           openLoginPage();
         } else {
-          fn_getMemberPoint();
-          fn_getMemberPointHistory();
+          */
+      fn_getMemberPoint();
+      fn_getMemberPointHistory();
+      /*
         }
       });
+      */
 
       // 뒤로가기 클릭
       $('#div_pointHistory .btn_go_prev').on('click', function () {
@@ -24,13 +28,17 @@
 
     // 보유 포인트 조회
     function fn_getMemberPoint() {
+      /*
       get('/api/getMemberPoint').done(function (result) {
         $('#div_pointHistory #em_memberPoint').html(fn_getCommaNumber(result.data.memberPoint));
       });
+      */
+      $('#div_pointHistory #em_memberPoint').html(fn_getCommaNumber(9900));
     }
 
     function fn_getMemberPointHistory() {
       nowPage++;
+      /*
       get('/api/pointHistory', 'nowPage=' + nowPage + '&rowsPerPage=' + rowsPerPage).done(function (result) {
         if (nowPage == 1) {
           lastPage = result.data.lastPage;
@@ -57,6 +65,7 @@
           $('#div_showHistoryList').append(tmplt);
         }
       });
+      */
     }
   </script>
 

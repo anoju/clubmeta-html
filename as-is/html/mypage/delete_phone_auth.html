@@ -51,16 +51,20 @@
       $('#memberDeletePhoneWrap .btn_send_code').on('click', function () {
         var body = { countryCd: $('#memberDeletePhoneWrap [name=countryCd]').val(), mobileNo: $('#memberDeletePhoneWrap [name=mobileNo]').val() };
 
+        /*
         post('/api/sendSmsCertiNo', null, body)
           .done(function (result) {
-            getPageAjax('../mypage/confirm_code.html', 'type=delete&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
-              $('body').append(result); // 인증 코드 입력 화면 붙이고
-              $('#memberDeletePhoneWrap').hide(); // 현재화면 (전화번호인증) 숨기기
-            });
+            */
+        getPageAjax('../mypage/confirm_code.html', 'type=delete&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+          $('body').append(result); // 인증 코드 입력 화면 붙이고
+          $('#memberDeletePhoneWrap').hide(); // 현재화면 (전화번호인증) 숨기기
+        });
+        /*
           })
           .fail(function (result) {
             layerAlert(result.respMsg);
           });
+          */
       });
 
       // 이메일 인증으로 이동

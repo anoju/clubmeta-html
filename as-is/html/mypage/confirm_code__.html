@@ -49,40 +49,38 @@
             inputCertiNo += $(this).val();
             if (inputCertiNo.length == 6) {
               // 6자리 다 입력했으면 인증 번호 검증
-              /*
               get('/api/checkCertiNo', 'sendId=' + certiNoSendId + '&certiNo=' + inputCertiNo)
                 .done(function (result) {
-                  */
-              if (result.data.matchYn == 'Y') {
-                // 인증 번호 일치하면
+                  if (result.data.matchYn == 'Y') {
+                    // 인증 번호 일치하면
 
-                if (confirmType == 'updateMobile') {
-                  //전화번호 수정일 때
-                  // 인증 번호 form에 등록
-                  $('#divPhoneAuth [name=certiNo]').val(inputCertiNo);
-                  /*
+                    if (confirmType == 'updateMobile') {
+                      //전화번호 수정일 때
+                      // 인증 번호 form에 등록
+                      $('#divPhoneAuth [name=certiNo]').val(inputCertiNo);
+                      /*
                       post('/api/changeMobileNo', null, $('#mobileForm').serializeObject())
                         .done(function (result) {
-                        */
-                  openToastPop('전화번호가 수정되었습니다.').done(function () {
-                    //설정페이지 휴대폰번호 변경하고 창닫기
-                    if (typeof getMyInfo == 'function') {
-                      getMyInfo();
-                    }
-                    $('#settingsWrap').show();
-                    $('#divConfirmCode, #divPhoneAuth').remove();
-                  });
-                  /*
+                          */
+                      openToastPop('전화번호가 수정되었습니다.').done(function () {
+                        //설정페이지 휴대폰번호 변경하고 창닫기
+                        if (typeof getMyInfo == 'function') {
+                          getMyInfo();
+                        }
+                        $('#settingsWrap').show();
+                        $('#divConfirmCode, #divPhoneAuth').remove();
+                      });
+                      /*
                         })
                         .fail(function (result) {
                           layerAlert(result.respMsg);
                         });
                         */
-                } else if (confirmType == 'updateEmail') {
-                  //이메일 수정일 때
-                  // 인증 번호 form에 등록
-                  $('#divEmailAuth [name=certiNo]').val(inputCertiNo);
-                  /*
+                    } else if (confirmType == 'updateEmail') {
+                      //이메일 수정일 때
+                      // 인증 번호 form에 등록
+                      $('#divEmailAuth [name=certiNo]').val(inputCertiNo);
+                      /*
 										// 이메일 프로모션 동의여부 체크
 										if($("#emailForm #agree_marketing").is(":checked")){
 											$("#emailForm [name=emailPrmtAgreeYn]").val("Y");
@@ -90,89 +88,77 @@
 											$("#emailForm [name=emailPrmtAgreeYn]").val("N");
 										}
 										*/
-
-                  /*
+                      /*
                       post('/api/changeEmail', null, $('#emailForm').serializeObject())
                         .done(function (result) {
-                        */
-                  openToastPop('이메일이 수정되었습니다.').done(function () {
-                    //설정페이지 이메일 변경하고 창닫기
-                    if (typeof getMyInfo == 'function') {
-                      getMyInfo();
-                    }
-                    $('#settingsWrap').show();
-                    $('#divConfirmCode, #divEmailAuth').remove();
-                  });
-                  /*
+                          */
+                      openToastPop('이메일이 수정되었습니다.').done(function () {
+                        //설정페이지 이메일 변경하고 창닫기
+                        if (typeof getMyInfo == 'function') {
+                          getMyInfo();
+                        }
+                        $('#settingsWrap').show();
+                        $('#divConfirmCode, #divEmailAuth').remove();
+                      });
+                      /*
                         })
                         .fail(function (result) {
                           layerAlert(result.respMsg);
                         });
                         */
-                } else if (confirmType == 'delete') {
-                  //비활성화 및 삭제일 때
+                    } else if (confirmType == 'delete') {
+                      //비활성화 및 삭제일 때
 
-                  if ($('#memberDeleteForm #authType').val() == 'PHONE') {
-                    $('#memberDeleteForm [name=emailCertiYn]').val('Y');
-                    //$("#memberDeletePhoneForm [name=certiNo]").val(inputCertiNo);
-                  } else {
-                    $('#memberDeleteForm [name=mobileCertiYn]').val('Y');
-                    //$("#memberDeleteEmailForm [name=certiNo]").val(inputCertiNo);
-                  }
+                      if ($('#memberDeleteForm #authType').val() == 'PHONE') {
+                        $('#memberDeleteForm [name=emailCertiYn]').val('Y');
+                        //$("#memberDeletePhoneForm [name=certiNo]").val(inputCertiNo);
+                      } else {
+                        $('#memberDeleteForm [name=mobileCertiYn]').val('Y');
+                        //$("#memberDeleteEmailForm [name=certiNo]").val(inputCertiNo);
+                      }
 
-                  //계정 비활성화 및 삭제
-                  var withdrawReasonContId = $('#memberDeleteForm input:radio[name=id_set]:checked').prop('id');
-                  var withdrawReasonCont = $('#memberDeleteForm [for=' + withdrawReasonContId + ']').text();
-                  $('#memberDeleteForm #withdrawReasonCont').val(withdrawReasonCont);
-
-                  /*
+                      //계정 비활성화 및 삭제
+                      var withdrawReasonContId = $('#memberDeleteForm input:radio[name=id_set]:checked').prop('id');
+                      var withdrawReasonCont = $('#memberDeleteForm [for=' + withdrawReasonContId + ']').text();
+                      $('#memberDeleteForm #withdrawReasonCont').val(withdrawReasonCont);
                       post('/api/withdraw', null, $('#memberDeleteForm').serializeObject())
                         .done(function (result) {
-                        */
-                  openToastPop('탈퇴가 완료 되었습니다.').done(function () {
-                    //reqToApp("InitApp");
-                    //로그아웃 후 initApp호출
-                    fn_removeToken().done(function () {
-                      reqToApp('InitApp');
-                    });
-                  });
-                  /*
+                          openToastPop('탈퇴가 완료 되었습니다.').done(function () {
+                            //reqToApp("InitApp");
+                            //로그아웃 후 initApp호출
+                            fn_removeToken().done(function () {
+                              reqToApp('InitApp');
+                            });
+                          });
                         })
                         .fail(function (result) {
                           layerAlert(result.respMsg);
                         });
-                        */
-                } else if (confirmType == 'challengePtcp') {
-                  //챌린지 참가일 때
-                  // 인증 번호 form에 등록
-                  $('#divPhoneAuth [name=certiNo]').val(inputCertiNo);
+                    } else if (confirmType == 'challengePtcp') {
+                      //챌린지 참가일 때
+                      // 인증 번호 form에 등록
+                      $('#divPhoneAuth [name=certiNo]').val(inputCertiNo);
 
-                  /*
                       post('/api/changeMobileNo', null, $('#mobileForm').serializeObject())
                         .done(function (result) {
-                        */
-                  openToastPop('전화번호가 수정되었습니다.').done(function () {
-                    $('#challengeWrap').show();
-                    $('#divConfirmCode, #divPhoneAuth').remove();
-                  });
-                  /*
+                          openToastPop('전화번호가 수정되었습니다.').done(function () {
+                            $('#challengeWrap').show();
+                            $('#divConfirmCode, #divPhoneAuth').remove();
+                          });
                         })
                         .fail(function (result) {
                           layerAlert(result.respMsg);
                         });
-                        */
-                }
-              } else {
-                // 불일치시 오류 메시지 표시
-                $('#divConfirmCode #p_errMsg_invalidCode').show();
-              }
-              /*
+                    }
+                  } else {
+                    // 불일치시 오류 메시지 표시
+                    $('#divConfirmCode #p_errMsg_invalidCode').show();
+                  }
                 })
                 .fail(function (result) {
                   // 인증시간 초과 또는 기타 오류
                   layerAlert(result.respMsg);
                 });
-                */
             }
           });
         }
@@ -207,7 +193,6 @@
           url = '/api/sendSmsCertiNo';
           body = { countryCd: $('#divPhoneAuth #mobileForm [name=countryCd]').val(), mobileNo: $('#divPhoneAuth #mobileForm [name=mobileNo]').val() };
         }
-        /*
         post(url, null, body)
           .done(function (result) {
             // 인증 만료시간 다시 설정
@@ -223,7 +208,6 @@
           .fail(function (result) {
             layerAlert(result.respMsg);
           });
-          */
       });
     });
 

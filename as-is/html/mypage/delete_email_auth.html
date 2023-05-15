@@ -30,17 +30,20 @@
       // 코드 전송 버튼 클릭
       $('#memberDeleteEmailWrap .btn_send_code').on('click', function () {
         var body = { email: $('#memberDeleteEmailWrap [name=email]').val() };
-
+        /*
         post('/api/sendEmailCertiNo', null, body)
           .done(function (result) {
-            getPageAjax('../mypage/confirm_code.html', 'type=delete&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
-              $('body').append(result); // 인증 코드 입력 화면 붙이고
-              $('#memberDeleteEmailWrap').hide(); // 현재화면 (이메일인증) 숨기기
-            });
+          */
+        getPageAjax('../mypage/confirm_code.html', 'type=delete&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+          $('body').append(result); // 인증 코드 입력 화면 붙이고
+          $('#memberDeleteEmailWrap').hide(); // 현재화면 (이메일인증) 숨기기
+        });
+        /*
           })
           .fail(function (result) {
             layerAlert(result.respMsg);
           });
+          */
       });
 
       // 전화번호 인증으로 이동

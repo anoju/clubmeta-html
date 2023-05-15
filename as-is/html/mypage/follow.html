@@ -17,16 +17,20 @@
       // 로그인 체크
       if (followMemberNo == '') {
         // 자기꺼 목록일때는 로그인 체크
+        /*
         getAccessToken().done(function (result) {
           if (result == null || result == '') {
             layerAlert('로그인이 필요한 서비스입니다.').done(function () {
               $('#divFollow .btn_go_prev').trigger('click'); // 레이어창 닫기
             });
           } else {
-            initFollow();
-            fn_followMoveTab(type.toUpperCase());
+          */
+        initFollow();
+        fn_followMoveTab(type.toUpperCase());
+        /*
           }
         });
+        */
       } else {
         initFollow();
         fn_followMoveTab(type.toUpperCase());
@@ -61,78 +65,73 @@
         var checkbox = $(this);
         var checked = checkbox.prop('checked');
         var fMemberNo = checkbox.closest('.performer_list').data('memberNo');
-
+        /*
         getAccessToken().done(function (result) {
           if (result == null || result == '') {
             checkbox.prop('checked', !checked); // 체크박스 원래대로
             openLoginPage();
           } else {
-            if (checked) {
+          */
+        if (checked) {
+          /*
               del('/api/followCancel/' + fMemberNo)
                 .done(function (result) {
-                  if (followMemberNo == '') {
-                    // 자기거면 following건수 다시 조회
-                    get('/api/followingCnt').done(function (result) {
-                      $('#divFollow #followingCnt').html(fn_getCommaNumber(result.data.followingCnt));
-                    });
-                  }
+                  */
+          if (followMemberNo == '') {
+            // 자기거면 following건수 다시 조회
+            /*
+                get('/api/followingCnt').done(function (result) {
+                  $('#divFollow #followingCnt').html(fn_getCommaNumber(result.data.followingCnt));
+                });
+                */
+            $('#divFollow #followingCnt').html(fn_getCommaNumber(parseInt($('#divFollow #followingCnt').text()) + 1));
+          }
 
-                  if (followMemberNo == '' && checkbox.closest('#div_following_list').length > 0) {
-                    // 자기거 && following에 있는것 취소한 경우 목록에서 제거
-                    checkbox.closest('.performer_list').remove();
-                    mOffset += 1;
-                  }
-
-                  /*
-    						// follower/following 다른 탭에 있는 동일 member 도 동일하게 처리
-    						$("#divFollow .performer_list[data-member-no=" + fMemberNo + "] .follow_toggle input[type=checkbox]").prop("checked", checked);
-
-
-    						if(followMemberNo == "" && $("#divFollow #div_following_list .performer_list[data-member-no=" + fMemberNo + "]").length > 0) {
-    							// 자기거 목록 && following에 있는것 취소한 경우 목록에서 제거
-    							$("#divFollow #div_following_list .performer_list[data-member-no=" + fMemberNo + "]").remove();
-    						}
-    						*/
+          if (followMemberNo == '' && checkbox.closest('#div_following_list').length > 0) {
+            // 자기거 && following에 있는것 취소한 경우 목록에서 제거
+            checkbox.closest('.performer_list').remove();
+            mOffset += 1;
+          }
+          /*
                 })
                 .fail(function (result) {
                   // 실패시 체크박스 원래대로
                   checkbox.prop('checked', !checked);
                 });
-            } else {
+                */
+        } else {
+          /*
               post('/api/follow/' + fMemberNo)
                 .done(function (result) {
-                  if (followMemberNo == '') {
-                    // 자기거면 following건수 다시 조회
+                */
+          if (followMemberNo == '') {
+            // 자기거면 following건수 다시 조회
+            /*
                     get('/api/followingCnt').done(function (result) {
                       $('#divFollow #followingCnt').html(fn_getCommaNumber(result.data.followingCnt));
                     });
-                  }
-
-                  /*
-    						// follower/following 다른 탭에 있는 동일 member 도 동일하게 처리
-    						$("#divFollow .performer_list[data-member-no=" + fMemberNo + "] .follow_toggle input[type=checkbox]").prop("checked", checked);
-
-    						if(followMemberNo == "" && $("#divFollow #div_following_list .performer_list[data-member-no=" + fMemberNo + "]").length == 0) {
-    							// 자기거 목록 && following에 없는것 follow한 경우 목록에 추가 (follower에서 복사)
-    							var newFollowing = $("#divFollow #div_follower_list .performer_list[data-member-no=" + fMemberNo + "]").clone();
-    							newFollowing.find(".btn_follow_del").remove();	// 삭제 버튼은 제거
-    							$("#divFollow #div_following_list").append(newFollowing);
-    						}
-    						*/
+                    */
+            $('#divFollow #followingCnt').html(fn_getCommaNumber(parseInt($('#divFollow #followingCnt').text()) - 1));
+          }
+          /*
                 })
                 .fail(function (result) {
                   // 실패시 체크박스 원래대로
                   checkbox.prop('checked', !checked);
                 });
-            }
+                */
+        }
+        /*
           }
         });
+        */
       });
 
       // 삭제 클릭시 처리 (로그인 확인부터)
       $('#divFollow').on('click', '.performer_list .btn_follow_del', function () {
         var fMemberNo = $(this).closest('.performer_list').data('memberNo');
         var div = $(this).closest('div.performer_list');
+        /*
         del('/api/followingCancel/' + fMemberNo)
           .done(function (result) {
             div.remove(); // 해당 row 제거
@@ -144,9 +143,11 @@
             mOffset += 1;
           })
           .fail(function (result) {});
+        */
       });
 
       // 스크롤시 추가 데이터 조회
+      /*
       $('#divFollow').on('scroll', function (e) {
         if (followIsLoading) return;
         if ($('#div_followList_wrapper').height() - ($('#divFollow').height() + $('#divFollow').scrollTop()) < 100) {
@@ -156,10 +157,11 @@
           });
         }
       });
+      */
 
       // 검색어 입력시
       $('[name=searchWord]').on('input', function () {
-        fn_followUserList(nowDispFType, true);
+        // fn_followUserList(nowDispFType, true);
       });
     });
 
@@ -172,12 +174,14 @@
       } else {
         url = '/api/userProfile/' + followMemberNo;
       }
+      /*
       get(url).done(function (result) {
         var data = result.data;
         $('#divFollow #memberId').html(data.memberId);
         $('#divFollow #followerCnt').html(fn_getCommaNumber(data.followerCnt));
         $('#divFollow #followingCnt').html(fn_getCommaNumber(data.followingCnt));
       });
+      */
     }
 
     // 탭 이동시
@@ -201,7 +205,7 @@
     	}
     	*/
       // 탭 이동시 목록 처음부터 조회
-      fn_followUserList(fType, true);
+      // fn_followUserList(fType, true);
     }
 
     // Following/Follower 목록 조회

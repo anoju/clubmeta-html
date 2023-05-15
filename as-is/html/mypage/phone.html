@@ -37,15 +37,19 @@
 
         if (fn_checkValid('hp', $(this).val())) {
           // 정상인 경우 중복 체크
+          /*
           get('/api/member/duplCheck/MOBILE', 'checkValue=' + $(this).val()).done(function (result) {
             if (result.data.dupYn == 'Y') {
               // 오류 메시지 표시
               $('#divPhoneAuth .warning_txt.already_use').show();
             } else {
-              // 코드 받기 버튼 활성화
-              $('#divPhoneAuth .btn_send_code').prop('disabled', false);
+          */
+          // 코드 받기 버튼 활성화
+          $('#divPhoneAuth .btn_send_code').prop('disabled', false);
+          /*
             }
           });
+          */
         } else {
           // 오류 메시지 표시
           $('#divPhoneAuth .warning_txt.not_valid').show();
@@ -56,16 +60,20 @@
       $('#divPhoneAuth .btn_send_code').on('click', function () {
         var body = { countryCd: $('#divPhoneAuth [name=countryCd]').val(), mobileNo: $('#divPhoneAuth [name=mobileNo]').val() };
 
+        /*
         post('/api/sendSmsCertiNo', null, body)
           .done(function (result) {
-            getPageAjax('../mypage/confirm_code.html', 'type=' + entryType + '&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
-              $('.wrap').hide(); // 현재화면 (전화번호수정) 숨기기
-              $('body').append(result); // 인증 코드 입력 화면 붙이고
-            });
+          */
+        getPageAjax('../mypage/confirm_code.html', 'type=' + entryType + '&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+          $('.wrap').hide(); // 현재화면 (전화번호수정) 숨기기
+          $('body').append(result); // 인증 코드 입력 화면 붙이고
+        });
+        /*
           })
           .fail(function (result) {
             layerAlert(result.respMsg);
           });
+          */
       });
     });
 

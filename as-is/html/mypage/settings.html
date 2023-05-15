@@ -8,20 +8,22 @@
 
     // 로그인 체크
     function fn_checkLoginYn(alertYn) {
+      /*
       getAccessToken().done(function (result) {
         if (result == null || result == '') {
           if (alertYn == 'Y') {
             openLoginPage();
-            /* 							layerAlert("로그인이 필요한 서비스입니다.")
-            .done(openLoginPage); */
           } else {
             openLoginPage();
           }
         } else {
-          //내정보 가져오기
-          getMyInfo();
+        */
+      //내정보 가져오기
+      getMyInfo();
+      /*
         }
       });
+      */
     }
 
     // 로그인 창이 닫혔을때
@@ -32,6 +34,7 @@
 
     //내정보 가져오기
     function getMyInfo() {
+      /*
       get('/api/userSetting', null).done(function (result) {
         console.log(result);
         var mobileNo = '등록된 전화번호가 없습니다.';
@@ -70,6 +73,7 @@
         $('#settingsWrap #newsLettAgreeYn').val(newsLettAgreeYn);
         $('#settingsWrap #prInfoReceiveAgreeYn').val(prInfoReceiveAgreeYn);
       });
+      */
     }
 
     //전화번호 변경
@@ -129,6 +133,7 @@
 
     //약관셋팅
     function setTerms() {
+      /*
       get('/api/terms/TERMS10/list', 'reqYn=Y').done(function (result) {
         var list = result.data.list;
         var html = '';
@@ -140,6 +145,7 @@
         }
         $('#termsList').append(html);
       });
+      */
     }
 
     //약관내용팝업 열기

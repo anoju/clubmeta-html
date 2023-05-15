@@ -26,35 +26,42 @@
         }
 
         // 중복 체크
+        /*
         get('/api/member/duplCheck/MEMBERID', 'checkValue=' + $('#divMemberId [name=memberId]').val()).done(function (result) {
           if (result.data.dupYn == 'Y') {
             // 오류 메시지 표시
             $('#divMemberId #p_errMsg_dupId').show();
             return;
           } else {
-            // 오류 메시지 숨기기
-            $('#divMemberId #p_errMsg_dupId').hide();
-            // 완료 버튼 활성화
-            $('#divMemberId .btn_progress').prop('disabled', false);
+            */
+        // 오류 메시지 숨기기
+        $('#divMemberId #p_errMsg_dupId').hide();
+        // 완료 버튼 활성화
+        $('#divMemberId .btn_progress').prop('disabled', false);
+        /*
           }
         });
+        */
       });
 
       // 완료 버튼 클릭시
       $('#divMemberId .btn_progress').on('click', function () {
+        /*
         post('/api/changeId', null, $('#memberIdForm').serializeObject())
           .done(function (result) {
-            layerAlert('수정이 완료 되었습니다.').done(function () {
-              //설정페이지 이메일 변경하고 창닫기
-              if (typeof getMyInfo == 'function') {
-                getMyInfo();
-              }
-              if (typeof resetMemberId == 'function') {
-                resetMemberId();
-              }
-              $('#settingsWrap').show();
-              $('#divMemberId').remove();
-            });
+            */
+        layerAlert('수정이 완료 되었습니다.').done(function () {
+          //설정페이지 이메일 변경하고 창닫기
+          if (typeof getMyInfo == 'function') {
+            getMyInfo();
+          }
+          if (typeof resetMemberId == 'function') {
+            resetMemberId();
+          }
+          $('#settingsWrap').show();
+          $('#divMemberId').remove();
+        });
+        /*
           })
           .fail(function (result) {
             if (result.respCode == '<%= CommonConstants.ERR_CD_JOIN_DUPL_EMAIL %>') {
@@ -80,6 +87,7 @@
               $('#divMemberId [name=memberId]').trigger('input');
             }
           });
+          */
       });
     });
   </script>
