@@ -337,6 +337,7 @@
       // follower 목록 화면
       function fn_goFollowerList() {
         getPageAjax('../mypage/follow.html', 'type=follower').done(function (result) {
+          setUrlParams({ type: 'follower' });
           $('#div_myProfile').hide();
           $('body').append(result);
         });
@@ -345,6 +346,7 @@
       // following 목록 화면
       function fn_goFollowingList() {
         getPageAjax('../mypage/follow.html', 'type=following').done(function (result) {
+          setUrlParams({ type: 'following' });
           $('#div_myProfile').hide();
           $('body').append(result);
         });

@@ -45,6 +45,7 @@
           .done(function (result) {
             */
         getPageAjax('../mypage/confirm_code.html', 'type=updateEmail&certiNoExpSec=' + result.data.certiNoExpSec).done(function (result) {
+          setUrlParams({ type: 'updateEmail', certiNoExpSec: 180 });
           $('.wrap').hide(); // 현재화면 (이메일수정) 숨기기
           $('body').append(result); // 인증 코드 입력 화면 붙이고
         });

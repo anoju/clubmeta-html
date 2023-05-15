@@ -1,10 +1,14 @@
 <div class="wrap div_layer" id="divConfirmCode">
   <script type="text/javascript">
     // 코드 만료시간
-    var codeExpTimeSec = '<%= request.getParameter("certiNoExpSec") %>';
+    // var codeExpTimeSec = '<%= request.getParameter("certiNoExpSec") %>';
+    var codeExpTimeSec = getUrlParams().certiNoExpSec;
 
     // 인증 구분 (join/findPw)
-    var confirmType = '<%= request.getParameter("type") %>';
+    //var confirmType = '<%= request.getParameter("type") %>';
+    var confirmType = getUrlParams().type;
+
+    removeUrlParams(['type', 'certiNoExpSec']);
 
     // 인증 번호가 발송된 email 주소 혹은 전화번호 (검증 and 재전송 처리용)
     var certiNoSendId = '';

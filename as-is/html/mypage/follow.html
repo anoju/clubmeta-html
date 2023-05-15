@@ -1,7 +1,10 @@
 <div class="wrap div_layer" id="divFollow" style="height: 100%; overflow: scroll">
   <script type="text/javascript">
-    var type = "<%= request.getParameter('type') %>";
-    var followMemberNo = "<%= StringUtil.nvl(request.getParameter('followMemberNo')) %>";
+    // var type = "<%= request.getParameter('type') %>";
+    // var followMemberNo = "<%= StringUtil.nvl(request.getParameter('followMemberNo')) %>";
+    var type = getUrlParams().type;
+    var followMemberNo = '';
+    removeUrlParams('type');
 
     // 목록 관련
     var followNowPageMap = { FOLLOWING: 0, FOLLOWER: 0 };
@@ -370,7 +373,7 @@
       </div>
 
       <!-- 			<button type="button" onclick="pagingTest();">더보기</button> -->
-      <!--
+
       <div class="performer_list reset">
         <a href="">
           <div class="performer" style="background-image: url(../images/@performer02.jpg)"></div>
@@ -418,7 +421,6 @@
           <label for="follow3"><span></span></label>
         </div>
       </div>
-      -->
     </div>
     <!--// contents -->
   </div>
