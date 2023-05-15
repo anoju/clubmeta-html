@@ -78,7 +78,8 @@
     <!--// popup_detail view-->
 
     <script type="text/javascript">
-      var videoNo = "<%= request.getParameter('videoNo') %>";
+      // var videoNo = "<%= request.getParameter('videoNo') %>";
+      var videoNo = 123456;
 
       $(document).ready(function () {
         if (videoNo == null || videoNo == '' || videoNo == 'null') {
@@ -148,6 +149,8 @@
       }
 
       function fn_checkLoginYn(alertYn) {
+        fn_voteInit();
+        /*
         getAccessToken().done(function (result) {
           if (result == null || result == '') {
             if (alertYn == 'Y') {
@@ -160,12 +163,14 @@
             fn_voteInit();
           }
         });
+        */
       }
 
       // 초기화 (보유 포인트 조회해서 화면 세팅)
       function fn_voteInit() {
         $('#votingPoint').val('');
         // 기존 투표 여부 확인
+        /*
         get('/api/videoVote/dupCheck/' + videoNo, null).done(function (result) {
           if (result.data.dupYn == 'Y') {
             layerAlert('이미 투표한 영상입니다.').done(function () {
@@ -178,6 +183,8 @@
             });
           }
         });
+        */
+        $('#em_hold_shoes').html(fn_getCommaNumber(300));
       }
 
       // 투표 개수 더하기

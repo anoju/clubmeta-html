@@ -67,10 +67,10 @@
             </a>
             <div class="id">
               <a onclick="fn_goUserProfile(event);">
-                <p class="p_memberId">TARAN_PUB2</p>
+                <p class="p_memberId">TARAN_PUB2_TARAN_PUB2</p>
               </a>
 
-              <div class="txt replyCont">댓글 테스트22</div>
+              <div class="txt replyCont">댓글 테스트22 긴댓글을 확인하는 내용입니다. 긴댓글을 확인하는 내용입니다. 긴댓글을 확인하는 내용입니다. 긴댓글을 확인하는 내용입니다. 긴댓글을 확인하는 내용입니다. 긴댓글을 확인하는 내용입니다.</div>
               <div class="info">
                 <span class="time">58초 전</span>
                 <a class="a_reportReply" onclick="fn_cmmtReport(event);">신고</a>
@@ -320,18 +320,23 @@
       function fn_cmmtLikeLogin(e) {
         var checked = $(e.target).prop('checked');
         var cmmtNo = $(e.target).closest('.reply_list').data('cmmtNo');
+        var like = $("#div_replyList .reply_list[data-cmmt-no='" + cmmtNo + "'] .em_likeCnt");
+        var newLike = parseInt(like.text());
 
         if (checked) {
           // 좋아요
-          post('/api/replyLike/' + cmmtNo, null, null).done(function (result) {
-            $("#div_replyList .reply_list[data-cmmt-no='" + cmmtNo + "'] .em_likeCnt").html(result.data.likeCnt);
-          });
+          //post('/api/replyLike/' + cmmtNo, null, null).done(function (result) {
+          // $("#div_replyList .reply_list[data-cmmt-no='" + cmmtNo + "'] .em_likeCnt").html(result.data.likeCnt);
+          //});
+          newLike += 1;
         } else {
           // 좋아요 취소
-          del('/api/replyLikeCancel/' + cmmtNo, null, null).done(function (result) {
-            $("#div_replyList .reply_list[data-cmmt-no='" + cmmtNo + "'] .em_likeCnt").html(result.data.likeCnt);
-          });
+          //del('/api/replyLikeCancel/' + cmmtNo, null, null).done(function (result) {
+          // $("#div_replyList .reply_list[data-cmmt-no='" + cmmtNo + "'] .em_likeCnt").html(result.data.likeCnt);
+          //});
+          newLike -= 1;
         }
+        like.text(newLike);
       }
       // 댓글 좋아요 로그인 안한 경우
       function fn_cmmtLikeNoLogin(e) {
@@ -343,15 +348,17 @@
       // 댓글 신고하기
       function fn_cmmtReport(e) {
         var cmmtNo = $(e.target).closest('.reply_list').data('cmmtNo');
-        fn_checkLoginYn('N', () => {
-          openReportPopup('CMMT', cmmtNo);
-        });
+        // fn_checkLoginYn('N', () => {
+        openReportPopup('CMMT', cmmtNo);
+        // });
       }
 
       // 댓글 삭제
       function fn_deleteCmmt(e) {
         var cmmtNo = $(e.target).closest('.reply_list').data('cmmtNo');
         layerConfirm('댓글을 삭제하시겠습니까?').done(function () {
+          console.log('댓글 삭제처리');
+          /*
           del('/api/replyDel/' + cmmtNo)
             .done(function (result) {
               openToastPop('댓글이 삭제되었습니다.');
@@ -368,11 +375,14 @@
             .fail(function (result) {
               layerAlert(result.respMsg);
             });
+          */
         });
       }
 
       // 로그인 체크 해서 로그인 안했으면 로그인 창
       function fn_checkLoginYn(alertYn, callback, noLoginCallback) {
+        callback();
+        /*
         getAccessToken().done(function (result) {
           if (result == null || result == '') {
             if (alertYn == 'Y') {
@@ -387,6 +397,7 @@
             }
           }
         });
+        */
       }
 
       // 로그인창 닫혔을때

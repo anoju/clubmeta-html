@@ -373,7 +373,8 @@
 
       // 사용자 신고하기
       function fn_userReport() {
-        // 		openReportPopup("USER", memberNo);
+        openReportPopup('USER', memberNo);
+        /*
         fn_checkLoginYn(
           'N',
           () => {
@@ -381,6 +382,7 @@
           },
           null
         );
+        */
       }
 
       // 로그인 체크 해서 로그인 안했으면 로그인 창

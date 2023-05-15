@@ -9,7 +9,7 @@
 
     $(document).ready(function () {
       //로그인 여부 확인
-      getChallengeList();
+      fn_checkLoginYn();
 
       $(window).on('scroll', function () {
         var activeTab = $('.tabs a[class=active]').attr('id');
@@ -47,11 +47,13 @@
         var followYn = $(this).val();
         var $this = $('#globalSearhWrap #clubberList #follow_' + memberNo);
 
-        /*
         getAccessToken().done(function (result) {
           if (result == null || result == '') {
             $this.prop('checked', !$this.is(':checked'));
             openLoginPage();
+            /* 	  					$this.prop("checked", !$this.is(":checked"));
+          layerAlert("로그인이 필요한 서비스입니다.")
+          .done(openLoginPage); */
           } else {
             if (followYn == 'Y') {
               del('/api/followCancel/' + memberNo, null, null)
@@ -72,7 +74,6 @@
             }
           }
         });
-        */
       });
 
     // 로그인 창이 닫혔을때
@@ -256,25 +257,124 @@
 
       $('#searchChallengeForm #searchWord').val($('#searchForm #searchWord').val());
       var param = $('#searchChallengeForm').serialize();
-      CRswiper = new Swiper('.ranking_slider', {
-        freeMode: false,
-        slidesPerView: 'auto',
-        spaceBetween: 13,
-        observer: true,
-        on: {
-          reachEnd: function () {},
-          activeIndexChange: function () {
-            var chlgNo = this.$el[0].dataset.chlgNo;
-            var activeIndex = this.activeIndex;
-            var realIndex = $('#swiper-wrapper-' + chlgNo).children().length;
-            //슬라이드 중간쯤 active되면 다음페이지 가져오기
-            if (activeIndex >= Number(realIndex) - 5) {
-              getChallengerVideoList(chlgNo);
+      get('/api/challenge/search', param).done(function (result) {
+        var list = result.data.list;
+        var html = '';
+        var isSwiper = false;
+        var chlgStatusHtml = '';
+
+        if (list.length == 0) {
+          html += '<div class="no_result">검색된 챌린지가 없습니다.</div>';
+        }
+
+        for (var i = 0; i < list.length; i++) {
+          var list2 = list[i].challengervideolist;
+          if (list2.length > 0) {
+            isSwiper = true;
+          } else {
+            isSwiper = false;
+          }
+          switch (list[i].chlgProgStatusCd) {
+            case 'C20':
+              chlgStatusHtml = "<span class='l_ing'>진행 중</span>";
+              break;
+            case 'C30':
+              chlgStatusHtml = "<span class='l_waiting'>발표 대기</span>";
+              break;
+            case 'C90':
+              chlgStatusHtml = "<span class='l_ended'>종료</span>";
+              break;
+            default:
+              chlgStatusHtml = '';
+          }
+          var videoLastPage = parseInt((list[i].chlgPtcpVideoCnt - 1) / 10) + 1;
+          html += '<div class="challenge_list" id="challenge_' + list[i].chlgNo + '" data-chlg-no="' + list[i].chlgNo + '">';
+          html += '	<form id="challengerForm_' + list[i].chlgNo + '">';
+          html += '		<input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10">';
+          html += '		<input type="hidden" id="nowPage" name="nowPage" value="1">';
+          //html += '		<input type="hidden" id="lastPage" name="lastPage" value="2">';
+          html += '		<input type="hidden" id="lastPage" name="lastPage" value="' + videoLastPage + '">';
+          html += '		<input type="hidden" id="chlgNo" name="chlgNo" value="' + list[i].chlgNo + '">';
+          html += '	</form>';
+          html += '	<div class="tit_more">';
+          html += '		<h2 onclick="openChallengeDetail(\'' + list[i].chlgNo + '\');">' + list[i].chlgName + '</h2>';
+          html += chlgStatusHtml;
+          html += '	</div>';
+
+          if (list2.length == 0) {
+            html += '</div>';
+            html += '<div class="challenge_no">';
+            html += '	  <i class="ico_empty"></i>';
+            html += '		순위에 든 퍼포머가 없네요!<br>';
+            html += '		챌린지에 참여하고 우승해 랭킹에 올라보세요.';
+            html += '</div>';
+          } else {
+            if (isSwiper) {
+              html += '	<div class="ranking_slider" data-chlg-no="' + list[i].chlgNo + '">';
+            } else {
+              html += '	<div class="">';
             }
+            html += '		<div class="swiper-wrapper" id="swiper-wrapper-' + list[i].chlgNo + '">';
+
+            for (var i2 = 0; i2 < list2.length; i2++) {
+              var blind = '';
+              var clickUseYn = '';
+              var memberId = '@' + list2[i2].memberId;
+              var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list2[i2].regMemberNo + '\');" style="background-image:url(' + list2[i2].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+              if (list2[i2].delYn == 'Y' || list2[i2].videoViewYn == 'N') {
+                blind = 'blind';
+                clickUseYn = 'N';
+              }
+              if (list2[i2].memberStatusCd == 'M20' || list2[i2].memberStatusCd == 'M99') {
+                //memberId = "@"+list2[i2].memberId;
+                memberId = list2[i2].memberStatusCd == 'M20' ? '정지회원' : '탈퇴회원';
+                divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+              }
+              html += '			<div class="challenger_list swiper-slide">';
+              //html += '				<div class="performer" onclick="viewUserProfile(\''+list2[i2].regMemberNo+'\');" style="background-image: url('+list2[i2].profileImgUrl+'), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+              html += divPerformer;
+              //html += '				<a href="javascript:playVideo(\''+list2[i2].videoNo+'\');" class="thumb">';
+              html += "				<a href=\"javascript:playVideo('rankVideo', '" + list2[i2].videoNo + "', '10', '1', '" + list[i].chlgNo + "', null, null, '" + clickUseYn + '\');" class="thumb ' + blind + '">';
+              html += '					<img src="' + list2[i2].videoThumbUrl + '" alt="">';
+              html += '				</a>';
+              html += '				<div class="id">';
+              html += '					<p onclick="viewUserProfile(\'' + list2[i2].regMemberNo + '\');">' + memberId + '</p>';
+              html += '					<div class="point_area">';
+              html += '						<span><i class="ico_shoe"></i>' + list2[i2].votingCnt + ' 표</span>';
+              html += '						<span><i class="ico_ai"></i>' + list2[i2].aiScore + ' 점</span>';
+              html += '					</div>';
+              html += '				</div>';
+              html += '			</div>';
+            }
+            html += '		</div>';
+            html += '	</div>';
+            html += '</div>';
           }
         }
+        $('#challengeList').append(html);
+        $('#searchChallengeForm #lastPage').val(result.data.lastPage);
+        $('#searchChallengeForm #rowsPerPage').val('20');
+
+        CRswiper = new Swiper('.ranking_slider', {
+          freeMode: false,
+          slidesPerView: 'auto',
+          spaceBetween: 13,
+          observer: true,
+          on: {
+            reachEnd: function () {},
+            activeIndexChange: function () {
+              var chlgNo = this.$el[0].dataset.chlgNo;
+              var activeIndex = this.activeIndex;
+              var realIndex = $('#swiper-wrapper-' + chlgNo).children().length;
+              //슬라이드 중간쯤 active되면 다음페이지 가져오기
+              if (activeIndex >= Number(realIndex) - 5) {
+                getChallengerVideoList(chlgNo);
+              }
+            }
+          }
+        });
+        dfd.resolve();
       });
-      dfd.resolve();
       return dfd.promise();
     }
 
@@ -391,6 +491,19 @@
       }
     }
 
+    function fn_checkLoginYn() {
+      getAccessToken().done(function (result) {
+        if (result == null || result == '') {
+          var html = '';
+          html += '<div class="no_history">최근 검색 기록이 없습니다</div>';
+          $('#recentlySearchResult').html(html);
+        } else {
+          // 로그인 되어 최근검색 결과 가져오기
+          getRecentlySearchResult();
+        }
+      });
+    }
+
     //searchWord 입력 시 clear button 노출
     $(document)
       .off('propertychange change keyup paste input', '#searchForm #searchWord')
@@ -437,35 +550,42 @@
           <i></i><a href="">챌린지</a>
           <button type="button" class="btn_del_history">삭제</button>
         </div>
-        <div class="history">
-          <i></i><a href="">TARAN</a>
-          <button type="button" class="btn_del_history">삭제</button>
-        </div>
-        <div class="history">
-          <i></i><a href="">Faker</a>
-          <button type="button" class="btn_del_history">삭제</button>
-        </div>
       </div>
     </div>
     <!--// 최근 검색어 -->
   </div>
 
-  <div class="contents" id="searchResult">
+  <div class="contents" id="searchResult" style="display: none">
     <!-- 검색어 -->
     <div class="search_result" id="searchResultList">
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('enterjungs');">enterjungs</a> <button type="button" class="btn_go_link">이동</button></div>
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('Faker');">Faker</a> <button type="button" class="btn_go_link">이동</button></div>
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('jspark');">jspark</a> <button type="button" class="btn_go_link">이동</button></div>
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('naverTest');">naverTest</a> <button type="button" class="btn_go_link">이동</button></div>
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('qwer1234');">qwer1234</a> <button type="button" class="btn_go_link">이동</button></div>
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('TARAN_PUB');">TARAN_PUB</a> <button type="button" class="btn_go_link">이동</button></div>
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('ttssssaerifj');">ttssssaerifj</a> <button type="button" class="btn_go_link">이동</button></div>
-      <div class="keyword"><i></i><a href="javascript:inputSearchWord('wizard94');">wizard94</a> <button type="button" class="btn_go_link">이동</button></div>
+      <!--                 <div class="keyword">
+                <i></i><a href="">club</a>
+                <button type="button" class="btn_go_link">이동</button>
+            </div> -->
     </div>
     <!--// 검색어 -->
   </div>
 
-  <div class="contents" id="challengeContent">
+  <div class="contents" id="challengeContent" style="display: none">
+    <form id="searchChallengeForm">
+      <input type="hidden" id="viewYn" name="viewYn" value="Y" />
+      <input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" />
+      <input type="hidden" id="nowPage" name="nowPage" value="1" />
+      <input type="hidden" id="lastPage" name="lastPage" value="0" />
+      <input type="hidden" id="searchType" name="searchType" value="chlgName" />
+      <input type="hidden" id="searchWord" name="searchWord" value="" />
+      <input type="hidden" id="sortField" name="sortField" value="CHLG_PTCP_VIDEO_CNT" />
+      <input type="hidden" id="sortWord" name="sortWord" value="DESC" />
+    </form>
+    <form id="searchClubberForm">
+      <input type="hidden" id="rowsPerPage" name="rowsPerPage" value="20" />
+      <input type="hidden" id="nowPage" name="nowPage" value="1" />
+      <input type="hidden" id="lastPage" name="lastPage" value="0" />
+      <input type="hidden" id="searchType" name="searchType" value="memberId" />
+      <input type="hidden" id="searchWord" name="searchWord" value="" />
+      <input type="hidden" id="sortField" name="sortField" value="" />
+      <input type="hidden" id="sortWord" name="sortWord" value="" />
+    </form>
     <!-- tabs -->
     <div class="tabs">
       <a href="javascript:changeTab('challengeTab');" class="active" id="challengeTab">챌린지</a>
@@ -473,136 +593,9 @@
     </div>
     <!--// tabs -->
 
-    <div id="challengeList">
-      <div class="challenge_list" id="challenge_52" data-chlg-no="52">
-        <form id="challengerForm_52"><input type="hidden" id="rowsPerPage" name="rowsPerPage" value="10" /> <input type="hidden" id="nowPage" name="nowPage" value="1" /> <input type="hidden" id="lastPage" name="lastPage" value="5" /> <input type="hidden" id="chlgNo" name="chlgNo" value="52" /></form>
-        <div class="tit_more">
-          <h2 onclick="openChallengeDetail('52');">#테스트챌린지2</h2>
-          <span class="l_ing">진행 중</span>
-        </div>
-        <div class="ranking_slider" data-chlg-no="52">
-          <div class="swiper-wrapper" id="swiper-wrapper-52">
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10183');" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '337', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230512_104616.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10183');">@TARAN_PUB</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>51 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10183');" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '336', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10183/10183_20230512_104211.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10183');">@TARAN_PUB</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>35 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10154');" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '302', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10154/10154_20221129_105708.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10154');">@baekdama</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>3 표</span> <span><i class="ico_ai"></i>28 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221129/1669710708696.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '327', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10134/10134_20230105_014758.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10134');">@clubmeta_kakao</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>31 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221129/1669710708696.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '326', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10134/10134_20230104_052503.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10134');">@clubmeta_kakao</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>0 표</span> <span><i class="ico_ai"></i>31 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221130/1669768181993.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '306', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10116/10116_20221129_021052.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10116');">@기타기타</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>3 표</span> <span><i class="ico_ai"></i>22 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10166');" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '308', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10166/10166_20221129_024350.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10166');">@TOBETEST</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>24 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10168');" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '309', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10168/10168_20221129_024522.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10168');">@ljm</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>1 표</span> <span><i class="ico_ai"></i>23 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="javascript:void(0);" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '304', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10162/10162_20221129_010350.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10162');">탈퇴회원</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>4 표</span> <span><i class="ico_ai"></i>17 점</span>
-                </div>
-              </div>
-            </div>
-            <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10164');" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
-              <a href="javascript:playVideo('rankVideo', '305', '10', '1', '52', null, null, '');" class="thumb"> <img src="http://stream-dev.club-meta.io:8989/video/10164/10164_20221129_015041.png" alt="" /> </a>
-              <div class="id">
-                <p onclick="viewUserProfile('10164');">@투비비빅</p>
-                <div class="point_area">
-                  <span><i class="ico_shoe"></i>4 표</span> <span><i class="ico_ai"></i>9 점</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
-        </div>
-      </div>
-      <div class="no_result">검색된 챌린지가 없습니다.</div>
-    </div>
+    <div id="challengeList" style="display: none"></div>
 
-    <div id="clubberList" style="display: none">
-      <div class="performer_list">
-        <a href="javascript:viewUserProfile('10183');"> <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div> </a>
-        <div class="id">
-          <a href="javascript:viewUserProfile('10183');">
-            <p>TARAN_PUB<i class="ico_perfomer"></i></p>
-          </a>
-        </div>
-        <div class="follow_toggle">
-          <input type="checkbox" id="follow_10183" checked="" data-member-no="10183" value="N" /> <label for="follow_10183"><span></span></label>
-        </div>
-      </div>
-      <div class="no_result">검색된 클러버가 없습니다.</div>
-    </div>
+    <div id="clubberList" style="display: none"></div>
   </div>
   <!--// contents -->
 </div>
