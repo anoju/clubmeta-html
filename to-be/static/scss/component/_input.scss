@@ -1,0 +1,302 @@
+// input
+.input {
+  position: relative;
+  display: flex;
+  width: 100%;
+  background: #fafafa;
+  border: 0.1rem solid #fafafa;
+  border-radius: 1rem;
+  align-items: center;
+  transition: border 0.3s;
+  &.box {
+    border-color: var(--line-color);
+    background-color: #fff;
+  }
+  &.disabled:not(.box) {
+    background: #f8f8f8;
+    border-color: #f8f8f8;
+  }
+  &.focus {
+    border-color: var(--primary-color);
+  }
+  &.is-error {
+    border-color: var(--alert-txt-color);
+    input:not(:focus) {
+      color: var(--alert-txt-color);
+      // @include bg-etc(1.6rem auto, right 1.2rem center);
+      // background-image: url(../images/icon/ico-error@3x.png);
+    }
+  }
+
+  input:-internal-autofill-selected {
+    background: none;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+  input {
+    width: 100%;
+    flex: 1 1 auto;
+    height: 4.6rem;
+    padding: 0 0.8rem;
+    border: 0 none;
+    color: inherit;
+    background: none;
+    border-radius: 1rem;
+    margin: 0;
+    outline: none;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--strong-txt-color);
+    appearance: none;
+    &[type='file'] {
+      font-size: 1.4rem;
+      line-height: 2.2rem;
+      padding-top: 1.1rem;
+      padding-bottom: 1.1rem;
+    }
+    &:first-child {
+      padding-left: 1.6rem;
+    }
+    &:last-child {
+      padding-right: 1.6rem;
+    }
+    &[readonly] {
+      color: var(--base-txt-color);
+    }
+    &:disabled {
+      color: var(--placeholder-txt-color);
+    }
+    // &.t-right {
+    //   &::placeholder {
+    //     text-align: left;
+    //   }
+    // }
+    &.date {
+      @include bg-etc(2.4rem auto, right 1.6rem center);
+      @include ico-calendar;
+      &::-webkit-calendar-picker-indicator {
+        width: 2.2rem;
+        opacity: 0;
+      }
+      // &:before {
+      //   content: attr(placeholder);
+      //   color: var(--placeholder-txt-color);
+      // }
+      &::-webkit-date-and-time-value {
+        text-align: left;
+      }
+    }
+  }
+  &.h56 {
+    border-radius: 1.2rem;
+    input {
+      height: 5.4rem;
+    }
+  }
+
+  &.small {
+    input {
+      height: 3rem;
+      font-size: 1.4rem;
+      &:first-child {
+        padding-left: 0.8rem;
+      }
+      &:last-child {
+        padding-right: 0.8rem;
+      }
+    }
+  }
+  > div:last-child {
+    margin-right: 1.2rem;
+  }
+  .button {
+    flex: 0 0 auto;
+  }
+  > .button:last-child {
+    margin-right: 0.8rem;
+  }
+  > .button.icon:last-child {
+    margin-right: 1.6rem;
+  }
+  .timer {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    white-space: nowrap;
+    margin-right: 1.2rem;
+    display: flex;
+    align-items: center;
+  }
+  .del {
+    margin-right: 0.8rem;
+    &:last-child {
+      margin-right: 1.6rem;
+    }
+    // + .btn-inp-pwd{
+    // 	margin-left: 0.8rem;
+    // }
+  }
+  .btn-inp-pwd {
+    @include text-blind;
+    position: relative;
+    display: block;
+    width: 1.6rem;
+    height: 1.6rem;
+    flex: 0 0 1.6rem;
+    margin-right: 1.6rem;
+    overflow: hidden;
+    background: url(../images/icon/Ico-eye-off@3x.png) no-repeat center center / contain;
+  }
+
+  input[type='text'] ~ .btn-inp-pwd {
+    background-image: url(../images/icon/Ico-eye-on@3x.png);
+  }
+  &:not(.form-box) {
+    & + :is(.flex, .input, .select, .textarea) {
+      margin-top: var(--item-margin-y);
+    }
+  }
+  .unit {
+    flex-shrink: 0;
+    color: var(--strong-txt-color2);
+    margin-right: 0.8rem;
+    &.front {
+      margin-right: 0;
+      margin-left: 0.8rem;
+    }
+  }
+  .dash {
+    padding: 0 0.5rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    color: #c2c2c2;
+  }
+  .masking {
+    text-align: center;
+    flex-shrink: 0;
+    color: #818892;
+    font-size: 1.6rem;
+  }
+
+  &.line {
+    border-width: 0;
+    border-bottom: 0.2rem solid #d6dbe1;
+    border-radius: 0;
+    padding-top: 2.2rem;
+    background: none;
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      bottom: -0.2rem;
+      width: 0;
+      height: 0.2rem;
+      background: var(--primary-color);
+      transition: width 0.3s ease;
+    }
+    &.focus,
+    &.focused {
+      &:before {
+        width: 100%;
+      }
+    }
+
+    > div:last-child {
+      margin-right: 0;
+    }
+    .unit {
+      margin-right: 0rem;
+      &.front {
+        margin-left: 0rem;
+      }
+    }
+    input {
+      height: 3.6rem;
+      padding: 0.6rem 0;
+      font-size: 2rem;
+      line-height: 2.4rem;
+      // color: #818892;
+      border-radius: 0;
+      &::placeholder {
+        color: transparent;
+      }
+      &:not(:placeholder-shown) ~ .lbl {
+        top: 0.4rem;
+        font-size: 1rem;
+        color: #818892;
+      }
+    }
+    .btn-inp-del {
+      &:nth-last-child(2) {
+        margin-right: 0;
+      }
+    }
+
+    .lbl {
+      position: absolute;
+      left: 0;
+      top: 2.6rem;
+      font-size: 2rem;
+      line-height: 1.4;
+      color: var(--placeholder-txt-color);
+      transition: 0.3s;
+      &:not(label) {
+        pointer-events: none;
+      }
+    }
+    .timer {
+      margin-right: 0;
+    }
+
+    // & + .input.line {
+    //   margin-top: 4rem;
+    // }
+  }
+
+  &.search-inp {
+    height: 5.6rem;
+  }
+}
+.btn-inp-del {
+  @include text-blind;
+  position: relative;
+  display: block;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  @include bg-etc;
+  //background-image: url(../images/icon/btn-input-del.png);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z' fill='%23D6DBE1'/%3E%3Cpath d='M8.46967 9.53033C8.17678 9.23744 8.17678 8.76256 8.46967 8.46967C8.76256 8.17678 9.23744 8.17678 9.53033 8.46967L12 10.9394L14.4697 8.46967C14.7626 8.17678 15.2375 8.17678 15.5304 8.46967C15.8233 8.76256 15.8233 9.23744 15.5304 9.53033L13.0607 12L15.5303 14.4697C15.8232 14.7626 15.8232 15.2374 15.5303 15.5303C15.2374 15.8232 14.7626 15.8232 14.4697 15.5303L12 13.0607L9.53037 15.5303C9.23748 15.8232 8.7626 15.8232 8.46971 15.5303C8.17682 15.2374 8.17682 14.7626 8.46971 14.4697L10.9394 12L8.46967 9.53033Z' fill='white'/%3E%3C/svg%3E");
+}
+.datepicker-time {
+  display: flex;
+  > div {
+    + div {
+      margin-top: 0 !important;
+      margin-left: 0.4rem;
+    }
+  }
+  .input {
+    flex: 0 0 45%;
+  }
+}
+@media (max-width: 359px) {
+  .datepicker-time {
+    display: flex;
+    flex-wrap: wrap;
+    .input {
+      flex: 0 0 100%;
+      margin-bottom: 0.8rem;
+      + .select {
+        margin-left: 0;
+      }
+    }
+    .select {
+      width: calc(50% - 0.2rem);
+    }
+  }
+}

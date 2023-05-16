@@ -1,0 +1,36 @@
+.spinner {
+  display: inline-flex;
+  width: 9.6rem;
+  height: 3.6rem;
+  border: 0.1rem solid #ddd;
+  border-radius: 0.4rem;
+  background: #fff;
+  .button {
+    height: 3.4rem;
+    width: 3.4rem;
+    padding: 0;
+    flex-shrink: 0;
+    border-radius: 0;
+    @include bg-etc(1.6rem auto);
+    &.minus {
+      background-image: url(../images/icon/ico-spinner-minus@3x.png);
+    }
+    &.plus {
+      background-image: url(../images/icon/ico-spinner-plus@3x.png);
+    }
+    &:disabled {
+      opacity: 0.3;
+      background-color: transparent;
+    }
+  }
+  input {
+    width: 100%;
+    flex: 1 1 auto;
+    height: 3.4rem;
+    text-align: center;
+    padding: 0;
+    border: 0 none;
+    font-size: 1.4rem;
+    outline: none;
+  }
+}
