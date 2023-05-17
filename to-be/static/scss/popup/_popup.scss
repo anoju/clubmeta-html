@@ -233,7 +233,7 @@
       transform: translateY(0);
       transition: all 0.3s;
       @include web-center;
-      @include media-min-width(1024) {
+      @include media-min-width($max-window-width) {
         @include web-center-fixed;
       }
     }
@@ -610,7 +610,7 @@
     right: 1.5rem;
   }
 
-  @include media-min-width(1024) {
+  @include media-min-width($max-window-width) {
     &.full,
     &.bottom {
       > .pop-wrap {

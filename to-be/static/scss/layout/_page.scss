@@ -6,7 +6,7 @@
   background-color: #fff;
   @include web-center;
 }
-@include media-min-width(1024) {
+@include media-min-width($max-window-width) {
   body {
     background-color: #fafafa;
   }
@@ -28,7 +28,7 @@
   bottom: 0;
   width: 100%;
   -webkit-overflow-scrolling: none;
-  @include media-min-width(1024) {
+  @include media-min-width($max-window-width) {
     @include web-center-fixed;
     width: 102.4rem;
   }

@@ -490,7 +490,7 @@
       position: fixed;
       top: 8.8rem;
       right: var(--base-padding);
-      @include media-min-width(1024) {
+      @include media-min-width($max-window-width) {
         left: 50%;
         right: auto;
         margin-left: calc(51.2rem - var(--base-padding));

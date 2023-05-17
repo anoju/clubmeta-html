@@ -11,7 +11,7 @@
   width: auto !important;
   z-index: 50;
   transition: padding 0.3s, bottom 0.3s;
-  @include media-min-width(1024) {
+  @include media-min-width($max-window-width) {
     right: 50%;
     margin-right: calc(-51.2rem + var(--base-padding));
   }
@@ -84,7 +84,7 @@
   opacity: 0;
   transform: translateX(500%);
   transition: opacity 0.3s, transform 0s 0.3s;
-  @include media-min-width(1024) {
+  @include media-min-width($max-window-width) {
     right: 50%;
     margin-right: calc(-51.2rem + var(--base-padding));
   }
@@ -112,12 +112,12 @@
       @include ios-bottom(padding-bottom, var(--base-padding));
     }
   }
-  &:not(.end) {
+  &:not(.end-fixed) {
     > div {
       background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) var(--base-padding), #fff 100%) !important;
     }
   }
-  @include media-min-width(1024) {
+  @include media-min-width($max-window-width) {
     & {
       > div {
         @include web-center;

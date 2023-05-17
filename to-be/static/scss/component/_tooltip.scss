@@ -68,7 +68,7 @@
   color: #fff;
   background-color: var(--tooltop-bg);
   backdrop-filter: blur(1px);
-  @include media-min-width(1024) {
+  @include media-min-width($max-window-width) {
     @include web-center(true);
   }
 }

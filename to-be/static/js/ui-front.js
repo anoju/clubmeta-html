@@ -2,21 +2,40 @@
  * 클럽메타 UI 스크립트 *
  * 작성자 : 안효주 *
  ********************************/
+
 /** init **/
 const ui = {
+  className: {
+    wrap: '.page',
+    mainWrap: '.main-page',
+    header: '.page-head',
+    body: '.page-body',
+    btnTop: '.btn-page-top',
+    floatingBtn: '.floating-btn',
+    popup: '.popup',
+    topFixed: '.top-fixed',
+    bottomFixed: '.bottom-fixed',
+    bottomFixedSpace: '.bottom-fixed-space'
+  },
   isInit: false,
   basePath: '/to-be/static/',
   Init: function () {
     if (this.isInit) {
-      this.reInit();
+      ui.reInit();
     } else {
-      this.isInit = true;
-      this.Common.page();
+      ui.isInit = true;
+      ui.Common.init();
+      ui.Util.init();
     }
   },
-  reInit: function () {},
+  reInit: function () {
+    ui.Common.reInit();
+    ui.Util.reInit();
+  },
   isLoadInit: false,
-  LoadInit: function () {}
+  LoadInit: function () {
+    ui.Common.LoadInit();
+  }
 };
 
 $(function () {
@@ -35,11 +54,21 @@ $(function () {
 $(window).on('load', function () {
   ui.LoadInit();
 });
-
+$(window).on('scroll resize', function () {
+  ui.Common.scrollEvt();
+  ui.Common.fixedInit();
+  ui.Common.bottomSpace();
+});
 $(window).on('resize', function () {
   ui.Common.vhChk();
 });
 $(window).on('scroll', function () {});
+$(window).on(
+  'scroll',
+  _.debounce(function () {
+    ui.Common.scrollEndEvt();
+  }, 1500)
+);
 
 //Html include
 ui.Html = {
@@ -254,13 +283,34 @@ ui.Device = {
 
 /** common **/
 ui.Common = {
-  winLoad: function () {
+  init: function () {
+    ui.Common.page();
+    ui.BtnTop.init();
+    ui.Common.header();
+    ui.Common.bottomSpaceAppend();
+    ui.Common.bottomSpaceRepeat();
+    ui.Common.fixedInit();
+    ui.Common.UI();
+    // ui.Common.landscape();
+  },
+  reInit: function () {
+    ui.Common.page();
+    ui.BtnTop.append();
+    ui.Common.header();
+    ui.Common.bottomSpaceAppend();
+    ui.Common.bottomSpaceRepeat();
+    ui.Common.fixedInit();
     ui.Common.hr();
-    ui.Common.space();
+    ui.Common.lottie();
+  },
+  LoadInit: function () {
+    ui.Common.bottomSpace();
+    ui.Common.hr();
+    ui.Common.lottie();
   },
   page: function () {
-    $('.page').each(function () {
-      if (!$(this).closest('.popup').length) $(this).addClass('main-page');
+    $(ui.className.wrap).each(function () {
+      if (!$(this).closest(ui.className.popup).length) $(this).addClass(ui.className.mainWrap.slice(1));
     });
   },
   dark: function () {
@@ -281,53 +331,46 @@ ui.Common = {
       if (!$this.attr('aria-hidden') !== 'true') $this.attr('aria-hidden', true);
     });
   },
+  fixedInit: function () {
+    ui.Common.fixed(ui.className.mainWrap + ' ' + ui.className.header);
+    ui.Common.fixed('.tab-fixed');
+  },
   fixed: function (target, isBottom) {
     if (isBottom === undefined) isBottom = false;
-    //고정(fixed)
     const $target = $(target);
     if (!$target.length) return;
     $target.each(function () {
       const $this = $(this);
-      if (!$target.data('init')) return;
-      $target.data('init', true);
-      $(window).on('scroll', function () {
-        if ($('html').hasClass('lock')) return false;
-        const $scrollTop = $(this).scrollTop();
-
-        $target.each(function () {
-          if ($(this).closest('.' + Layer.popClass).length) return;
-          const $this = $(this);
-          const $topMargin = getTopFixedHeight($this);
-          let $topEl = $this;
-          const $offsetTop = $this.data('top') !== undefined ? $this.data('top') : Math.max(0, getOffset(this).top);
-          const $thisH = $this.outerHeight();
-          const $isFixed = isBottom ? $scrollTop + $topMargin > $offsetTop + $thisH : $scrollTop + $topMargin > $offsetTop;
-          if ($isFixed) {
-            $this.data('top', $offsetTop);
-            $this.addClass('top-fixed');
-            if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
-            if ($topMargin !== parseInt($topEl.css('top')) && $topEl.css('position') === 'fixed') $topEl.css('top', $topMargin);
-            if ($this.attr('id') !== 'header' && $('#header').hasClass('top-fixed')) $('#header').addClass('not-fixed-style');
-          } else {
-            $this.removeData('top');
-            if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
-            $topEl.removeCss('top');
-            $this.removeClass('top-fixed');
-            if (($this.attr('id') !== 'header' && $('#header').hasClass('top-fixed') && $('.top-fixed').length === 1) || !$('.top-fixed').length) $('#header').removeClass('not-fixed-style');
-          }
-        });
-      });
+      if ($('html').hasClass('lock')) return false;
+      const $scrollTop = $(window).scrollTop();
+      if ($this.closest(ui.className.popup).length) return;
+      const $topMargin = getTopFixedHeight($this);
+      let $topEl = $this;
+      const $offsetTop = $this.data('top') !== undefined ? $this.data('top') : Math.max(0, getOffset(this).top);
+      const $thisH = $this.outerHeight();
+      const $isFixed = isBottom ? $scrollTop + $topMargin > $offsetTop + $thisH : $scrollTop + $topMargin > $offsetTop;
+      if ($isFixed) {
+        $this.data('top', $offsetTop);
+        $this.addClass(ui.className.topFixed.slice(1));
+        if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
+        if ($topMargin !== parseInt($topEl.css('top')) && $topEl.css('position') === 'fixed') $topEl.css('top', $topMargin);
+      } else {
+        $this.removeData('top');
+        if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
+        $topEl.removeCss('top');
+        $this.removeClass(ui.className.topFixed.slice(1));
+      }
     });
   },
   header: function () {
-    const $page = $('.main-page');
+    const $page = $(ui.className.mainWrap);
     if (!$page.length) return;
     $page.each(function () {
       if (!$(this).is(':visible')) return;
-      const $head = $(this).find('.page-head');
-      const $titleEl = $head.find('h1');
+      const $head = $(this).find(ui.className.header);
+      const $titleEl = $head.find('.head-title');
       if (!$titleEl.length) return;
-      if ($head.closest('.page').find('.' + ui.Common.scrollShowTitleClass).length) $titleEl.addClass('scl-title-hide');
+      if ($head.closest(ui.className.wrap).find('.' + ui.Common.scrollShowTitleClass).length) $titleEl.addClass('scl-title-hide');
 
       const $headLeft = $head.find('.head-left');
       if ($headLeft.find('h1').length) return;
@@ -345,24 +388,24 @@ ui.Common = {
       }
     });
   },
-  spaceAppend: function () {
-    const $wrap = $('.page');
-    if ($wrap.length) return;
+  bottomSpaceAppend: function () {
+    const $wrap = $(ui.className.wrap);
+    if (!$wrap.length) return;
     $wrap.each(function () {
-      if (!$(this).find('.bottom-fixed-space').length) {
-        $(this).append('<div class="bottom-fixed-space" aria-hidden="true"></div>');
+      if (!$(this).find(ui.className.bottomFixedSpace).length) {
+        $(this).append('<div class="' + ui.className.bottomFixedSpace.slice(1) + '" aria-hidden="true"></div>');
       }
     });
   },
-  space: function () {
-    const $wrap = $('.page');
-    if ($wrap.length) return;
+  bottomSpace: function () {
+    const $wrap = $(ui.className.wrap);
+    if (!$wrap.length) return;
     $wrap.each(function () {
-      const $space = $(this).find('.bottom-fixed-space');
+      const $space = $(this).find(ui.className.bottomFixedSpace);
       if (!$space.length) return;
       const $spaceArryHeight = [];
       $(this)
-        .find('.bottom-fixed')
+        .find(ui.className.bottomFixed)
         .not('.none-space')
         .each(function () {
           const $this = $(this);
@@ -373,15 +416,15 @@ ui.Common = {
 
       const $maxHeight = $spaceArryHeight.length ? Math.max.apply(null, $spaceArryHeight) : 0;
       $space.css('height', $maxHeight);
-      const $floatingBtn = $(this).find('.floating-btn');
+      const $floatingBtn = $(this).find(ui.className.floatingBtn);
       if ($floatingBtn.length) $floatingBtn.css('bottom', $maxHeight === 0 ? 24 : $maxHeight + 10);
     });
   },
-  spaceInit: function () {
+  bottomSpaceRepeat: function () {
     let i = 0;
     const repeatEvt = function () {
       if (i < 10) {
-        ui.Common.space();
+        ui.Common.bottomSpace();
         setTimeout(repeatEvt, 100);
       }
       i += 1;
@@ -391,7 +434,7 @@ ui.Common = {
   landscape: function () {
     //가로모드 막기
     if (ui.Mobile.any()) {
-      const _landscapeDiv = '.landscape_lock';
+      const _landscapeDiv = '.landscape-lock';
       if (!$(_landscapeDiv).length) {
         const $landscapeHtml = '<div class="' + _landscapeDiv.substring(1) + '"><div class="tbl"><div class="td">이 사이트는 세로 전용입니다.<br />단말기를 세로모드로 변경해주세요.</div></div></div>';
         $('body').append($landscapeHtml);
@@ -403,99 +446,87 @@ ui.Common = {
         });
     }
   },
-  scroll: function () {
-    let $lastSclTop = $(window).scrollTop();
-    const $scrollEvt = function () {
-      const $SclTop = $(window).scrollTop();
-      const $wrap = $('.main-page:visible');
-      const $header = $wrap.find('.page-head');
-      const $headerH = $header.outerHeight();
-      const $spaceH = $wrap.find('.bottom-fixed-space').outerHeight();
-      const $btnTop = $wrap.find(ui.BtnTop.class);
-      const $bottom = parseInt($btnTop.parent().css('bottom'));
-      const $margin = 24;
-      const $Height = window.innerHeight;
-      const $scrollHeight = $('body').get(0).scrollHeight;
-      if ($spaceH > 0 && $spaceH != $bottom - $margin) {
-        $wrap.find('.floating-btn').css('bottom', $spaceH === 0 ? $margin : $spaceH + 10);
-      }
+  lastSclTop: $(window).scrollTop(),
+  scrollEvt: function () {
+    const $SclTop = $(window).scrollTop();
+    const $wrap = $(ui.className.mainWrap + ':visible');
+    const $header = $wrap.find(ui.className.header);
+    const $headerH = $header.outerHeight();
+    const $spaceH = $wrap.find(ui.className.bottomFixedSpace).outerHeight();
+    const $btnTop = $wrap.find(ui.className.btnTop);
+    const $bottom = parseInt($btnTop.parent().css('bottom'));
+    const $margin = 24;
+    const $Height = window.innerHeight;
+    const $scrollHeight = $('body').get(0).scrollHeight;
+    if ($spaceH > 0 && $spaceH != $bottom - $margin) {
+      $wrap.find(ui.className.floatingBtn).css('bottom', $spaceH === 0 ? $margin : $spaceH + 10);
+    }
 
-      if ($SclTop > ui.BtnTop.min && $lastSclTop !== $SclTop) {
-        if ($('html').hasClass('input-focus') && ui.Mobile.any()) return;
-        ui.BtnTop.on($btnTop);
+    if ($SclTop > ui.BtnTop.min && ui.Common.lastSclTop !== $SclTop) {
+      if ($('html').hasClass('input-focus') && ui.Mobile.any()) return;
+      ui.BtnTop.on($btnTop);
+    } else {
+      ui.BtnTop.off($btnTop);
+    }
+    const $fadeTitle = $wrap.find('.' + ui.Common.scrollShowTitleClass);
+    const $headerTit = $header.find('h1');
+    if ($fadeTitle.length && $headerTit.length) ui.Common.scrollShowTitle($fadeTitle[0], window, $header[0], $headerTit[0]);
+
+    const $sclHead = $wrap.find('.ui-header-bg-origin');
+    if ($header.length && $sclHead.length) {
+      if ($sclHead.offset().top - $headerH < $SclTop) {
+        $header.addClass('bg-origin');
       } else {
-        ui.BtnTop.off($btnTop);
+        $header.removeClass('bg-origin');
       }
-      const $fadeTitle = $wrap.find('.' + ui.Common.scrollShowTitleClass);
-      const $headerTit = $header.find('h1');
-      if ($fadeTitle.length && $headerTit.length) ui.Common.scrollShowTitle($fadeTitle[0], window, $header[0], $headerTit[0]);
+    }
 
-      const $sclHead = $wrap.find('.ui-header-bg-origin');
-      if ($header.length && $sclHead.length) {
-        if ($sclHead.offset().top - $headerH < $SclTop) {
-          $header.addClass('bg-origin');
-        } else {
-          $header.removeClass('bg-origin');
-        }
+    // 스크롤시 헤더 숨기기
+    /*
+    if ($SclTop < ui.Common.lastSclTop) {
+      if ($('.top-fixed.fixed-off').length) {
+        $('.top-fixed').removeClass('fixed-off').removeCss('transform');
       }
-
-      // 스크롤시 헤더 숨기기
-      /*
-      if ($SclTop < $lastSclTop) {
-        if ($('.top-fixed.fixed-off').length) {
-          $('.top-fixed').removeClass('fixed-off').removeCss('transform');
-        }
-      } else {
-        if ($('.top-fixed').length && $header.length) {
-          $('.top-fixed')
-            .addClass('fixed-off')
-            .css('transform', 'translateY(-' + $headerH + 'px)');
-        }
+    } else {
+      if ($('.top-fixed').length && $header.length) {
+        $('.top-fixed')
+          .addClass('fixed-off')
+          .css('transform', 'translateY(-' + $headerH + 'px)');
       }
-      */
-      const $btnFixed = $wrap.find('.btn-wrap.bottom-fixed');
-      if ($btnFixed.length) {
-        $btnFixed.each(function () {
-          const $this = $(this);
-          if ($this.hasClass('is-restore')) {
-            const $top = $this.offset().top;
-            const $bottom = $top + $this.children().outerHeight();
-            if ($SclTop + $Height > $bottom) {
-              $this.addClass('fixed-none');
-            } else {
-              $this.removeClass('fixed-none');
-            }
+    }
+    */
+    const $btnFixed = $wrap.find('.btn-wrap' + ui.className.bottomFixed);
+    if ($btnFixed.length) {
+      $btnFixed.each(function () {
+        const $this = $(this);
+        if ($this.hasClass('is-restore')) {
+          const $top = $this.offset().top;
+          const $bottom = $top + $this.children().outerHeight();
+          if ($SclTop + $Height > $bottom) {
+            $this.addClass('fixed-none');
           } else {
-            if ($SclTop + $Height > $scrollHeight - 3) {
-              $this.addClass('not-fixed-style');
-            } else {
-              $this.removeClass('not-fixed-style');
-            }
+            $this.removeClass('fixed-none');
           }
-        });
-      }
+        } else {
+          if ($SclTop + $Height > $scrollHeight - 3) {
+            $this.addClass('end-fixed');
+          } else {
+            $this.removeClass('end-fixed');
+          }
+        }
+      });
+    }
 
-      setTimeout(function () {
-        $lastSclTop = $SclTop;
-      }, 50);
-    };
-    const $scrollEndEvt = function () {
-      const $SclTop = $(window).scrollTop();
-      if ($SclTop > ui.BtnTop.min) {
-        ui.BtnTop.off();
-      }
-    };
-    $(window).on('scroll resize', $scrollEvt);
-    $(window).on(
-      'scroll',
-      _.debounce(function () {
-        $scrollEndEvt();
-      }, 1500)
-    );
-
-    $(document).on('click', '#container', function (e) {
-      if (!$('html').hasClass('lock')) $(window).scroll();
-    });
+    setTimeout(function () {
+      ui.Common.lastSclTop = $SclTop;
+    }, 50);
+  },
+  scrollEndEvt: function () {
+    const $SclTop = $(window).scrollTop();
+    if ($SclTop > ui.BtnTop.min) {
+      const btn = $(ui.className.mainWrap + ':visible ' + ui.className.btnTop);
+      ui.BtnTop.off(btn);
+    }
   },
   scrollShowTitleClass: 'page-fade-title',
   scrollShowTitle: function (target, wrap, header, titleEl) {
@@ -570,20 +601,188 @@ ui.Common = {
       $lottieInit();
     }
   },
-  init: function () {
-    ui.Common.page();
-    ui.Common.header();
-    ui.Common.spaceAppend();
-    ui.Common.spaceInit();
-    ui.Common.scroll();
-    // ui.Common.landscape();
+  UI: function () {
+    $(document).on('click', '#container', function (e) {
+      if (!$('html').hasClass('lock')) $(window).scroll();
+    });
+  }
+};
+ui.Util = {
+  path: function (type) {
+    let $path = location.pathname;
+    let $returnVal = $path;
+    if ($.isNumeric(type)) {
+      if ($path.indexOf('/') >= 0) {
+        $path = $path.split('/');
+        $returnVal = $path[type];
+      }
+    } else if (type === 'file') {
+      if ($path.indexOf('/') >= 0) $returnVal = $path.split('/').pop();
+    } else if (type === 'fileName') {
+      if ($path.indexOf('/') >= 0) $path = $path.split('/').pop();
+      if ($path.indexOf('.') >= 0) {
+        $returnVal = $path.split('.').shift();
+      } else {
+        $returnVal = $path;
+      }
+    } else if (type === 'fileType') {
+      if ($path.indexOf('/') >= 0) $path = $path.split('/').pop();
+      if ($path.indexOf('.') >= 0) {
+        $returnVal = $path.split('.').pop();
+      } else {
+        $returnVal = null;
+      }
+    }
+    return $returnVal;
+  },
+  loadScript: function (url, callback) {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    if (script.readyState) {
+      //IE
+      script.onreadystatechange = function () {
+        if (script.readyState == 'loaded' || script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else {
+      //Others
+      script.onload = function () {
+        callback();
+      };
+    }
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  },
+  paint: function () {
+    if (!$('.smooth-corners').length) return;
+    const $url = ui.basePath + '/js/lib/paint.min.js';
+    if (CSS && 'paintWorklet' in CSS) CSS.paintWorklet.addModule($url);
+  },
+  canvasRotateImg: function (target, src, deg) {
+    const image = document.createElement('img');
+    image.onload = function () {
+      drawRotated(deg);
+    };
+    image.src = src;
 
-    ui.Common.fixed('#header');
-    ui.Common.fixed('.tab-fixed');
+    const canvas = target;
+
+    const drawRotated = function (degrees) {
+      const ctx = canvas.getContext('2d');
+
+      if (degrees == 90 || degrees == 270) {
+        canvas.width = image.height;
+        canvas.height = image.width;
+      } else {
+        canvas.width = image.width;
+        canvas.height = image.height;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (degrees == 90 || degrees == 270) {
+        ctx.translate(image.height / 2, image.width / 2);
+      } else {
+        ctx.translate(image.width / 2, image.height / 2);
+      }
+      ctx.rotate((degrees * Math.PI) / 180);
+      ctx.drawImage(image, -image.width / 2, -image.height / 2);
+    };
+  },
+  iframe: function () {
+    if ($('iframe.load-height').length) {
+      const iframeHeight = function () {
+        $('iframe.load-height').each(function () {
+          const $this = $(this);
+          const $thisH = $(this).height();
+          const $bodyH = $this.contents().find('body').height();
+          if (!!$bodyH && $thisH < $bodyH) $this.height($bodyH);
+        });
+      };
+
+      iframeHeight();
+      setTimeout(function () {
+        iframeHeight();
+      }, 1000);
+    }
+  },
+  lazyImg: function () {
+    let lazyloadImages;
+    let lazyloadThrottleTimeout;
+    lazyloadImages = document.querySelectorAll('.lazy');
+    if (!lazyloadImages.length) return false;
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver(function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            const image = entry.target;
+            if (image.dataset.src) image.src = image.dataset.src;
+            image.classList.remove('lazy');
+            imageObserver.unobserve(image);
+          }
+        });
+      });
+
+      lazyloadImages.forEach(function (image) {
+        imageObserver.observe(image);
+      });
+    } else {
+      const lazyload = function () {
+        if (lazyloadThrottleTimeout) {
+          clearTimeout(lazyloadThrottleTimeout);
+        }
+
+        lazyloadThrottleTimeout = setTimeout(function () {
+          const scrollTop = window.pageYOffset;
+          lazyloadImages.forEach(function (img) {
+            if (img.offsetTop < window.innerHeight + scrollTop) {
+              img.src = img.dataset.src;
+              img.classList.remove('lazy');
+            }
+          });
+          if (lazyloadImages.length == 0) {
+            document.removeEventListener('scroll', lazyload);
+            window.removeEventListener('resize', lazyload);
+            window.removeEventListener('orientationChange', lazyload);
+          }
+        }, 20);
+      };
+
+      document.addEventListener('scroll', lazyload);
+      window.addEventListener('resize', lazyload);
+      window.addEventListener('orientationChange', lazyload);
+    }
+  },
+  reInit: function () {
+    ui.Util.iframe();
+    ui.Util.lazyImg();
+  },
+  init: function () {
+    ui.Util.paint();
+    ui.Util.iframe();
+    ui.Util.lazyImg();
   }
 };
 
 ui.Etc = {
+  console: function (txt, delay) {
+    if (delay == undefined) delay = 3000;
+    const $consoles = $('.console');
+    let $top = 0;
+    let $last = '';
+    if ($consoles.length) {
+      $last = $('.console').last();
+      $top = parseInt($last.css('top')) + $last.outerHeight();
+    }
+    const $wrap = $('#wrap').length ? $('#wrap') : $('body');
+    $wrap.append('<div class="console">' + txt + '</div>');
+    $last = $('.console').last();
+    if ($top > 0) $last.css('top', $top);
+    $last.delay(delay).fadeOut(500, function () {
+      $(this).remove();
+    });
+  },
   guide: function () {
     const themeColorChange = function () {
       const $path = location.pathname;
@@ -649,7 +848,10 @@ ui.Etc = {
 };
 
 ui.BtnTop = {
-  class: '.btn-page-top',
+  init: function () {
+    ui.BtnTop.append();
+    ui.BtnTop.UI();
+  },
   label: '컨텐츠 상단으로 이동',
   text: 'TOP',
   min: 100,
@@ -657,20 +859,16 @@ ui.BtnTop = {
   hoverClass: 'hover',
   scrollSpeed: 300,
   append: function () {
-    const $wrap = $('.page');
+    const $wrap = $(ui.className.wrap);
     if (!$wrap.length) return;
     $wrap.each(function () {
-      if (!$(this).find(ui.BtnTop.class).length) {
-        let btnHtml = '';
-        if ($(this).find('.page-body').hasClass('not-top-btn')) return;
-        if (!$(this).find('.floating-btn').length) btnHtml += '<div class="floating-btn">';
-        btnHtml += '<a href="#" class="btn ' + ui.BtnTop.class.substring(1) + '" title="' + ui.BtnTop.label + '" role="button" aria-label="' + ui.BtnTop.label + '">' + ui.BtnTop.text + '</a>';
-        if (!$(this).find('.floating-btn').length) btnHtml += '</div>';
-        if ($(this).find('.floating-btn').length) {
-          $(this).find('.floating-btn').append(btnHtml);
-        } else {
-          $(this).append(btnHtml);
-        }
+      if ($(this).find(ui.className.btnTop).length || $(this).find(ui.className.body).hasClass('not-top-btn')) return;
+      let btnHtml = '<a href="#" class="button not ' + ui.className.btnTop.substring(1) + '" title="' + ui.BtnTop.label + '" role="button" aria-label="' + ui.BtnTop.label + '">' + ui.BtnTop.text + '</a>';
+      if ($(this).find(ui.className.floatingBtn).length) {
+        $(this).find(ui.className.floatingBtn).append(btnHtml);
+      } else {
+        btnHtml = '<div class="' + ui.className.floatingBtn.slice(1) + '">' + btnHtml + '</div>';
+        $(this).append(btnHtml);
       }
     });
   },
@@ -684,21 +882,21 @@ ui.BtnTop = {
   },
   UI: function () {
     $(document)
-      .on('click', ui.BtnTop.class, function (e) {
+      .on('click', ui.className.btnTop, function (e) {
         e.preventDefault();
-        const $page = $(this).closest('.page');
-        if ($page.closest('.popup').length) {
-          const $body = $page.find('.page-body');
+        const $page = $(this).closest(ui.className.wrap);
+        if ($page.closest(ui.className.popup).length) {
+          const $body = $page.find(ui.className.body);
           ui.Scroll.wrapTop($body, 0, ui.BtnTop.scrollSpeed);
         } else {
           ui.Scroll.top(0, ui.BtnTop.scrollSpeed);
           $page.find($focusableEl).first().focus();
         }
       })
-      .on('mouseenter', ui.BtnTop.class, function () {
+      .on('mouseenter', ui.className.btnTop, function () {
         $(this).addClass(ui.BtnTop.hoverclass);
       })
-      .on('mouseleave', ui.BtnTop.class, function () {
+      .on('mouseleave', ui.className.btnTop, function () {
         $(this).removeClass(ui.BtnTop.hoverClass);
       });
   }

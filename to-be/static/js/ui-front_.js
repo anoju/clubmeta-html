@@ -401,13 +401,13 @@ ui.Common = {
             $this.addClass('top-fixed');
             if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
             if ($topMargin !== parseInt($topEl.css('top')) && $topEl.css('position') === 'fixed') $topEl.css('top', $topMargin);
-            if ($this.attr('id') !== 'header' && $('#header').hasClass('top-fixed')) $('#header').addClass('not-fixed-style');
+            if ($this.attr('id') !== 'header' && $('#header').hasClass('top-fixed')) $('#header').addClass('end-fixed');
           } else {
             $this.removeData('top');
             if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
             $topEl.removeCss('top');
             $this.removeClass('top-fixed');
-            if (($this.attr('id') !== 'header' && $('#header').hasClass('top-fixed') && $('.top-fixed').length === 1) || !$('.top-fixed').length) $('#header').removeClass('not-fixed-style');
+            if (($this.attr('id') !== 'header' && $('#header').hasClass('top-fixed') && $('.top-fixed').length === 1) || !$('.top-fixed').length) $('#header').removeClass('end-fixed');
           }
         });
       });
@@ -655,9 +655,9 @@ ui.Common = {
             }
           } else {
             if ($SclTop + $Height > $scrollHeight - 3) {
-              $this.addClass('not-fixed-style');
+              $this.addClass('end-fixed');
             } else {
-              $this.removeClass('not-fixed-style');
+              $this.removeClass('end-fixed');
             }
           }
         });
@@ -6965,13 +6965,13 @@ const Layer = {
           $this.addClass($topClassName);
           if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
           if ($topMargin !== parseInt($topEl.css('top')) && $topEl.css('position') === 'fixed') $topEl.css('top', $topMargin);
-          if ($head.hasClass($topClassName)) $head.addClass('not-fixed-style');
+          if ($head.hasClass($topClassName)) $head.addClass('end-fixed');
         } else {
           $this.removeData('top');
           if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
           $topEl.removeCss('top');
           $this.removeClass($topClassName);
-          if (($head.hasClass($topClassName) && $wrap.find('.' + $topClassName).length === 1) || !$wrap.find('.' + $topClassName).length) $head.removeClass('not-fixed-style');
+          if (($head.hasClass($topClassName) && $wrap.find('.' + $topClassName).length === 1) || !$wrap.find('.' + $topClassName).length) $head.removeClass('end-fixed');
         }
       });
     }
