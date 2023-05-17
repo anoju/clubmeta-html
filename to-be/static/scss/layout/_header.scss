@@ -8,6 +8,12 @@
   position: sticky;
   top: 0;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  min-height: 4rem;
+  padding: 0 1.2rem;
+  transition: 0.3s;
+  overflow: hidden;
   z-index: 50;
   background: #fff;
   transition: backgound-color 0.5s, box-shadow 0.3s, transform 0.3s;
@@ -17,24 +23,13 @@
   html.ios & {
     @include ios-top(padding-top);
   }
-  > div {
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-height: 4rem;
-    padding: 0 1.2rem;
-    transition: 0.3s;
-    overflow: hidden;
-  }
   &.top-fixed {
     @include dimm-white;
   }
-  &.head-ty2 {
+  &.ty-fixed {
     position: fixed;
     left: 0;
     width: 100%;
-    background: rgba(255, 255, 255, 0);
-    transition: background 0.3s, transform 0.3s;
   }
   .head-title {
     display: flex;

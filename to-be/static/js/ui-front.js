@@ -6,9 +6,11 @@
 /** init **/
 const ui = {
   className: {
+    lock: '.lock',
     wrap: '.page',
     mainWrap: '.main-page',
     header: '.page-head',
+    title: '.head-title',
     body: '.page-body',
     btnTop: '.btn-page-top',
     floatingBtn: '.floating-btn',
@@ -341,7 +343,7 @@ ui.Common = {
     if (!$target.length) return;
     $target.each(function () {
       const $this = $(this);
-      if ($('html').hasClass('lock')) return false;
+      if ($('html').hasClass(ui.className.lock.slice(1))) return false;
       const $scrollTop = $(window).scrollTop();
       if ($this.closest(ui.className.popup).length) return;
       const $topMargin = getTopFixedHeight($this);
@@ -368,7 +370,11 @@ ui.Common = {
     $page.each(function () {
       if (!$(this).is(':visible')) return;
       const $head = $(this).find(ui.className.header);
-      const $titleEl = $head.find('.head-title');
+      const $body = $(this).find(ui.className.body);
+      if ($head.length && $body.length && $head.css('position') === 'fixed') {
+        $body.css('padding-top', $head.outerHeight());
+      }
+      const $titleEl = $head.find(ui.className.title);
       if (!$titleEl.length) return;
       if ($head.closest(ui.className.wrap).find('.' + ui.Common.scrollShowTitleClass).length) $titleEl.addClass('scl-title-hide');
 
@@ -481,20 +487,6 @@ ui.Common = {
       }
     }
 
-    // 스크롤시 헤더 숨기기
-    /*
-    if ($SclTop < ui.Common.lastSclTop) {
-      if ($('.top-fixed.fixed-off').length) {
-        $('.top-fixed').removeClass('fixed-off').removeCss('transform');
-      }
-    } else {
-      if ($('.top-fixed').length && $header.length) {
-        $('.top-fixed')
-          .addClass('fixed-off')
-          .css('transform', 'translateY(-' + $headerH + 'px)');
-      }
-    }
-    */
     const $btnFixed = $wrap.find('.btn-wrap' + ui.className.bottomFixed);
     if ($btnFixed.length) {
       $btnFixed.each(function () {
@@ -603,8 +595,77 @@ ui.Common = {
   },
   UI: function () {
     $(document).on('click', '#container', function (e) {
-      if (!$('html').hasClass('lock')) $(window).scroll();
+      if (!$('html').hasClass(ui.className.lock.slice(1))) $(window).scroll();
     });
+
+    const $fixedHead = $(ui.className.mainWrap + ':visible ' + ui.className.header + '.ty-fixed');
+
+    let isFirst = false;
+    let startY = 0;
+    let prevY = null;
+    let scrollDirection = null;
+    let scrollDirectionVal = 10;
+    let prevMove = 0;
+    let lastMove = 0;
+
+    $(window).on('scroll', function () {
+      if (!isFirst) {
+        startY = window.scrollY;
+        isFirst = true;
+      }
+      let currentY = window.scrollY;
+      let distanceY = currentY - startY;
+      console.log(distanceY);
+      if (prevY !== null) {
+        const deltaY = currentY - prevY;
+        if (deltaY > 0 && Math.abs(distanceY) > scrollDirectionVal && scrollDirection !== 'down') {
+          scrollDirection = 'down';
+          startY = currentY;
+        } else if (deltaY < 0 && Math.abs(distanceY) > scrollDirectionVal && scrollDirection !== 'up') {
+          scrollDirection = 'up';
+          startY = currentY;
+        }
+      }
+
+      if ($fixedHead.length) {
+        const headerHeight = $fixedHead.outerHeight();
+        const min = -headerHeight;
+        const max = 0;
+        let move = 0;
+        if (window.scrollY <= scrollDirectionVal) {
+          $fixedHead.removeCss('transition').css('transform', `translateY(${move}px)`);
+        } else {
+          move = scrollDirection === 'down' ? Math.min(max, Math.max(min, lastMove - distanceY)) : Math.min(max, Math.max(min, lastMove - (headerHeight + distanceY)));
+          console.log(scrollDirection, lastMove, distanceY);
+          if (prevMove !== move) $fixedHead.css({ transform: `translateY(${move}px)`, transition: 'none' });
+        }
+        prevMove = move;
+      }
+      prevY = currentY;
+    });
+
+    $(window).on(
+      'scroll',
+      _.debounce(function () {
+        startY = window.scrollY;
+        if ($fixedHead.length) {
+          const headerHeight = $fixedHead.outerHeight();
+          let move;
+          if (Math.abs(prevMove) > headerHeight / 2) {
+            move = -headerHeight;
+          } else {
+            move = 0;
+          }
+          $fixedHead.removeCss('transition');
+          if (prevMove !== move) $fixedHead.css('transform', `translateY(${move}px)`);
+          prevMove = move;
+          lastMove = move;
+        }
+        prevY = null;
+        scrollDirection = null;
+        isFirst = false;
+      }, 1000)
+    );
   }
 };
 ui.Util = {
@@ -863,7 +924,7 @@ ui.BtnTop = {
     if (!$wrap.length) return;
     $wrap.each(function () {
       if ($(this).find(ui.className.btnTop).length || $(this).find(ui.className.body).hasClass('not-top-btn')) return;
-      let btnHtml = '<a href="#" class="button not ' + ui.className.btnTop.substring(1) + '" title="' + ui.BtnTop.label + '" role="button" aria-label="' + ui.BtnTop.label + '">' + ui.BtnTop.text + '</a>';
+      let btnHtml = '<a href="#" class="button not ' + ui.className.btnTop.slice(1) + '" title="' + ui.BtnTop.label + '" role="button" aria-label="' + ui.BtnTop.label + '">' + ui.BtnTop.text + '</a>';
       if ($(this).find(ui.className.floatingBtn).length) {
         $(this).find(ui.className.floatingBtn).append(btnHtml);
       } else {
