@@ -601,6 +601,7 @@ ui.Common = {
     const $fixedHead = $(ui.className.mainWrap + ':visible ' + ui.className.header + '.ty-fixed');
 
     let isFirst = false;
+    let isScrollIng = false;
     let startY = 0;
     let prevY = null;
     let scrollDirection = null;
@@ -615,13 +616,12 @@ ui.Common = {
       }
       let currentY = window.scrollY;
       let distanceY = currentY - startY;
-      console.log(distanceY);
       if (prevY !== null) {
         const deltaY = currentY - prevY;
-        if (deltaY > 0 && Math.abs(distanceY) > scrollDirectionVal && scrollDirection !== 'down') {
+        if (deltaY > 0 && Math.abs(distanceY) > 3 && scrollDirection !== 'down') {
           scrollDirection = 'down';
           startY = currentY;
-        } else if (deltaY < 0 && Math.abs(distanceY) > scrollDirectionVal && scrollDirection !== 'up') {
+        } else if (deltaY < 0 && Math.abs(distanceY) > 3 && scrollDirection !== 'up') {
           scrollDirection = 'up';
           startY = currentY;
         }
@@ -631,12 +631,10 @@ ui.Common = {
         const headerHeight = $fixedHead.outerHeight();
         const min = -headerHeight;
         const max = 0;
-        let move = 0;
+        let move = Math.min(max, Math.max(min, distanceY > 0 ? -distanceY : -(distanceY + headerHeight)));
         if (window.scrollY <= scrollDirectionVal) {
           $fixedHead.removeCss('transition').css('transform', `translateY(${move}px)`);
         } else {
-          move = scrollDirection === 'down' ? Math.min(max, Math.max(min, lastMove - distanceY)) : Math.min(max, Math.max(min, lastMove - (headerHeight + distanceY)));
-          console.log(scrollDirection, lastMove, distanceY);
           if (prevMove !== move) $fixedHead.css({ transform: `translateY(${move}px)`, transition: 'none' });
         }
         prevMove = move;
@@ -644,22 +642,39 @@ ui.Common = {
       prevY = currentY;
     });
 
+    $(document).on('touchstart', function () {
+      if ($fixedHead.length) {
+        isScrollIng = true;
+      }
+    });
+    $(document).on('touchend', function () {
+      if ($fixedHead.length) {
+        isScrollIng = false;
+        fixedEnd();
+      }
+    });
+
+    function fixedEnd() {
+      if (isScrollIng) return;
+      const headerHeight = $fixedHead.outerHeight();
+      let move;
+      if (Math.abs(prevMove) > headerHeight / 2) {
+        move = -headerHeight;
+      } else {
+        move = 0;
+      }
+      $fixedHead.removeCss('transition');
+      if (prevMove !== move) $fixedHead.css('transform', `translateY(${move}px)`);
+      prevMove = move;
+      lastMove = move;
+    }
+
     $(window).on(
       'scroll',
       _.debounce(function () {
         startY = window.scrollY;
         if ($fixedHead.length) {
-          const headerHeight = $fixedHead.outerHeight();
-          let move;
-          if (Math.abs(prevMove) > headerHeight / 2) {
-            move = -headerHeight;
-          } else {
-            move = 0;
-          }
-          $fixedHead.removeCss('transition');
-          if (prevMove !== move) $fixedHead.css('transform', `translateY(${move}px)`);
-          prevMove = move;
-          lastMove = move;
+          fixedEnd();
         }
         prevY = null;
         scrollDirection = null;
