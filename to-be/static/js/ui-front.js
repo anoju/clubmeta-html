@@ -19,10 +19,10 @@ const ui = {
     bottomFixed: '.bottom-fixed',
     bottomFixedSpace: '.bottom-fixed-space'
   },
-  isInit: false,
   basePath: function () {
     return '/to-be/static/';
   },
+  isInit: false,
   init: function () {
     if (this.isInit) {
       ui.reInit();
@@ -31,17 +31,37 @@ const ui = {
       ui.common.init();
       ui.util.init();
       ui.button.init();
+      ui.tooltip.init();
+      ui.form.init();
+      ui.list.init();
+      ui.scroll.init();
+      ui.animation.init();
+      ui.animation.splitting();
+      ui.chart.init();
     }
   },
   reInit: function () {
     ui.common.reInit();
     ui.util.reInit();
     ui.button.reInit();
+    ui.Tab.reInit();
+    ui.tooltip.reInit();
+    ui.form.reInit();
+    ui.list.reInit();
+    ui.swiper.reInit();
+    ui.animation.init();
+    ui.animation.splitting();
+    ui.chart.init();
   },
   isLoadInit: false,
-  LoadInit: function () {
-    ui.common.LoadInit();
-    ui.button.LoadInit();
+  loadInit: function () {
+    if (ui.isLoadInit) return;
+    ui.isLoadInit = true;
+    ui.common.loadInit();
+    ui.button.loadInit();
+    ui.form.loadInit();
+    ui.list.loadInit();
+    ui.swiper.init();
   }
 };
 
@@ -52,14 +72,14 @@ $(function () {
 
   const $elements = $.find('*[data-include-html]');
   if ($elements.length) {
-    ui.html.include(ui.init);
+    ui.html.include().done(ui.init);
   } else {
     ui.init();
   }
 });
 
 $(window).on('load', function () {
-  ui.LoadInit();
+  ui.loadInit();
 });
 $(window).on('scroll resize', function () {
   ui.common.scrollEvt();
@@ -68,6 +88,10 @@ $(window).on('scroll resize', function () {
 });
 $(window).on('resize', function () {
   ui.common.vhChk();
+  ui.tab.resize();
+  ui.tooltip.resize();
+  ui.table.guideResize();
+  ui.touch.rotateItem();
 });
 $(window).on('scroll', function () {});
 $(window).on(
@@ -79,9 +103,10 @@ $(window).on(
 
 //Html include
 ui.html = {
-  include: function (fn) {
+  include: function () {
     const $elements = $.find('*[data-include-html]');
     if ($elements.length) {
+      var dfd = $.Deferred();
       if (location.host) {
         $.each($elements, function (i) {
           const $this = $(this);
@@ -100,18 +125,74 @@ ui.html = {
               else $this.removeAttr('data-include-html');
             }
             if (i === $elements.length - 1) {
-              if (!!fn) fn();
+              dfd.resolve();
             }
           });
         });
       } else {
-        if (!!fn) fn();
+        dfd.resolve();
       }
+      return dfd.promise();
     }
   }
 };
 
-//PC 디바이스 체크
+/** 디바이스 확인 **/
+ui.device = {
+  iPhone8PlusH: 736,
+  screenH: window.screen.height,
+  screenW: window.screen.width,
+  isIPhoneX: function () {
+    $('html').addClass('iPhone-X');
+  },
+  notIPhoneX: function () {
+    $('html').removeClass('iPhone-X');
+  },
+  check: function () {
+    ui.mobile.check();
+    ui.pc.check();
+    if (ui.mobile.any()) {
+      const $pixelRatio = Math.round(window.devicePixelRatio);
+      if (!!$pixelRatio) $('html').addClass('pixel-ratio-' + $pixelRatio);
+
+      const $isIPhoneX = ui.mobile.iPhone() && ui.device.screenH > ui.device.iPhone8PlusH ? true : false;
+      if ($isIPhoneX) {
+        if ($(window).width() < $(window).height()) ui.Device.isIPhoneX();
+        else ui.Device.notIPhoneX();
+      }
+
+      //가로, 세로 회전시
+      if (window.screen.orientation.angle == 0) $('html').removeClass('landscape');
+      else $('html').addClass('landscape');
+      $(window).on('orientationchange', function () {
+        if (window.screen.orientation.angle == 0) {
+          $('html').removeClass('landscape');
+          if ($isIPhoneX) ui.device.isIPhoneX();
+        } else {
+          $('html').addClass('landscape');
+          if ($isIPhoneX) ui.device.notIPhoneX();
+        }
+      });
+    }
+
+    // 최소기준 디바이스(가로)크기보다 작으면 meta[name="viewport"] 수정
+    const deviceMinWidth = 320;
+    if ($(window).width() < deviceMinWidth) {
+      const $viewport = $('meta[name="viewport"]');
+      const $newContent = 'width=' + deviceMinWidth + ',user-scalable=no,viewport-fit=cover';
+      $viewport.attr('content', $newContent);
+    }
+  },
+  app: function () {
+    // isWebView() -앱확인., goOutLink() -새창. 는 개발팀 공통함수
+    if (typeof isWebView === 'function' && isWebView()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+//PC
 ui.pc = {
   window: function () {
     return navigator.userAgent.match(/windows/i) == null ? false : true;
@@ -176,8 +257,7 @@ ui.pc = {
     }
   }
 };
-
-//모바일 디바이스 체크
+//모바일
 ui.mobile = {
   Android: function () {
     return navigator.userAgent.match(/Android/i) == null ? false : true;
@@ -206,12 +286,13 @@ ui.mobile = {
   Windows: function () {
     return navigator.userAgent.match(/IEMobile/i) == null ? false : true;
   },
+  tabletCheckWidth: 760,
   tablet: function () {
     if (ui.mobile.any()) {
       if (window.screen.width < window.screen.height) {
-        return window.screen.width > 760 ? true : false;
+        return window.screen.width > ui.mobile.tabletCheckWidth ? true : false;
       } else {
-        return window.screen.height > 760 ? true : false;
+        return window.screen.height > ui.mobile.tabletCheckWidth ? true : false;
       }
     }
   },
@@ -228,63 +309,7 @@ ui.mobile = {
     //if(ui.mobile.iPhoneVersion() >= 12)$('html').addClass('ios12');
 
     // 앱인지 구분
-    if (ui.device.app()) {
-      $('html').addClass('is-app');
-    }
-  }
-};
-
-//디바이스체크 실행
-ui.device = {
-  screenH: window.screen.height,
-  screenW: window.screen.width,
-  isIPhoneX: function () {
-    $('html').addClass('iPhone-X');
-  },
-  notIPhoneX: function () {
-    $('html').removeClass('iPhone-X');
-  },
-  check: function () {
-    ui.mobile.check();
-    ui.pc.check();
-    if (ui.mobile.any()) {
-      const $pixelRatio = Math.round(window.devicePixelRatio);
-      if (!!$pixelRatio) $('html').addClass('pixel-ratio-' + $pixelRatio);
-    }
-
-    //가로, 세로 회전시
-    if (ui.mobile.any()) {
-      if (window.orientation == 0) {
-        $('html').removeClass('landscape');
-      } else {
-        $('html').addClass('landscape');
-      }
-      $(window).on('orientationchange', function () {
-        if (window.orientation == 0) {
-          $('html').removeClass('landscape');
-          if ($isIPhoneX) ui.device.isIPhoneX();
-        } else {
-          $('html').addClass('landscape');
-          if ($isIPhoneX) ui.device.notIPhoneX();
-        }
-      });
-    }
-
-    // 최소기준 디바이스(가로)크기보다 작으면 meta[name="viewport"] 수정
-    const deviceMinWidth = 320;
-    if ($(window).width() < deviceMinWidth) {
-      const $viewport = $('meta[name="viewport"]');
-      const $newContent = 'width=' + deviceMinWidth + ',user-scalable=no,viewport-fit=cover';
-      $viewport.attr('content', $newContent);
-    }
-  },
-  app: function () {
-    // isWebView() -앱확인., goOutLink() -새창. 는 개발팀 공통함수
-    if (typeof isWebView === 'function' && isWebView()) {
-      return true;
-    } else {
-      return false;
-    }
+    if (ui.device.app()) $('html').addClass('is-app');
   }
 };
 
@@ -310,7 +335,7 @@ ui.common = {
     ui.common.hr();
     ui.common.lottie();
   },
-  LoadInit: function () {
+  loadInit: function () {
     ui.common.bottomSpace();
     ui.common.hr();
     ui.common.lottie();
@@ -454,8 +479,9 @@ ui.common = {
     //가로모드 막기
     if (ui.mobile.any()) {
       const _landscapeDiv = '.landscape-lock';
+      const _text = '이 사이트는 세로 전용입니다.<br />단말기를 세로모드로 변경해주세요.';
       if (!$(_landscapeDiv).length) {
-        const $landscapeHtml = '<div class="' + _landscapeDiv.substring(1) + '"><div class="tbl"><div class="td">이 사이트는 세로 전용입니다.<br />단말기를 세로모드로 변경해주세요.</div></div></div>';
+        const $landscapeHtml = '<div class="' + _landscapeDiv.substring(1) + '"><div class="tbl"><div class="td">' + _text + '</div></div></div>';
         $('body').append($landscapeHtml);
       }
       $(_landscapeDiv)
@@ -607,7 +633,7 @@ ui.common = {
     }
   },
   UI: function () {
-    $(document).on('click', '#container', function (e) {
+    $(document).on('click', ui.className.mainWrap, function (e) {
       if (!$('html').hasClass(ui.className.lock.slice(1))) $(window).scroll();
     });
 
@@ -660,14 +686,8 @@ ui.common = {
         isScrollIng = true;
       }
     });
-    $(document).on('touchend', function () {
-      if (isScrollIng) {
-        isScrollIng = false;
-        fixedEnd();
-      }
-    });
 
-    function fixedEnd() {
+    const fixedEnd = function () {
       const $fixedHead = $(ui.className.mainWrap + ':visible ' + ui.className.header + '.ty-fixed');
       if (isScrollIng || !$fixedHead.length) return;
       const headerHeight = $fixedHead.outerHeight();
@@ -681,7 +701,14 @@ ui.common = {
       if (prevMove !== move) $fixedHead.css('transform', `translateY(${move}px)`);
       prevMove = move;
       lastMove = move;
-    }
+    };
+
+    $(document).on('touchend', function () {
+      if (isScrollIng) {
+        isScrollIng = false;
+        fixedEnd();
+      }
+    });
 
     $(window).on(
       'scroll',
@@ -822,7 +849,7 @@ ui.util = {
         }
 
         lazyloadThrottleTimeout = setTimeout(function () {
-          const scrollTop = window.pageYOffset;
+          const scrollTop = window.scrollY;
           lazyloadImages.forEach(function (img) {
             if (img.offsetTop < window.innerHeight + scrollTop) {
               img.src = img.dataset.src;
@@ -862,7 +889,7 @@ ui.etc = {
       $last = $('.console').last();
       $top = parseInt($last.css('top')) + $last.outerHeight();
     }
-    const $wrap = $('#wrap').length ? $('#wrap') : $('body');
+    const $wrap = $(ui.className.mainWrap + ':visible').length ? $(ui.className.mainWrap + ':visible') : $('body');
     $wrap.append('<div class="console">' + txt + '</div>');
     $last = $('.console').last();
     if ($top > 0) $last.css('top', $top);
@@ -973,9 +1000,9 @@ ui.btnTop = {
         const $page = $(this).closest(ui.className.wrap);
         if ($page.closest(ui.className.popup).length) {
           const $body = $page.find(ui.className.body);
-          ui.Scroll.wrapTop($body, 0, ui.btnTop.scrollSpeed);
+          ui.scroll.wrapTop($body, 0, ui.btnTop.scrollSpeed);
         } else {
-          ui.Scroll.top(0, ui.btnTop.scrollSpeed);
+          ui.scroll.top(0, ui.btnTop.scrollSpeed);
           $page.find($focusableEl).first().focus();
         }
       })
@@ -990,7 +1017,7 @@ ui.btnTop = {
 
 /** button **/
 ui.button = {
-  LoadInit: function () {
+  loadInit: function () {
     //링크없는 a태그 role=button 추가
     $('a').each(function (e) {
       const $href = $(this).attr('href');
@@ -1110,6 +1137,7 @@ ui.button = {
     });
   },
   star: function () {
+    // 별점
     $(document).on('click', '.ico-star-wrap > button', function (e) {
       e.preventDefault();
       const $idx = $(this).index();
@@ -1136,6 +1164,8 @@ ui.button = {
     });
   },
   loading: function (element, show) {
+    const loadingElClass = '.loading-svg';
+    const activeClass = '.loading';
     const $element = $(element);
     if (show === undefined) show = true;
     if (!$element) return;
@@ -1143,7 +1173,7 @@ ui.button = {
     const $elH = $element.outerHeight();
     const $min = $elW < $elH ? $elW / 2 : $elH / 2;
     // const $max = $elW < $elH ? $elH : $elW;
-    let $html = '<div class="loading-svg" role="img">';
+    let $html = '<div class="' + loadingElClass.slice(1) + '" role="img">';
     $html += '<svg width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">';
     $html += '<circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>';
     $html += '</svg>';
@@ -1152,7 +1182,7 @@ ui.button = {
     let hideTimer;
     if (show) {
       clearTimeout(hideTimer);
-      $element.addClass('loading');
+      $element.addClass(activeClass.slice(1));
       $element.append($html);
       showTimer = setTimeout(function () {
         $element.css('clip-path', 'circle(' + $min + 'px at 50% 50%)');
@@ -1161,13 +1191,13 @@ ui.button = {
       clearTimeout(showTimer);
       $element.removeCss('clip-path');
       hideTimer = setTimeout(function () {
-        $element.find('.loading-svg').remove();
-        $element.removeClass('loading');
+        $element.find(loadingElClass).remove();
+        $element.removeClass(activeClass.slice(1));
       }, 500);
     }
   },
   reInit: function () {
-    ui.button.LoadInit();
+    ui.button.loadInit();
     ui.button.disabled();
   },
   init: function () {
@@ -1369,7 +1399,7 @@ ui.tab = {
     $(wrap).each(function () {
       const $this = $(this);
       const $children = $this.children();
-      const $isScrollX = ui.Scroll.is($children).x;
+      const $isScrollX = ui.scroll.is($children).x;
       const $btnClass = 'tab-expand-btn';
       const $btn = '<div class="' + $btnClass + '"><button type="button" aria-label="펼쳐보기" aria-expanded="false"></button></div>';
       if ($isScrollX) {
@@ -1415,7 +1445,7 @@ ui.tab = {
         setTimeout(function () {
           const $active = $this.find(ui.tab.className.active);
           if ($active.length) {
-            ui.Scroll.center($active, $delay * 10);
+            ui.scroll.center($active, $delay * 10);
             ui.tab.line($this, isMove);
           }
         }, $delay);
@@ -1488,7 +1518,7 @@ ui.tab = {
             if ($panel.length && isScroll) {
               const $tabBtn = $('[href="#' + panel + '"]');
               const $tab = $tabBtn.length ? $tabBtn.closest(ui.tab.className.inner) : panel;
-              ui.Scroll.inScreen($tab, panel);
+              ui.scroll.inScreen($tab, panel);
             }
           });
         }
@@ -1564,7 +1594,7 @@ ui.tab = {
       const $this = $(this);
       $this.addClass('_autoHeight');
       $this.attr('data-view', 1);
-      ui.Swiper.ready($this);
+      ui.swiper.ready($this);
 
       const $tabChageEvt = function (e) {
         const $index = e.realIndex;
@@ -1579,7 +1609,7 @@ ui.tab = {
         $activePanel.attr('aria-expanded', true).removeAttr('aria-hidden');
         if ($activeBtn.length) ui.tab.tabActive($activeBtn);
       };
-      ui.Swiper.base($this, $tabChageEvt);
+      ui.swiper.base($this, $tabChageEvt);
 
       $this.find('.swiper-slide').attr({
         'aria-expanded': false,
@@ -1680,8 +1710,8 @@ ui.tab = {
         ui.tab.panelActive($href, $siblings, true);
       }
       if ($tabInner.length) {
-        const isScroll = ui.Scroll.is($tabInner).x;
-        if (isScroll) ui.Scroll.center($tab);
+        const isScroll = ui.scroll.is($tabInner).x;
+        if (isScroll) ui.scroll.center($tab);
       }
 
       let $winScrollTop = $(window).scrollTop();
@@ -1690,11 +1720,11 @@ ui.tab = {
       if ($topFixed.length) {
         const $topMargin = ui.common.getTopFixedHeight($this);
         const $scrollMove = getOffset($topFixed[0]).top;
-        if ($winScrollTop + $topMargin > $scrollMove) ui.Scroll.top($scrollMove - $topMargin);
+        if ($winScrollTop + $topMargin > $scrollMove) ui.scroll.top($scrollMove - $topMargin);
       }
 
       if ($($href).length) {
-        //ui.Animation
+        //ui.animation
         if ($($href).find('.animate__animated').length) {
           setTimeout(function () {
             $($href).find('.animate__animated').addClass('paused');
@@ -1722,7 +1752,7 @@ ui.tab = {
         }
 
         if ($($href).find('.ui-swiper').length) {
-          ui.Swiper.update($($href).find('.ui-swiper'));
+          ui.swiper.update($($href).find('.ui-swiper'));
         }
       }
     });
@@ -1791,7 +1821,7 @@ ui.tab = {
       const $header = $wrap.find(ui.className.header);
       const $headH = $header.length ? $header.outerHeight() : 0;
       const $top = $($href).offset().top - $headH;
-      ui.Scroll.top($top);
+      ui.scroll.top($top);
     });
   },
   reInit: function () {
@@ -1806,20 +1836,29 @@ ui.tab = {
   }
 };
 //툴팁
-ui.Tooltip = {
+ui.tooltip = {
+  className: {
+    wrap: '.tooltip-wrap',
+    btn: '.tooltip-btn',
+    active: '.on',
+    body: '.tooltip-body',
+    inner: '.tooltip-inner',
+    arrow: '.tooltip-arr',
+    closeBtn: '.tooltip-close'
+  },
   resize: function () {
-    if (!$('.tooltip-btn.on').length) return;
-    $('.tooltip-btn.on').each(function () {
+    if (!$(ui.tooltip.className.btn + ui.tooltip.className.active).length) return;
+    $(ui.tooltip.className.btn + ui.tooltip.className.active).each(function () {
       const $btn = $(this);
-      const $wrap = $btn.closest('.tooltip-wrap');
-      const $cont = $wrap.find('.tooltip-cont');
+      const $wrap = $btn.closest(ui.tooltip.className.wrap);
+      const $cont = $wrap.find(ui.tooltip.className.body);
       const $winW = $(window).width() - 40;
       const $btnW = $btn.outerWidth();
       const $btnX = Math.min($winW + $btnW / 2 - 2, $btn.offset().left) - 20;
       let $scrollEnd = $(window).height() + $(window).scrollTop();
       if ($(ui.className.bottomFixed + ':visible').length) $scrollEnd = $scrollEnd - $(ui.className.bottomFixed).children().outerHeight();
       const $left = Math.max(-4, $btnX);
-      $cont.children('.tooltip-arr').css({
+      $cont.children(ui.tooltip.className.arrow).css({
         left: $left + $btnW / 2
       });
       $cont.css({
@@ -1841,17 +1880,17 @@ ui.Tooltip = {
   position: function (tar) {
     const $tar = $(tar);
 
-    if (!$tar.find('.tooltip-inner').length) $tar.wrapInner('<div class="tooltip-inner"></div>');
-    if (!$tar.find('.tooltip-arr').length) $tar.prepend('<i class="tooltip-arr" aria-hidden="true"></i>');
-    if (!$tar.find('.tooltip-close').length) $tar.find('.tooltip-inner').append('<a href="#" class="tooltip-close" role="button" aria-label="툴팁닫기"></a>');
-    ui.Tooltip.resize();
+    if (!$tar.find(ui.tooltip.className.inner).length) $tar.wrapInner('<div class="' + ui.tooltip.className.inner.slice(1) + '"></div>');
+    if (!$tar.find(ui.tooltip.className.arrow).length) $tar.prepend('<i class="' + ui.tooltip.className.arrow.slice(1) + '" aria-hidden="true"></i>');
+    if (!$tar.find(ui.tooltip.className.closeBtn).length) $tar.find(ui.tooltip.className.inner).append('<a href="#" class="' + ui.tooltip.className.closeBtn.slice(1) + '" role="button" aria-label="툴팁닫기"></a>');
+    ui.tooltip.resize();
   },
   aria: function (element) {
     $(element).each(function (e) {
-      const $btn = $(this).find('.tooltip-btn');
-      const $cont = $(this).find('.tooltip-cont');
+      const $btn = $(this).find(ui.tooltip.className.btn);
+      const $cont = $(this).find(ui.tooltip.className.body);
       let $contId = $cont.attr('id');
-      const $closeBtn = $(this).find('.tooltip-close');
+      const $closeBtn = $(this).find(ui.tooltip.className.closeBtn);
       if (!$contId) $contId = 'ttCont-' + e;
       $btn.attr({
         role: 'button'
@@ -1865,15 +1904,15 @@ ui.Tooltip = {
     });
   },
   reInit: function () {
-    ui.Tooltip.aria('.tooltip-wrap');
+    ui.tooltip.aria(ui.tooltip.className.wrap);
   },
   init: function () {
-    ui.Tooltip.aria('.tooltip-wrap');
+    ui.tooltip.aria(ui.tooltip.className.wrap);
 
     //열기
-    $(document).on('click', '.tooltip-wrap .tooltip-btn', function (e) {
+    $(document).on('click', ui.tooltip.className.wrap + ' ' + ui.tooltip.className.btn, function (e) {
       e.preventDefault();
-      const $cont = $(this).closest('.tooltip-wrap').find('.tooltip-cont');
+      const $cont = $(this).closest(ui.tooltip.className.wrap).find(ui.tooltip.className.body);
       if ($(this).hasClass('is-pop')) {
         const $popContent = $cont.html();
         const $popTitle = $cont.attr('title');
@@ -1883,36 +1922,36 @@ ui.Tooltip = {
           Layer.tooltip($popContent);
         }
       } else {
-        if ($(this).hasClass('on')) {
+        if ($(this).hasClass(ui.tooltip.className.active.slice(1))) {
           $cont.stop(true, false).fadeOut();
-          $(this).removeClass('on');
+          $(this).removeClass(ui.tooltip.className.active.slice(1));
         } else {
-          $('.tooltip-btn').removeClass('on');
-          $('.tooltip-cont').fadeOut();
-          $(this).addClass('on');
+          $(ui.tooltip.className.btn).removeClass(ui.tooltip.className.active.slice(1));
+          $(ui.tooltip.className.body).fadeOut();
+          $(this).addClass(ui.tooltip.className.active.slice(1));
           $cont.stop(true, false).fadeIn();
           setTimeout(function () {
-            ui.Tooltip.position($cont);
+            ui.tooltip.position($cont);
           }, 30);
         }
       }
     });
     //닫기
-    $(document).on('click', '.tooltip-close', function (e) {
+    $(document).on('click', ui.tooltip.className.closeBtn, function (e) {
       e.preventDefault();
-      const $cont = $(this).closest('.tooltip-cont');
-      const $btn = $cont.siblings('.tooltip-btn');
-      $btn.removeClass('on');
+      const $cont = $(this).closest(ui.tooltip.className.body);
+      const $btn = $cont.siblings(ui.tooltip.className.btn);
+      $btn.removeClass(ui.tooltip.className.active.slice(1));
       $cont.stop(true, false).fadeOut(500, function () {
         $btn.focus();
       });
     });
     $(document)
       .on('click touchend', function (e) {
-        $('.tooltip-cont').stop(true, false).fadeOut();
-        $('.tooltip-wrap .tooltip-btn').removeClass('on');
+        $(ui.tooltip.className.body).stop(true, false).fadeOut();
+        $(ui.tooltip.className.wrap + ' ' + ui.tooltip.className.btn).removeClass(ui.tooltip.className.active.slice(1));
       })
-      .on('click touchend', '.tooltip-wrap', function (e) {
+      .on('click touchend', ui.tooltip.className.wrap, function (e) {
         e.stopPropagation();
       });
   }
@@ -2082,19 +2121,44 @@ ui.Touch = {
 };
 
 /** form **/
-ui.Form = {
-  winLoad: function () {
+ui.form = {
+  init: function () {
+    ui.form.focus();
+    ui.form.select();
+    // ui.form.select2();
+    ui.form.selectUI();
+    ui.form.inputUI();
+    ui.form.inpBtn();
+    ui.form.textarea();
+    ui.form.textareaUI();
+    ui.form.textCountInit();
+    ui.form.textCountUI();
+
+    ui.form.spinnerUI();
+    ui.form.spinner();
+    ui.form.range();
+    ui.form.jqRange();
+    ui.form.jqCalendar('.datepicker');
+  },
+  reInit: function () {
+    ui.form.loadInit();
+    ui.form.select();
+    // ui.form.select2();
+    ui.form.textarea();
+    ui.form.textCountInit();
+
+    ui.form.spinner();
+    ui.form.range();
+    ui.form.jqRange();
+    ui.form.jqCalendar('.datepicker');
+  },
+  loadInit: function () {
     //select off효과
     $('select').each(function () {
       const $val = $(this).val();
       if ($val == '' || $val == null) {
         $(this).addClass('off');
       }
-    });
-
-    //입력 텍스트 카운팅(로딩)
-    $('[data-text-count]').each(function (e) {
-      ui.Form.textCount(this);
     });
   },
   focus: function () {
@@ -2141,7 +2205,7 @@ ui.Form = {
           if (isPop) {
             $wrap.stop(true, false).animate({ scrollTop: $move }, 200);
           } else {
-            ui.Scroll.top($move, 200);
+            ui.scroll.top($move, 200);
           }
         }
       }, 300);
@@ -2228,7 +2292,7 @@ ui.Form = {
             if ($forLbl.length) $forLbl.addClass('ui-select-lbl').attr('title', $btnTitle);
 
             $sel.change(function () {
-              ui.Form.selectSetVal(this);
+              ui.form.selectSetVal(this);
             });
           }
           $sel.change();
@@ -2454,14 +2518,14 @@ ui.Form = {
     }
   },
   textarea: function () {
-    // ui.Form.textareaSpace();
+    // ui.form.textareaSpace();
     $('.textarea.auto-height textarea').each(function () {
-      ui.Form.textareaHeight(this);
+      ui.form.textareaHeight(this);
     });
   },
   textareaUI: function () {
     $(document).on('keyup keydown keypress change', '.textarea.auto-height textarea', function () {
-      ui.Form.textareaHeight(this);
+      ui.form.textareaHeight(this);
     });
   },
   success: function (element, messege) {
@@ -2520,124 +2584,20 @@ ui.Form = {
       if ($val != '') $target.text(Math.min($max, $length));
     }
   },
-  agree: function () {
-    const $wrapClass = '.ui-agree';
-    const $allAgreeChkClass = '.ui-all-agree-chk';
-    const $agreeChkClass = '.ui-agree-chk';
-
-    $($wrapClass).each(function () {
-      const $wrapEl = $(this);
-      if ($wrapEl.data('_ui-init')) return;
-      $wrapEl.data('_ui-init', true);
-      // 전체동의
-      $wrapEl.find($allAgreeChkClass).on('change', function () {
-        const $this = $(this);
-        const $wrap = $this.closest($wrapClass);
-        const $items = $wrap.find($agreeChkClass);
-        const $isFolding = $wrap.hasClass('folding');
-        const $foldingBtn = $wrap.find('.ui-folding-btn');
-        const $foldingPanel = $wrap.find('.folding-panel');
-        if ($(this).prop('checked')) {
-          $items.prop('checked', true).change();
-          if ($isFolding && $foldingBtn.hasClass('open')) {
-            $foldingBtn.removeClass('open');
-            $foldingPanel.stop(true, false).slideUp(200);
-          }
-        } else {
-          $items.prop('checked', false).change();
-          if ($isFolding && !$foldingBtn.hasClass('open')) {
-            $foldingBtn.addClass('open');
-            $foldingPanel.stop(true, false).slideDown(200);
-          }
-        }
-      });
-
-      $wrapEl.find($agreeChkClass).on('change', function () {
-        const $this = $(this);
-        const $wrap = $this.closest($wrapClass);
-        const $allchk = $wrap.find($allAgreeChkClass);
-        const $items = $wrap.find($agreeChkClass);
-        const $isFolding = $wrap.hasClass('folding');
-        const $foldingBtn = $wrap.find('.ui-folding-btn');
-        const $foldingPanel = $wrap.find('.folding-panel');
-        const $itemsLength = $items.length;
-        const $itemsChecked = $wrap.find($agreeChkClass + ':checked').length;
-        if ($itemsLength === $itemsChecked) {
-          $allchk.prop('checked', true);
-          if ($isFolding && $foldingBtn.hasClass('open')) {
-            $foldingBtn.removeClass('open');
-            $foldingPanel.stop(true, false).slideUp(200);
-          }
-        } else {
-          $allchk.prop('checked', false);
-        }
-      });
-    });
-
-    // 선택약관(문자, 메일수신)
-    $('[data-agree-target]').each(function () {
-      const $this = $(this);
-      const $dataTargets = $this.data('agree-target').split(',');
-      const $targets = [];
-      $.each($dataTargets, function () {
-        if ($(this.trim()).length) $targets.push(this.trim());
-      });
-      if ($this.data('_ui-init')) return;
-      $this.data('_ui-init', true);
-      $this.on('change', function () {
-        let $checked = 0;
-        if ($(this).prop('checked')) {
-          $.each($targets, function () {
-            if ($('' + this).prop('checked')) $checked += 1;
-          });
-          if ($checked === 0) {
-            $.each($targets, function () {
-              $('' + this).prop('checked', true);
-            });
-          }
-        } else {
-          $.each($targets, function () {
-            $('' + this).prop('checked', false);
-          });
-        }
-      });
-
-      $.each($targets, function () {
-        $('' + this).change(function () {
-          let $checked = 0;
-          if ($(this).prop('checked')) {
-            $this.prop('checked', true).change();
-          } else {
-            $.each($targets, function () {
-              if ($('' + this).prop('checked')) $checked += 1;
-            });
-            if ($checked === 0) $this.prop('checked', false).change();
-          }
-        });
-      });
+  textCountEl: '[data-text-count]',
+  textCountInit: function () {
+    $(ui.form.textCountEl).each(function (e) {
+      ui.form.textCount(this);
     });
   },
-  mail: function () {
-    // 이메일 직접입력
-    const mailCheck = function (element, isFocus) {
-      const $this = $(element);
-      const $val = $this.val();
-      const $closest = $this.closest('.inp-mail');
-      const $inp = $closest.find('.input').last().find('input');
-      if ($this.find(':selected').text() === '직접입력') {
-        $inp.closest('.input').removeClass('disabled');
-        $inp.prop('readonly', false);
-        if (isFocus) $inp.focus();
-      } else {
-        $inp.closest('.input').addClass('disabled');
-        $inp.prop('readonly', true).val($val);
-      }
-    };
-    $('.inp-mail select').on('change', function () {
-      mailCheck(this, true);
+  textCountUI: function () {
+    $(document).on('keypress keyup', ui.form.textCountEl, function (e) {
+      ui.form.textCount(this, e);
     });
-    $('.inp-mail select').each(function () {
-      mailCheck(this, false);
+    $(document).on('paste cut', ui.form.textCountEl, function (e) {
+      if (e.originalEvent.clipboardData) {
+        ui.form.textCount(this, e);
+      }
     });
   },
   spinner: function () {
@@ -3133,7 +3093,7 @@ ui.Form = {
         if (!$isInline) {
           if (ui.mobile.any()) {
             $($calendar).find('.title').attr('tabindex', -1).focus();
-            if ($('#wrap').length) $('#wrap').attr('aria-hidden', true);
+            if ($(ui.className.mainWrap + ':visible').length) $(ui.className.mainWrap + ':visible').attr('aria-hidden', true);
           } else {
             $($calendar).attr('tabindex', 0).focus();
             Layer.focusMove($calendar);
@@ -3205,7 +3165,7 @@ ui.Form = {
         //팝업달력
         Body.unlock();
         $(ob.input).change();
-        if ($('#wrap').length) $('#wrap').removeAttr('aria-hidden');
+        if ($(ui.className.mainWrap + ':visible').length) $(ui.className.mainWrap + ':visible').removeAttr('aria-hidden');
         $cal.find('.title').removeAttr('tabindex');
         $('.' + $dimmedClass).remove();
         $(target).next('.ui-datepicker-trigger').focus();
@@ -3329,117 +3289,1303 @@ ui.Form = {
         }
       });
     }
+  }
+};
+
+/** 리스트 **/
+ui.list = {
+  init: function () {
+    ui.list.allCheck();
   },
-  character: function () {
-    let $timer;
-    const $character = document.querySelector('.character-face');
-    if ($character === null) return;
-    const $characterHidden = document.querySelector('.character-hidden');
-    const _rotate3d = function (x, y, z, rad) {
-      const face = $character.querySelectorAll('.ears, .eyes, .mouse');
-      const value = 'rotate3d(' + x + ', ' + y + ', ' + z + ', ' + rad + 'rad)';
-      face.forEach(function (el) {
-        el.style.transform = value;
+  reInit: function () {
+    ui.list.loadInit();
+  },
+  loadInit: function () {
+    //토글실행
+    ui.folding.list('.ui-folding', '.folding-btn', '.folding-panel');
+    ui.folding.btn('.ui-folding-btn');
+    ui.folding.close('.ui-folding-close');
+
+    //테이블 스크롤 가이드 실행
+    ui.table.guideScroll();
+    ui.table.guideResize();
+  },
+  allCheck: function () {
+    const $wrapClass = '.ui-chk-wrap';
+    const $allChkClass = '.ui-all-chk';
+    const $chkClass = '.ui-chk';
+
+    // 전체동의
+    $(document).on('change', $wrapClass + ' ' + $allChkClass, function () {
+      const $this = $(this);
+      const $wrap = $this.closest($wrapClass);
+      const $items = $wrap.find($chkClass).not(':disabled');
+      if ($this.prop('checked')) {
+        if ($this.hasClass('_not_change_event')) $items.prop('checked', true);
+        else $items.prop('checked', true).change();
+      } else {
+        if ($this.hasClass('_not_change_event')) $items.prop('checked', false);
+        else $items.prop('checked', false).change();
+      }
+    });
+    $(document).on('change', $wrapClass + ' ' + $chkClass, function () {
+      const $this = $(this);
+      const $wrap = $this.closest($wrapClass);
+      const $allchk = $wrap.find($allChkClass);
+      const $items = $wrap.find($chkClass).not(':disabled');
+      const $itemsLength = $items.length;
+      const $itemsChecked = $wrap.find($chkClass + ':checked').not(':disabled').length;
+      if ($itemsLength === $itemsChecked) {
+        $allchk.prop('checked', true);
+      } else {
+        $allchk.prop('checked', false);
+      }
+    });
+  }
+};
+//아코디언
+ui.folding = {
+  listAria: function (list, btn, panel, addClass) {
+    if (!addClass) addClass = 'open';
+    if ($(list).length) {
+      $(list).each(function (e) {
+        $(this)
+          .children()
+          .each(function (f) {
+            const $btn = $(this).find(btn);
+            let $btnId = $btn.attr('id');
+            const $panel = $(this).find(panel);
+            let $panelId = $panel.attr('id');
+            if ($btn.length && $btn.attr('aria-expanded') == undefined) {
+              if ($btnId == undefined) {
+                $btnId = 'tglist_btn_' + e + '_' + f;
+                $btn.attr('id', $btnId);
+              }
+              if ($panelId == undefined) {
+                $panelId = 'tglist_panel_' + e + '_' + f;
+                $panel.attr('id', $panelId);
+              }
+              $btn.attr({
+                role: 'button',
+                'aria-expanded': false,
+                href: '#' + $panelId,
+                'aria-controls': $panelId
+              });
+              $panel.attr({
+                'aria-hidden': 'true',
+                'aria-labelledby': $btnId
+              });
+            }
+            if (!$btn.length) {
+              $panel.show();
+            }
+          });
       });
-    };
-    const _reset = function () {
-      clearTimeout($timer);
-      $character.classList.remove('playing');
-      $timer = setTimeout(function () {
-        $character.classList.remove('look-away', 'down', 'up');
-        _rotate3d(0, 0, 0, 0);
-      }, 1);
-    };
-    const _characterLook = function (event) {
-      const el = event.target;
-      const text = el.value.substr(0, el.selectionStart);
-      $characterHidden.innerHTML = '<span>' + text + '.</span>';
+      if ($(list).find('.' + addClass).length) {
+        $(list)
+          .find('.' + addClass)
+          .each(function () {
+            $(this).find(btn).attr('aria-expanded', true);
+            $(this).find(panel).removeAttr('aria-hidden').show();
+            if ($(this).find(btn).children('span').length && $(this).find(btn).children('span').text() == '더보기') {
+              $(this).find(btn).children('span').text('닫기');
+            }
+          });
+      }
+    }
+  },
+  list: function (list, btn, panel, addClass, speed) {
+    if (!addClass) addClass = 'open';
+    if (!speed) speed = 200;
+    $(list).each(function (e) {
+      const isFolding = $(this).data('folding');
+      if (isFolding) return;
+      $(this).data('folding', true);
+      $(this)
+        .find(btn)
+        .on('click', function (e) {
+          e.preventDefault();
+          const $this = $(this);
+          const $list = $this.closest(list);
+          const $li = $this.closest('li');
+          let $openDelay = 0;
+          if ($this.closest('.disabled').length || $this.hasClass('disabled')) return false;
 
-      const characterRect = $character.getBoundingClientRect();
-      const inputRect = el.getBoundingClientRect();
-      const caretRect = $characterHidden.getBoundingClientRect();
-      const caretPos = caretRect.left + Math.min(caretRect.width, inputRect.width) * !!text;
-      const distCaret = characterRect.left + characterRect.width / 2 - inputRect.left - caretPos;
-      const distInput = characterRect.top + characterRect.height / 2 - inputRect.top;
-      const y = Math.atan2(-distCaret, Math.abs(distInput) * 3);
-      const x = Math.atan2(distInput, (Math.abs(distInput) * 3) / Math.cos(y));
-      const angle = Math.max(Math.abs(x), Math.abs(y));
-      _rotate3d(x / angle, y / angle, y / angle / 2, angle);
-    };
-    const _characterLookAway = function (event) {
-      const el = event.target;
-      const characterRect = $character.getBoundingClientRect();
-      const inputRect = el.getBoundingClientRect();
-      const distInput = characterRect.top + characterRect.height / 2 - inputRect.top;
+          const slideCallback = function () {
+            if ($li.find(panel).find('.ui-swiper').length) {
+              ui.swiper.update($li.find(panel).find('.ui-swiper'));
+            }
+          };
 
-      $character.classList.add('look-away', distInput < 0 ? 'up' : 'down');
+          if ($li.hasClass(addClass)) {
+            $li.find(btn).attr('aria-expanded', false);
+            $li.removeClass(addClass);
+            $li
+              .find(panel)
+              .attr('aria-hidden', true)
+              .stop(true, false)
+              .slideUp(speed, function () {
+                slideCallback();
+              });
+            if ($this.children('span').length && $this.children('span').text() == '닫기') {
+              $this.children('span').text('더보기');
+            }
+          } else {
+            $li.addClass(addClass).find(btn).attr('aria-expanded', true);
+            if (!$list.hasClass('not-toggle')) {
+              const $siblings = $li.siblings();
+              $siblings.removeClass(addClass).find(btn).attr('aria-expanded', false);
+              $siblings.find(panel).attr('aria-hidden', true).stop(true, false).slideUp(speed);
+              if ($siblings.find(btn).children('span').length && $siblings.find(btn).children('span').text() == '닫기') {
+                $siblings.find(btn).children('span').text('더보기');
+              }
+            }
+            if ($li.find(panel).html() == '') $openDelay = 100;
+            $li
+              .find(panel)
+              .removeAttr('aria-hidden')
+              .stop(true, false)
+              .delay($openDelay)
+              .slideDown(speed, function () {
+                ui.scroll.inScreen($this, this);
+                slideCallback();
+              });
+            if ($this.children('span').length && $this.children('span').text() == '더보기') {
+              $this.children('span').text('닫기');
+            }
+          }
+        });
 
-      $timer = setTimeout(function () {
-        $character.classList.add('playing');
-      }, 300);
-    };
-
-    const _inpEvt = function (e) {
-      const el = e.target;
-      setTimeout(function () {
-        if (el.type === 'password') {
-          _characterLookAway(e);
-        } else {
-          _characterLook(e);
+      ui.folding.listAria(this, btn, panel, addClass);
+    });
+  },
+  btnAria: function (btn, className) {
+    if (className == undefined) className = 'open';
+    if ($(btn).length) {
+      $(btn).each(function (e) {
+        const $btn = $(this);
+        let $btnId = $btn.attr('id');
+        const $href = $btn.attr('href');
+        let $panelId = $href === undefined ? null : $btn.attr('href').substring(1);
+        let $panel = $('#' + $panelId);
+        //if($btn.attr('aria-expanded') != undefined) return false;
+        const $closest = $btn.closest('.folding-list').length ? $btn.closest('.folding-list') : $btn.closest('.folding');
+        if ((!$panelId || $panelId == 'none') && $closest.length) {
+          $panel = $closest.find('.folding-panel');
+          if ($panel.attr('id')) $panelId = $panel.attr('id');
         }
-      }, 2);
-    };
+        if (!$panel.length) return;
+        if (!$btnId) $btnId = 'fdBtn_' + e;
+        if ($panelId == '' || $panelId == 'none' || $panelId == null) $panelId = 'fdPanel_' + e;
+        $btn.attr({
+          id: $btnId,
+          role: 'button',
+          href: '#' + $panelId,
+          'aria-expanded': false,
+          'aria-controls': $panelId
+        });
+        $panel.attr({
+          id: $panelId,
+          'aria-hidden': 'true',
+          'aria-labelledby': $btnId
+        });
+        //panel이 보이면
+        if ($panel.is(':visible')) {
+          $(this).addClass(className).attr('aria-expanded', true);
+        }
+        //btn이 활성화면
+        if ($(this).hasClass(className)) {
+          $(this).attr('aria-expanded', true);
+          $panel.removeAttr('aria-hidden').show();
+        }
+      });
+    }
+  },
+  btn: function (btn, className, speed) {
+    if (!className) className = 'open';
+    if (!speed) speed = 200;
+    ui.folding.btnAria(btn, className);
+    $(btn).each(function () {
+      const $btn = $(this);
+      if ($btn.data('_ui-init')) return;
+      $btn.data('_ui-init', true);
+      $btn.on('click', function (e) {
+        e.preventDefault();
+        const $this = $(this);
+        let $panel = $this.attr('href');
+        if ($this.closest('.disabled').length || $this.hasClass('disabled')) return false;
 
-    // init
-    const $input = document.querySelectorAll('.input input');
-    for (let i = 0; i < $input.length; i++) {
-      const $inp = $input[i];
-      $inp.addEventListener('focusin', _inpEvt, false);
-      $inp.addEventListener('click', _inpEvt, false);
-      $inp.addEventListener('keyup', _inpEvt, false);
-      $inp.addEventListener('keypress', _inpEvt, false);
-      $inp.addEventListener('focusout', _reset, false);
+        const slideCallback = function () {
+          if ($($panel).find('.ui-swiper').length) {
+            ui.swiper.update($($panel).find('.ui-swiper'));
+          }
+        };
+
+        if (($panel == '#' || $panel == '#none') && $this.closest('.folding-list').length) $panel = $this.closest('.folding-list').find('.folding-panel');
+        if ($this.hasClass(className) && !$this.hasClass('_not-folding-hide')) {
+          $this.removeClass(className).attr('aria-expanded', false);
+          $($panel)
+            .attr('aria-hidden', true)
+            .stop(true, false)
+            .slideUp(speed, function () {
+              slideCallback();
+            });
+        } else if (!$($panel).is(':visible')) {
+          $this.addClass(className).attr('aria-expanded', true);
+          $($panel)
+            .removeAttr('aria-hidden')
+            .stop(true, false)
+            .slideDown(speed, function () {
+              ui.scroll.inScreen($this, $($panel));
+              slideCallback();
+            });
+        }
+      });
+    });
+  },
+  close: function (btn, className, speed) {
+    if (!className) className = 'open';
+    if (!speed) speed = 200;
+    $(btn).each(function () {
+      const $this = $(this);
+      if ($this.data('_ui-init')) return;
+      $this.data('_ui-init', true);
+      $this.on('click', function (e) {
+        e.preventDefault();
+        const $closest = $(this).closest('[aria-labelledby]');
+        const $btn = $closest.attr('aria-labelledby');
+        if ($closest.length) {
+          $closest.attr('aria-hidden', true).stop(true, false).slideUp(speed);
+          if ($('#' + $btn).length)
+            $('#' + $btn)
+              .removeClass(className)
+              .attr('aria-expanded', false);
+        }
+      });
+    });
+  }
+};
+//테이블
+ui.table = {
+  class: '.tbl-scroll-in',
+  guideScroll: function () {
+    const $tbl = $(ui.table.class);
+    if (!$tbl.length) return;
+    $tbl.each(function () {
+      const $this = $(this);
+      $this.data('first', true);
+      $this.data('direction', '좌우');
+      $(this).on('scroll', function () {
+        $this.data('first', false);
+        $this.find('.tbl-guide').remove();
+        //$this.removeAttr('title');
+
+        const $sclInfo = $this.next('.tbl-scroll-ifno');
+        if ($sclInfo.length) {
+          const $sclPercentX = ui.scroll.sclPer($this).x;
+          const $sclPercentY = ui.scroll.sclPer($this).y;
+          const $horizon = $sclInfo.find('.horizon');
+          const $vertical = $sclInfo.find('.vertical');
+          if ($horizon.is(':visible')) $horizon.children().css('width', $sclPercentX + '%');
+          if ($vertical.is(':visible')) $vertical.children().css('height', $sclPercentY + '%');
+        }
+      });
+    });
+  },
+  guideResize: function () {
+    const $tbl = $(ui.table.class);
+    if (!$tbl.length) return;
+    $tbl.each(function () {
+      const $this = $(this);
+      const $direction = $this.data('direction');
+      let $changeDirection = '';
+      const $guide = '<div class="tbl-guide" title="해당영역은 테이블을 스크롤하면 사라집니다."><div><i class="icon" aria-hidden="true"></i>테이블을 ' + $direction + '로 스크롤하세요.</div></div>';
+      const $height = $this.outerHeight();
+
+      const $isScrollX = ui.scroll.is($this).x;
+      const $isScrollY = ui.scroll.is($this).y;
+      const $sclInfoHtml = '<div class="tbl-scroll-ifno" aria-hidden="true"><div class="horizon"><div></div></div><div class="vertical"><div></div></div></div>';
+      let $sclIfno = $this.next('.tbl-scroll-ifno');
+      if ($this.data('first')) {
+        if ($isScrollX && $isScrollY) {
+          $changeDirection = '상하좌우';
+        } else if ($isScrollX) {
+          $changeDirection = '좌우';
+        } else if ($isScrollY) {
+          $changeDirection = '상하';
+        } else {
+          $changeDirection = '';
+        }
+
+        if ($changeDirection == '') {
+          $this.removeAttr('tabindex').find('.tbl-guide').remove();
+          $sclIfno.remove();
+          $this.removeAttr('title');
+        } else {
+          if (!$this.find('.tbl-guide').length) {
+            if (!ui.Mobile.any()) {
+              $this.attr('tabindex', 0); //pc일땐 tabindex 사용
+            }
+            $this.prepend($guide);
+          }
+          if (!$sclIfno.length) {
+            $this.after($sclInfoHtml);
+            $sclIfno = $this.next('.tbl_scroll_ifno');
+          }
+          if ($sclIfno.length) {
+            $sclIfno.find('.vertical').css('height', $height);
+            $sclIfno.find('.vertical').show();
+            $sclIfno.find('.horizon').show();
+            if ($changeDirection == '좌우') {
+              $sclIfno.find('.vertical').hide();
+            } else if ($changeDirection == '상하') {
+              $sclIfno.find('.horizon').hide();
+            }
+          }
+
+          $this.attr('title', '터치스크롤하여 숨겨진 테이블영역을 확인하세요');
+        }
+
+        if ($direction != $changeDirection && $this.find('.tbl-guide').length) {
+          $this.find('.tbl-guide').changeTxt($direction, $changeDirection);
+          $this.data('direction', $changeDirection);
+        }
+      }
+    });
+  }
+};
+
+/** Swiper **/
+ui.swiper = {
+  init: function () {
+    if ($('.ui-swiper').length) {
+      ui.swiper.ready('.ui-swiper');
+      ui.swiper.base('.ui-swiper');
+      ui.swiper.UI();
     }
   },
   reInit: function () {
-    ui.Form.winLoad();
-    ui.Form.select();
-    // ui.Form.select2();
-    ui.Form.textarea();
-    ui.Form.agree();
-    ui.Form.mail();
-
-    ui.Form.spinner();
-    ui.Form.range();
-    ui.Form.jqRange();
-    ui.Form.jqCalendar('.datepicker');
+    ui.swiper.ready('.ui-swiper');
+    ui.swiper.base('.ui-swiper');
   },
-  init: function () {
-    ui.Form.focus();
-    ui.Form.select();
-    // ui.Form.select2();
-    ui.Form.selectUI();
-    ui.Form.inputUI();
-    ui.Form.inpBtn();
-    ui.Form.textarea();
-    ui.Form.textareaUI();
-    ui.Form.agree();
-    ui.Form.mail();
+  base: function (tar, changeEvt) {
+    $(tar).each(function () {
+      const $this = $(this);
+      const $swiper = $this.find('.swiper');
+      const $pagination = $this.find('.swiper-pagination');
+      const $slide = $this.find('.swiper-slide');
+      if (!$slide.length) return;
 
-    ui.Form.spinnerUI();
-    ui.Form.spinner();
-    ui.Form.range();
-    ui.Form.jqRange();
-    ui.Form.jqCalendar('.datepicker');
+      let $paginationType = 'bullets';
+      if ($this.hasClass('_fraction')) $paginationType = 'fraction';
 
-    //입력 텍스트 카운팅(입력)
-    $(document).on('keypress keyup', '[data-text-count]', function (e) {
-      ui.Form.textCount(this, e);
-    });
-    $(document).on('paste cut', '[data-text-count]', function (e) {
-      if (e.originalEvent.clipboardData) {
-        ui.Form.textCount(this, e);
+      let $navigation = false;
+      if ($this.hasClass('_navi')) {
+        let $btnHtml = '';
+        if (!$swiper.find('.swiper-button-prev').length) $btnHtml += '<button type="button" class="swiper-button-prev swiper-button"></button>';
+        if (!$swiper.find('.swiper-button-next').length) $btnHtml += '<button type="button" class="swiper-button-next swiper-button"></button>';
+        if ($btnHtml !== '') $swiper.append($btnHtml);
+        $navigation = {
+          prevEl: $this.find('.swiper-button-prev')[0],
+          nextEl: $this.find('.swiper-button-next')[0]
+        };
+      }
+
+      let $slidesPerView = 'auto';
+      if ($this.data('view') !== undefined) {
+        $slidesPerView = $this.data('view');
+        $this.removeAttr('data-view');
+      }
+
+      let $loop = $this.hasClass('_loop') ? true : false;
+      let $autoHeight = $this.hasClass('_autoHeight') ? true : false;
+      let $centeredSlides = $this.hasClass('_centeredSlides') ? true : false;
+
+      let $auto = false;
+      if ($this.data('auto') !== undefined) {
+        $auto = {
+          delay: $this.data('auto'),
+          disableOnInteraction: false
+        };
+        $this.removeAttr('data-auto');
+        if (!$this.find('.swiper-auto-ctl').length) {
+          if (!$this.find('.swiper-pagination-wrap').length) $pagination.wrap('<div class="swiper-pagination-wrap"></div>');
+          $pagination.before('<button type="button" class="swiper-auto-ctl" aria-label="슬라이드 자동롤링 중지"></button>');
+        }
+      }
+      let $parallax = false;
+      if (
+        $this.find('[data-swiper-parallax]').length ||
+        $this.find('[data-swiper-parallax-x]').length ||
+        $this.find('[data-swiper-parallax-y]').length ||
+        $this.find('[data-swiper-parallax-scale]').length ||
+        // $this.find('[data-swiper-parallax-duration]').length ||
+        $this.find('[data-swiper-parallax-opacity]').length
+      ) {
+        $parallax = true;
+      }
+
+      let $zoom = false;
+      if ($this.find('.swiper-zoom-container').length) {
+        $zoom = {
+          maxRatio: 2,
+          toggle: true
+        };
+        $this.find('.swiper-zoom-container').each(function () {
+          let $btnHtml = '<div class="swiper-zoom-btn">';
+          $btnHtml += '<button type="button" role="button" class="swiper-zoom-in" aria-label="확대"></button>';
+          $btnHtml += '<button type="button" role="button" class="swiper-zoom-out" aria-label="축소"></button>';
+          $btnHtml += '</div>';
+          $(this).before($btnHtml);
+        });
+      }
+
+      let baseSwiper;
+      if ($swiper.hasClass('swiper-initialized')) {
+        baseSwiper = $this.data('swiper');
+        if (baseSwiper !== undefined) baseSwiper.update();
+      } else {
+        baseSwiper = new Swiper($swiper[0], {
+          pagination: {
+            el: $pagination[0],
+            type: $paginationType,
+            clickable: true,
+            renderBullet: function (index, className) {
+              return '<button type="button" class="' + className + '" aria-label="' + (index + 1) + '번째 슬라이드로 이동"></button>';
+            }
+          },
+          navigation: $navigation,
+          slidesPerView: $slidesPerView,
+          loop: $loop,
+          autoHeight: $autoHeight,
+          centeredSlides: $centeredSlides,
+          autoplay: $auto,
+          parallax: $parallax,
+          zoom: $zoom,
+          on: {
+            init: function (e) {
+              if ($navigation) {
+                setTimeout(function () {
+                  e.navigation.prevEl.ariaLabel = '이전 슬라이드로 이동';
+                  e.navigation.nextEl.ariaLabel = '다음 슬라이드로 이동';
+                }, 1);
+              }
+            },
+            slideChangeTransitionEnd: function (e) {
+              if (!!changeEvt) changeEvt(e);
+            }
+          }
+        });
+        $this.data('swiper', baseSwiper);
       }
     });
+  },
+  ready: function (tar) {
+    const $target = $(tar);
+    $target.each(function () {
+      const $this = $(this);
+      if (!$this.find('.swiper-slide').length) {
+        let $children = $this.children();
+        while ($children.hasClass('swiper') || $children.hasClass('swiper-wrapper')) {
+          $children = $children.children();
+        }
+        $children.addClass('swiper-slide');
+      }
+
+      if (!$this.find('.swiper-wrapper').length) {
+        if (!$this.find('.swiper').length) {
+          $this.wrapInner('<div class="swiper-wrapper"></div>');
+          $this.wrapInner('<div class="swiper"></div>');
+        } else {
+          $this.find('.swiper').wrapInner('<div class="swiper-wrapper"></div>');
+        }
+      } else if (!$this.find('.swiper').length) {
+        $this.find('.swiper-wrapper').parent().wrapInner('<div class="swiper"></div>');
+      }
+      if (!$this.find('.swiper-pagination').length) {
+        $this.append('<div class="swiper-pagination"></div>');
+      }
+    });
+  },
+  UI: function () {
+    $(document).on('click', '.ui-swiper .swiper-auto-ctl', function (e) {
+      e.preventDefault();
+      const $this = $(this);
+      const $closest = $this.closest('.ui-swiper');
+      const $swiper = $closest.data('swiper');
+      if ($(this).hasClass('play')) {
+        $swiper.autoplay.start();
+        $(this).removeClass('play').changeAriaLabel('시작', '중지');
+      } else {
+        $swiper.autoplay.stop();
+        $(this).addClass('play').changeAriaLabel('중지', '시작');
+      }
+    });
+
+    $(document).on('click', '.ui-swiper .swiper-zoom-in', function (e) {
+      e.preventDefault();
+      const $this = $(this);
+      const $swiper = $this.closest('.ui-swiper').data('swiper');
+      $swiper.zoom.in();
+    });
+
+    $(document).on('click', '.ui-swiper .swiper-zoom-out', function (e) {
+      e.preventDefault();
+      const $this = $(this);
+      const $swiper = $this.closest('.ui-swiper').data('swiper');
+      $swiper.zoom.out();
+    });
+  },
+  update: function (target) {
+    $(target).each(function () {
+      const $this = $(this);
+      const $swiper = $this.data('swiper');
+      if ($swiper !== undefined) $swiper.update();
+    });
+  }
+};
+
+/** scroll **/
+ui.scroll = {
+  isCSS: function (val) {
+    const $type = ['auto', 'scroll', 'overlay', 'visible'];
+    if ($type.indexOf(val) > -1) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  is: function (target) {
+    const $obj = {
+      x: false,
+      width: 0,
+      y: false,
+      height: 0
+    };
+    const $target = $(target);
+    if ($target.outerWidth() < $target.get(0).scrollWidth) {
+      $obj.x = true;
+      $obj.width = $target.get(0).scrollWidth - $target.outerWidth();
+    }
+    if ($target.outerHeight() < $target.get(0).scrollHeight) {
+      $obj.y = true;
+      $obj.height = $target.get(0).scrollHeight - $target.outerHeight();
+    }
+    return $obj;
+  },
+  top: function (val, speed, callback) {
+    ui.scroll.wrapTop('html, body', val, speed, callback);
+  },
+  wrapTop: function (wrap, val, speed, callback) {
+    let $top = 0;
+    if (speed == undefined) speed = 300;
+    if ($.isNumeric(val)) {
+      $top = val;
+    } else {
+      if ($(val).length) $top = $(val).offset().top;
+    }
+    $(wrap)
+      .stop(true, false)
+      .animate({ scrollTop: $top }, speed, function () {
+        if (!!callback) callback();
+      });
+  },
+  center: function (el, speed, direction) {
+    let $parent = $(el).parent();
+    while ($parent.css('overflow-x') !== 'auto' && !$parent.is('body')) {
+      $parent = $parent.parent();
+    }
+    if (speed == undefined) speed = 200;
+    if (!!direction && direction == 'vertical') {
+      const $prtH = $parent.outerWidth();
+      const $thisT = Math.round($(el).position().top);
+      const $thisH = $(el).outerHeight();
+      const $isScrollY = ui.scroll.is($parent).y;
+      let $sclT = $thisT - $prtH / 2 + $thisH / 2;
+      if ($sclT < 0) $sclT = 0;
+      if ($isScrollY) $parent.stop(true, false).animate({ scrollTop: $sclT }, speed);
+    } else {
+      const $prtW = $parent.outerWidth();
+      const $thisL = Math.round($(el).position().left);
+      const $thisW = $(el).outerWidth();
+      const $isScrollX = ui.scroll.is($parent).x;
+      let $sclL = $thisL - $prtW / 2 + $thisW / 2;
+      if ($sclL < 0) $sclL = 0;
+      if ($isScrollX) $parent.stop(true, false).animate({ scrollLeft: $sclL }, speed);
+    }
+  },
+  guide: function (element) {
+    const $el = $(element);
+    const $wrapClass = 'ui-scl-guide';
+    const $contClass = 'ui-scl-cont';
+    const $infoClass = 'ui-scl-info';
+    const $barClass = 'ui-scl-bar';
+    $el.each(function () {
+      const $this = $(this);
+      const $isSclGuide = $this.data('sclGuide');
+
+      if (!$this.hasClass($contClass)) $this.addClass($contClass);
+      if (!$this.parent().hasClass($wrapClass)) $this.wrap('<div class="' + $wrapClass + '"></div>');
+      if (!$this.siblings('.' + $infoClass).length) $this.before('<div class="' + $infoClass + '" role="img" aria-label="스크롤하면 아래 숨겨진 컨텐츠를 확인 할 수 있습니다."></div>');
+      if (!$this.siblings('.' + $barClass).length) $this.after('<div class="' + $barClass + '" aria-hidden="true"><div></div></div>');
+      const $info = $this.siblings('.' + $infoClass);
+      const $bar = $this.siblings('.' + $barClass);
+      let $percent = ui.scroll.sclPer(this).x;
+      if ($percent <= 0) {
+        $bar.hide();
+      } else {
+        $bar
+          .show()
+          .children()
+          .css('width', $percent + '%');
+      }
+      const $sclGap = $this.get(0).scrollHeight - $this.outerHeight();
+      if ($sclGap < 1) {
+        $info.hide();
+      } else {
+        $info.show();
+      }
+
+      if (!$isSclGuide) {
+        $this.data('sclGuide', true);
+        $this.on('scroll', function () {
+          $percent = ui.scroll.sclPer(this).x;
+          if ($percent <= 0) {
+            $bar.hide();
+          } else {
+            $bar
+              .show()
+              .children()
+              .css('width', $percent + '%');
+          }
+          if ($percent >= 100) {
+            $info.hide();
+          } else {
+            $info.show();
+          }
+        });
+      }
+    });
+  },
+  sclPer: function (element, type) {
+    const $obj = {
+      x: 0,
+      y: 0
+    };
+    $obj.x = Math.abs($(element).scrollLeft() / ui.scroll.is(element).width) * 100;
+    $obj.y = Math.abs($(element).scrollTop() / ui.scroll.is(element).height) * 100;
+    return $obj;
+  },
+  horizonScl: function () {
+    const $wrap = '.tab-inner, .img-box-wrap';
+    if (!$($wrap).length || ui.Mobile.any()) return;
+    $($wrap).each(function () {
+      const $this = $(this);
+      if ($this.data('_ui-init')) return;
+      $this.data('_ui-init', true);
+      $this.on('mousewheel', function (e) {
+        const $wheelDelta = e.originalEvent.wheelDelta;
+        const $this = $(this);
+        const $thisW = $this.outerWidth();
+        const $thisSclW = $this[0].scrollWidth;
+        const $widthGap = $thisSclW - $thisW;
+        const $thisSclL = $this.scrollLeft();
+        let $isMove = false;
+        const $move = function () {
+          if ($isMove) return;
+          $isMove = true;
+          // $this.scrollLeft($thisSclL - $wheelDelta);
+          $this.stop(false, true).animate({ scrollLeft: $thisSclL - $wheelDelta }, 100, function () {
+            $isMove = false;
+          });
+        };
+
+        if ($wheelDelta > 0) {
+          //up
+          if ($thisSclL > 0) {
+            e.preventDefault();
+            $move();
+          }
+        } else {
+          //down
+          if ($thisSclL + $thisW < $thisSclW) {
+            e.preventDefault();
+            $move();
+          }
+        }
+      });
+    });
+  },
+  loading: function (el, showCallback, hideCallback) {
+    const io = new IntersectionObserver(
+      function (entries, observer) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            if (showCallback === false) observer.unobserve(entry.target);
+            else if (!!showCallback) showCallback();
+          } else {
+            if (!!hideCallback) hideCallback();
+          }
+        });
+      },
+      {
+        threshold: 0.03
+      }
+    );
+    const $items = document.querySelectorAll(el);
+    $items.forEach(function (odj) {
+      io.observe(odj);
+    });
+  },
+  inScreen: function (topEl, bototomEl, callback) {
+    if (!bototomEl) bototomEl = topEl;
+    const $scrollTop = $(window).scrollTop();
+    let $winHeight = $(window).height();
+    const $topMargin = ui.Common.getTopFixedHeight(topEl) > 0 ? ui.Common.getTopFixedHeight(topEl) + 10 : 0;
+    const bottomFixedSpace = $(ui.className.mainWrap + ':visible ' + ui.className.bottomFixedSpace);
+    const $bottomMargin = bottomFixedSpace.length ? bottomFixedSpace.outerHeight() + 10 : 0;
+    const $winEnd = $scrollTop + $winHeight - $bottomMargin;
+    const $topElTop = $(topEl).offset().top - $topMargin;
+    const $bototomElTop = $(bototomEl).offset().top;
+    const $bototomElHeight = $(bototomEl).outerHeight();
+    const $bototomElEnd = $bototomElTop + $bototomElHeight;
+    let $scroll = '';
+    if ($winEnd < $bototomElEnd) {
+      $scroll = Math.min($topElTop, $bototomElEnd - $winHeight + $bottomMargin);
+    } else if ($scrollTop > $topElTop) {
+      $scroll = $topElTop;
+    }
+
+    if ($scroll == '') {
+      if (!!callback) callback();
+    } else {
+      ui.scroll.top($scroll, 200, function () {
+        if (!!callback) callback();
+      });
+    }
+  },
+  init: function () {
+    ui.scroll.horizonScl();
+  }
+};
+
+/** animation **/
+ui.animation = {
+  init: function () {
+    let $animations = $('[data-animation]');
+    if ($animations.length > 0) {
+      ui.animation.sclReady();
+      const $boayEl = function () {
+        $animations = $('[data-animation]');
+        const rtnVal = [];
+        $animations.each(function () {
+          const $this = $(this);
+          if (!$this.closest('.popup').length) rtnVal.push(this);
+        });
+        return rtnVal;
+      };
+      if ($boayEl().length) {
+        ui.animation.sclCheckIn($boayEl(), window);
+        $(window).on(
+          'scroll resize',
+          _.throttle(function () {
+            if ($boayEl().length) ui.animation.sclCheckIn($boayEl(), window);
+          }, 300)
+        );
+      }
+
+      /*
+      if (!'IntersectionObserver' in window && !'IntersectionObserverEntry' in window && !'intersectionRatio' in window.IntersectionObserverEntry.prototype) {
+        // IntersectionObserver 지원안할때 
+        $(window).on('scroll resize',function(){
+          ui.animation.sclCheckIn($animations);
+        });
+      }else{
+        // IntersectionObserver 지원될때 
+        $($animations).each(function(){
+          ui.animation.sclAray.push(ui.animation.sclObserver(this))
+        });
+      }
+      */
+    }
+  },
+  sclIdx: 0,
+  sclAry: [],
+  sclReady: function (target) {
+    const $animations = $('[data-animation]');
+    $.each($animations, function () {
+      const $el = $(this);
+      const $delay = parseInt($el.data('delay'));
+      const $duration = parseInt($el.data('duration'));
+      let $repeat = parseInt($el.data('repeat'));
+      const $addClassAry = ['on', 'active', 'checked', 'selected'];
+      const $animateClassAry = ['rolling-number', 'count-number'];
+      const $dataAnimation = $el.data('animation');
+      if ($dataAnimation === 'rolling-number') ui.animation.rollingReady(this);
+      if ($dataAnimation === 'count-number') ui.animation.countReady(this);
+
+      let $animationClass = 'animate__' + $dataAnimation;
+      if ($addClassAry.indexOf($dataAnimation) >= 0 || $dataAnimation.indexOf('spl-') >= 0) {
+        $el.data('animation-type', 2);
+        $animationClass = $dataAnimation;
+      } else if ($animateClassAry.indexOf($dataAnimation) >= 0) {
+        $el.data('animation-type', 3);
+        $el.addClass($dataAnimation);
+      } else if (!$el.hasClass('animate__animated') && $animationClass.indexOf('animate__') >= 0) {
+        $el.data('animation-type', 1);
+        if ($delay > 0) {
+          $el.css({
+            '-webkit-animation-delay': $delay + 'ms',
+            'animation-delay': $delay + 'ms'
+          });
+        }
+        if ($duration > 0) {
+          $el.css({
+            '-webkit-animation-duration': $duration + 'ms',
+            'animation-duration': $duration + 'ms'
+          });
+        }
+        if ($repeat > 0) {
+          if ($repeat > 5) $repeat = 5;
+          $el.addClass('animate__repeat-' + $repeat);
+        }
+        $el.addClass('animate__animated paused ' + $animationClass);
+      }
+    });
+  },
+  sclTypeChk: function (el) {
+    let returnVal = null;
+    const $el = el;
+    const $type = $el.data('animation-type');
+    const $dataAnimation = $el.data('animation');
+    if ($type == 1) {
+      returnVal = 'animate__' + $dataAnimation;
+    } else if ($type == 2) {
+      returnVal = $dataAnimation;
+    } else if ($type == 3) {
+      returnVal = 'is-active';
+    }
+    return returnVal;
+  },
+  sclCheckIn: function (target, wrap) {
+    // const $target = $.find('*[data-animation]');
+    const $target = target;
+    if (!$target.length) return;
+    $.each($target, function () {
+      const $el = $(this);
+      if (!$el.length) return;
+      const $isWin = wrap === window ? true : false;
+      const $wrap = $(wrap);
+      const $wHeight = $wrap.height();
+      const $scrollTop = $wrap.scrollTop();
+      const $topFixedH = $isWin ? ui.Common.getTopFixedHeight($el) : ui.Common.getTopFixedHeight($el, 'pop-top-fixed');
+      let $bottomFixedH = 0;
+      if ($isWin && $('.bottom-fixed-space').length) {
+        $bottomFixedH = $('.bottom-fixed-space').height();
+      } else if ($wrap.find('.pop-foot').length) {
+        $bottomFixedH = $wrap.find('.pop-foot').height();
+      }
+      const $wrapTop = $scrollTop + $topFixedH;
+      const $wrapCenter = $scrollTop + ($wHeight - $topFixedH - $bottomFixedH) / 2;
+      const $wrapBottom = $scrollTop + ($wHeight - $bottomFixedH);
+
+      const $elHeight = $el.outerHeight();
+      const $matrix = $el.css('transform');
+      const $matrixAry = $matrix.replace(/[^0-9\-.,]/g, '').split(',');
+      let $matrixX = $matrixAry[12] || $matrixAry[4];
+      if ($matrixX === undefined) $matrixX = 0;
+      let $matrixY = $matrixAry[13] || $matrixAry[5];
+      if ($matrixY === undefined) $matrixY = 0;
+      let $elTop = $el.offset().top - $matrixY;
+      if (!$isWin) $elTop = $elTop + $scrollTop;
+      const $elCenter = $elTop + $elHeight / 2;
+      const $elBottom = $elTop + $elHeight;
+
+      const $animationClass = ui.animation.sclTypeChk($el);
+      if ($el.data('init')) return;
+      if (($wrapTop <= $elTop && $elTop <= $wrapBottom) || ($wrapTop <= $elBottom && $elBottom <= $wrapBottom) || ($wrapTop > $elTop && $elBottom > $wrapBottom)) {
+        ui.animation.sclAction($el, $elTop);
+        if (($el.hasClass('lottie__init'), $el.data('lottie'))) {
+          setTimeout(function () {
+            const $lottie = $el.data('lottie-opt');
+            // if ($el.hasClass('_loop')) $lottie.loop = true;
+            $lottie.play();
+          }, 100);
+        }
+      } else {
+        const $timer = $el.data('time');
+        if ($timer !== undefined) {
+          clearTimeout($timer);
+          $el.removeData('time');
+          if (ui.animation.sclIdx > 0) ui.animation.sclIdx -= 1;
+        }
+      }
+    });
+  },
+  sclObserver: function (el) {
+    const $el = $(el);
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.intersectionRatio > 0)) {
+          ui.animation.sclAction($el);
+        }
+      },
+      {
+        threshold: 0.03
+      }
+    );
+    // io.observe(el);
+    io.unobserve(el);
+    return io;
+  },
+  sclAction: function (el, top) {
+    const $el = $(el);
+    const $animationClass = ui.animation.sclTypeChk(el);
+    const $delay = 200;
+
+    if ($el.data('time') !== undefined) return;
+    let $isSameTop = false;
+    let timer;
+    if (top) {
+      const AryIdx = ui.animation.sclAry.indexOf(top);
+      if (AryIdx >= 0) {
+        $isSameTop = true;
+        timer = AryIdx * $delay;
+      } else {
+        ui.animation.sclAry.push(top);
+      }
+    }
+    if (!$isSameTop) {
+      timer = ui.animation.sclIdx * $delay;
+      ui.animation.sclIdx += 1;
+    }
+    const initTimer = setTimeout(function () {
+      $el.data('init', true);
+      if (ui.animation.sclIdx > 0 || !$isSameTop) ui.animation.sclIdx -= 1;
+      if (ui.animation.sclIdx === 0) ui.animation.sclAry = [];
+      const $slide = $el.closest('.swiper-slide');
+      if ($el.hasClass('animate__animated')) {
+        if ($el.closest('.tab-panel').length && !$el.closest('.tab-panel').hasClass('active')) return;
+        if ($slide.length) {
+          if ($slide.hasClass('swiper-slide-active')) {
+            if (!$el.hasClass($animationClass)) $el.addClass($animationClass);
+            if ($el.hasClass('paused')) $el.removeClass('paused');
+          }
+        } else {
+          if (!$el.hasClass($animationClass)) $el.addClass($animationClass);
+          if ($el.hasClass('paused')) $el.removeClass('paused');
+        }
+      } else {
+        if ($slide.length) {
+          if ($slide.hasClass('swiper-slide-active')) $el.addClass($animationClass);
+        } else {
+          if ($el.hasClass('count-number')) ui.animation.countInit($el);
+          $el.addClass($animationClass);
+          if ($el.hasClass('ui-tap-item')) {
+            const removeEvt = function () {
+              $el.remove();
+              $el[0].removeEventListener('animationend', removeEvt);
+            };
+            $el[0].addEventListener('animationend', removeEvt);
+          }
+        }
+      }
+      $el.removeData('time');
+    }, timer);
+    $el.data('time', initTimer);
+  },
+  rollingReady: function (target) {
+    const $this = $(target);
+    if ($this.hasClass('is-ready')) return;
+    $this.addClass('is-ready');
+    const $thisH = $this.height();
+    $this.css({
+      height: $thisH,
+      'line-height': $thisH + 'px'
+    });
+    const $thisText = $this.text();
+    $this.role('img');
+    $this.aria('label', $thisText);
+    $this.attr('title', $thisText);
+    const $textAry = $thisText.split('');
+    let $html = '';
+    const $space = '<span>&nbsp;</span>';
+    const $rotateNum = 3;
+    for (let i = 0; i < $textAry.length; i++) {
+      const $text = $textAry[i];
+      const $number = parseInt($text);
+      // console.log($text, $number)
+      if ($.isNumeric($number)) {
+        $html += '<span class="rolling__in" data-number="' + $number + '" style="top:-' + ($rotateNum * 10 + $number + 1) + '00%;animation-delay:' + i * 5 + '0ms;">';
+        $html += $space;
+        for (let j = 0; j < $rotateNum; j++) {
+          for (let k = 0; k < 10; k++) {
+            $html += '<span>' + k + '</span>';
+          }
+        }
+        for (let l = 0; l <= $number; l++) {
+          $html += '<span>' + l + '</span>';
+        }
+        $html += '</span>';
+      } else {
+        $html += '<span class="rolling__in" style="top:-100%;animation-delay:' + i * 5 + '0ms;">' + $space + '<span>' + $text + '</span></span>';
+      }
+    }
+    $this.html($html);
+  },
+  countReady: function (target) {
+    const $el = $(target);
+    const $text = $el.text();
+    $el.aria('label', $text);
+    $el.attr('title', $text);
+    $el.text('0');
+  },
+  countInit: function (target, duration) {
+    const $duration = duration === undefined ? 1000 : duration;
+    const $el = $(target);
+    const $title = $el.attr('title');
+    if ($title === '0') {
+      $el.text($title);
+      return;
+    }
+    const $number = onlyNumber($title);
+    $el.text(addComma($number));
+    const $width = $el.outerWidth();
+    const $height = $el.outerHeight();
+    $el
+      .css({
+        overflow: 'hidden',
+        'text-align': 'right',
+        'min-width': $width,
+        height: $height,
+        'min-inline-size': $width
+      })
+      .text(0);
+    // const $start = $el.text();
+    $({ now: 0 }).animate(
+      { now: $number },
+      {
+        duration: $duration,
+        easing: 'easeOutExpo',
+        step: function (now, e) {
+          $el.text(addComma(Math.floor(now)));
+          // if(isComma){
+          //   $el.text(addComma(Math.floor(now)));
+          // }else{
+          //   $el.text(Math.floor(now));
+          // }
+          if (now === parseInt($number)) {
+            $el.removeCss(['overflow', 'text-align', 'min-width', 'height', 'min-inline-size']);
+          }
+        }
+      }
+    );
+  },
+  sclAray: [],
+  splitting: function () {
+    $('[data-splitting]').each(function () {
+      const $el = $(this);
+      const $role = $el.attr('role');
+      if ($role === undefined) $el.role('img');
+      const $text = $el.text();
+      const $label = $el.attr('aria-label');
+      if ($label === undefined || $text !== $label) $el.aria('label', $text);
+    });
+    Splitting();
+  }
+};
+
+/** 차트 **/
+ui.chart = {
+  init: function () {
+    ui.chart.circle();
+  },
+  circle: function () {
+    $('[data-circle-box]').each(function () {
+      const _this = $(this);
+      let deg = 0;
+      let $firstSize = 0;
+      let $firstBgLineW = 0;
+      let $firstLineW = 0;
+      let strokeWidth = $(this).data('circle-width') ? parseInt($(this).data('circle-width')) : 5;
+      const typeCheck = _this.data('circle-box');
+      _this.addClass(typeCheck);
+      _this.find('[data-circle-val]').each(function (e) {
+        $(this).empty();
+        const idx = $(this).data('circle-val');
+        const color = $(this).data('circle-color');
+        const size = $(this).data('circle-size');
+        const dasharray = 2 * Math.PI * (18 - strokeWidth / 2);
+
+        let html = '';
+        html += '<svg viewBox="0 0 36 36" class="circular-chart"';
+        if (size) html += ' style="width:' + size + 'px;height:' + size + 'px;"';
+        html += ' aria-hidden="true">';
+        if (!e || typeCheck !== 'type2') {
+          // html += '<path';
+          // html += ' class="circle-bg"';
+          // html += ' d="M18 2.0845';
+          // html += ' a 15.9155 15.9155 0 0 1 0 31.831';
+          // html += ' a 15.9155 15.9155 0 0 1 0 -31.831"';
+          // html += ' />';
+          html += '<circle class="circle-bg" fill="none" stroke-width="' + strokeWidth + '" cx="18" cy="18" r="' + (18 - strokeWidth / 2) + '"></circle>';
+        }
+        html += '<circle';
+        html += ' class="circle"';
+        if (typeCheck === 'type1') {
+          html += ' style="';
+          html += '-webkit-animation-delay: ' + e * 0.3 + 's;';
+          html += 'animation-delay: ' + e * 0.3 + 's;';
+          html += '" ';
+        }
+        if (color) html += ' stroke="' + color + '"';
+        html += ' stroke-dasharray="' + dasharray * (idx / 100) + ', ' + dasharray + '"';
+        // html += ' d="M18 2.0845';
+        // html += ' a 15.9155 15.9155 0 0 1 0 31.831';
+        // html += ' a 15.9155 15.9155 0 0 1 0 -31.831"';
+        html += ' stroke-width="' + strokeWidth + '" cx="18" cy="18" r="' + (18 - strokeWidth / 2) + '"';
+        html += ' />';
+        html += '</svg>';
+        $(this).append(html);
+        if (typeCheck == 'type2') {
+          if (e) {
+            $(this)
+              .find('.circular-chart')
+              .css({ transform: 'rotate(' + 360 * (deg / 100) + 'deg)' });
+          }
+          deg += idx;
+        }
+        $(this).role('img');
+        // $(this).children().unwrap();
+        if (size) {
+          const $thisLineBg = $(this).find('.circle-bg');
+          const $thisLineBgW = parseInt($thisLineBg.css('stroke-width'));
+          const $thisLine = $(this).find('.circle');
+          const $thisLineW = parseInt($thisLine.css('stroke-width'));
+          if (!e) {
+            $firstSize = size;
+            $firstBgLineW = $thisLineBgW;
+            $firstLineW = $thisLineW;
+          } else {
+            const $ratio = $firstSize / size;
+            $thisLineBg.css('stroke-width', $firstBgLineW * $ratio);
+            $thisLine.css('stroke-width', $firstLineW * $ratio);
+          }
+        }
+      });
+    });
+  }
+};
+
+/********************************
+ * front 사용함수 *
+ ********************************/
+const $focusableEl = '[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex]';
+//Focus.disabled();
+const Focus = {
+  disabled: function (el) {
+    const $number = -10;
+    const $tabIdx = $(el).attr('tabindex');
+    const $dataIdx = $(el).data('tabindex');
+    if ($dataIdx == undefined && $tabIdx > $number) $(el).data('tabindex', $tabIdx);
+    $(el).attr('tabindex', $number);
+  },
+  abled: function (el) {
+    const $tabIdx = $(el).data('tabindex');
+    if ($tabIdx != undefined) {
+      $(el).attr('tabindex', $tabIdx);
+    } else {
+      $(el).removeAttr('tabindex');
+    }
+  }
+};
+
+//body scroll lock
+const Body = {
+  scrollTop: '',
+  lock: function () {
+    if ($('html').hasClass('lock')) return;
+
+    Body.scrollTop = window.scrollY;
+    const $wrap = $(ui.className.mainWrap + ':visible');
+    if ($wrap.length) {
+      const $wrapTop = $wrap.offset().top;
+      const $setTop = Body.scrollTop * -1 + $wrapTop;
+      $wrap.addClass('lock-wrap').css('top', $setTop);
+    }
+    $('html').addClass('lock');
+  },
+  unlock: function () {
+    if (!$('html').hasClass('lock')) return;
+
+    $('html').removeClass('lock');
+    $('.lock-wrap').removeAttr('style');
+    window.scrollTo(0, Body.scrollTop);
+    window.setTimeout(function () {
+      Body.scrollTop = '';
+    }, 0);
+  }
+};
+
+//로딩함수
+const Loading = {
+  className: {
+    wrap: '.loading-wrap'
+  },
+  speed: 150,
+  open: function (txt) {
+    let $html = '<div class="' + Loading.className.wrap.slice(1) + '" class="hide">';
+    $html += '<div class="tl">';
+    $html += '<div>';
+    /* // img 타입
+    $html += '<div class="loading-icon" role="img"';
+    if (!txt) {
+      $html += ' aria-label="화면을 불러오는중입니다."';
+    }
+    $html += '>';
+    $html += '</div>';
+    */
+
+    /* // svg 타입
+    $html += '<div class="loading-svg" role="img"';
+    if (!txt) {
+      $html += ' aria-label="화면을 불러오는중입니다."';
+    }
+    $html += '>';
+    $html += '<svg width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">';
+    $html += '<circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>';
+    $html += '</svg>';
+    $html += '</div>';
+    */
+
+    // lottie 타입
+    const $file = ui.basePath + '/lottie/loading.json';
+    $html += '<div class="loading-lottie" role="img"';
+    if (!txt) {
+      $html += ' aria-label="화면을 불러오는중입니다."';
+    }
+    $html += '>';
+    $html += '<div class="lottie _loop" data-lottie="' + $file + '" aria-hidden="true"></div>';
+    $html += '</div>';
+
+    if (!!txt) {
+      $html += '<div class="txt">' + txt + '</div>';
+    }
+    $html += '</div>';
+    $html += '</div>';
+    $html += '</div>';
+
+    if (!$(Loading.className.wrap).length) $('body').prepend($html);
+    $(Loading.className.wrap).stop(true, false).fadeIn(Loading.speed);
+    setTimeout(function () {
+      if ($(Loading.className.wrap + ' .lottie').length) ui.Common.lottie();
+    }, 10);
+  },
+  close: function () {
+    $(Loading.className.wrap)
+      .stop(true, false)
+      .fadeOut(Loading.speed, function () {
+        $(this).remove();
+      });
   }
 };

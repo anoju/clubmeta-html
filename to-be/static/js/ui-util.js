@@ -434,3 +434,25 @@ const imgError = function (img) {
   $parent.addClass('no-img-bg');
   // $(img).hide();
 };
+
+const getPageAjax = function (url, param) {
+  var dfd = $.Deferred();
+
+  $.ajax({
+    type: 'get',
+    url: url,
+    data: param
+  })
+    .done(function (result, textStatus, jqXHR) {
+      dfd.resolve(result, textStatus);
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      dfd.reject();
+    })
+    .always(function (result, textStatus, jqXHR) {
+      // 항상 실행할 코드
+      // console.log(result);	// 테스트 코드
+    });
+
+  return dfd.promise();
+};
