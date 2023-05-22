@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>CLUBMETA | 클럽메타</title>
-    <script class="__include" src="/as-is/html/include/head.js"></script>
+    <script class="__include" src="../include/head.js"></script>
     <style>
       #rankWrap {
         height: 100%;
@@ -58,7 +58,7 @@
         <div id="topClubberList">
           <div class="performer_list ranking first">
             <a href="javascript:viewUserProfile('10113');">
-              <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221121/1669022377579.jpg), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_1">1</i></div>
+              <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221121/1669022377579.jpg), url(../../rsc/front/images/common/ico_mypage.png)"><i class="badge no_1">1</i></div>
             </a>
             <div class="id">
               <p>@Faker</p>
@@ -70,7 +70,7 @@
           </div>
           <div class="performer_list ranking second">
             <a href="javascript:viewUserProfile('10139');">
-              <div class="performer" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_2">2</i></div>
+              <div class="performer" style="background-image: url(), url(../../rsc/front/images/common/ico_mypage.png)"><i class="badge no_2">2</i></div>
             </a>
             <div class="id">
               <p>@Juhuyck</p>
@@ -82,7 +82,7 @@
           </div>
           <div class="performer_list ranking third">
             <a href="javascript:viewUserProfile('10141');">
-              <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221122/1669100099479.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><i class="badge no_3">3</i></div>
+              <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221122/1669100099479.png), url(../../rsc/front/images/common/ico_mypage.png)"><i class="badge no_3">3</i></div>
             </a>
             <div class="id">
               <p>@바셀2</p>
@@ -294,7 +294,7 @@
               }
               html += '<div class="performer_list ranking ' + ranking + '">';
               html += '	<a href="javascript:viewUserProfile(\'' + list[i].memberNo + '\');">';
-              html += '		<div class="performer" style="background-image: url(' + list[i].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);">';
+              html += '		<div class="performer" style="background-image: url(' + list[i].profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png);">';
               html += '			<i class="badge ' + badge + '">' + list[i].ranking + '</i>';
               html += '		</div>';
               html += '	</a>';

@@ -320,7 +320,7 @@
               var blind = '';
               var clickUseYn = '';
               var memberId = '@' + list2[i2].memberId;
-              var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list2[i2].regMemberNo + '\');" style="background-image:url(' + list2[i2].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+              var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list2[i2].regMemberNo + '\');" style="background-image:url(' + list2[i2].profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
               if (list2[i2].delYn == 'Y' || list2[i2].videoViewYn == 'N') {
                 blind = 'blind';
                 clickUseYn = 'N';
@@ -328,10 +328,10 @@
               if (list2[i2].memberStatusCd == 'M20' || list2[i2].memberStatusCd == 'M99') {
                 //memberId = "@"+list2[i2].memberId;
                 memberId = list2[i2].memberStatusCd == 'M20' ? '정지회원' : '탈퇴회원';
-                divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+                divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(../../rsc/front/images/common/ico_mypage.png);"></div>';
               }
               html += '			<div class="challenger_list swiper-slide">';
-              //html += '				<div class="performer" onclick="viewUserProfile(\''+list2[i2].regMemberNo+'\');" style="background-image: url('+list2[i2].profileImgUrl+'), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+              //html += '				<div class="performer" onclick="viewUserProfile(\''+list2[i2].regMemberNo+'\');" style="background-image: url('+list2[i2].profileImgUrl+'), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
               html += divPerformer;
               //html += '				<a href="javascript:playVideo(\''+list2[i2].videoNo+'\');" class="thumb">';
               html += "				<a href=\"javascript:playVideo('rankVideo', '" + list2[i2].videoNo + "', '10', '1', '" + list[i].chlgNo + "', null, null, '" + clickUseYn + '\');" class="thumb ' + blind + '">';
@@ -391,7 +391,7 @@
           var blind = '';
           var clickUseYn = '';
           var memberId = '@' + list[i].memberId;
-          var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list[i].regMemberNo + '\');" style="background-image:url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list[i].regMemberNo + '\');" style="background-image:url(../../rsc/front/images/common/ico_mypage.png);"></div>';
           if (list[i].delYn == 'Y' || list[i].videoViewYn == 'N') {
             blind = 'blind';
             clickUseYn = 'N';
@@ -399,10 +399,10 @@
           if (list[i].memberStatusCd == 'M20' || list[i].memberStatusCd == 'M99') {
             //memberId = "@"+list[i].memberId;
             memberId = list[i].memberStatusCd == 'M20' ? '정지회원' : '탈퇴회원';
-            divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + list[i].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+            divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + list[i].profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
           }
           html += '<div class="challenger_list swiper-slide">';
-          //html += '	<div class="performer" onclick="viewUserProfile(\''+list[i].regMemberNo+'\');" style="background-image: url('+list[i].profileImgUrl+'), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          //html += '	<div class="performer" onclick="viewUserProfile(\''+list[i].regMemberNo+'\');" style="background-image: url('+list[i].profileImgUrl+'), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
           html += divPerformer;
           //html += '	<a href="javascript:playVideo(\''+list[i].videoNo+'\');" class="thumb">';
           html += "	<a href=\"javascript:playVideo('rankVideo', '" + list[i].videoNo + "', '" + $('#challengerForm_' + chlgNo + ' #rowsPerPage').val() + "', '" + $('#challengerForm_' + chlgNo + ' #nowPage').val() + "', '" + chlgNo + "', null, null, '" + clickUseYn + '\');" class="thumb ' + blind + '">';
@@ -455,7 +455,7 @@
           }
           html += '<div class="performer_list">';
           html += '	<a href="javascript:viewUserProfile(\'' + list[i].memberNo + '\');">';
-          html += '		<div class="performer" style="background-image: url(' + list[i].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          html += '		<div class="performer" style="background-image: url(' + list[i].profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
           html += '	</a>';
           html += '	<div class="id">';
           html += '		<a href="javascript:viewUserProfile(\'' + list[i].memberNo + '\');">';

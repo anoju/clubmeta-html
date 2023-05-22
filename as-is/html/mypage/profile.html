@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>CLUBMETA | 클럽메타</title>
-    <script class="__include" src="/as-is/html/include/head.js"></script>
+    <script class="__include" src="../include/head.js"></script>
     <style type="text/css">
       .wrap:not(#div_myProfile) {
         position: absolute;
@@ -34,7 +34,7 @@
 
       <!-- contents -->
       <div class="contents">
-        <div class="profile" id="profileImg" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(/as-is/rsc/front/images/common/ico_mypage.png)">
+        <div class="profile" id="profileImg" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(../../rsc/front/images/common/ico_mypage.png)">
           <button type="button" class="btn_add"></button>
         </div>
 
@@ -136,7 +136,7 @@
           var bodyData = new FormData($('#profileImgForm').get(0));
           postFile('/api/mypage/uploadProfileImg', null, bodyData)
             .done(function (result) {
-              $('#div_myProfile #profileImg').css('background-image', 'url(' + result.data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+              $('#div_myProfile #profileImg').css('background-image', 'url(' + result.data.profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png)');
             })
             .fail(function (result) {
               layerAlert(result.respMsg);
@@ -237,7 +237,7 @@
         get('/api/myProfile').done(function (result) {
           var data = result.data;
           $('#div_myProfile #memberId').html(data.memberId);
-          $('#div_myProfile #profileImg').css('background-image', 'url(' + data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+          $('#div_myProfile #profileImg').css('background-image', 'url(' + data.profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png)');
           $('#div_myProfile #videoCnt').html(fn_getCommaNumber(data.videoCnt));
           $('#div_myProfile #followerCnt').html(fn_getCommaNumber(data.followerCnt));
           $('#div_myProfile #followingCnt').html(fn_getCommaNumber(data.followingCnt));

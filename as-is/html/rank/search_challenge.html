@@ -111,7 +111,7 @@
               var blind = '';
               var clickUseYn = '';
               var memberId = '@' + list2[i2].memberId;
-              var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list2[i2].regMemberNo + '\');" style="background-image:url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+              var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list2[i2].regMemberNo + '\');" style="background-image:url(../../rsc/front/images/common/ico_mypage.png);"></div>';
               if (list2[i2].delYn == 'Y' || list2[i2].videoViewYn == 'N') {
                 blind = 'blind';
                 clickUseYn = 'N';
@@ -119,10 +119,10 @@
               if (list2[i2].memberStatusCd == 'M20' || list2[i2].memberStatusCd == 'M99') {
                 //memberId = "@"+list2[i2].memberId;
                 memberId = list2[i2].memberStatusCd == 'M20' ? '정지회원' : '탈퇴회원';
-                divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + list2[i2].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+                divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + list2[i2].profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
               }
               html += '			<div class="challenger_list swiper-slide">';
-              //html += '				<div class="performer" onclick="viewUserProfile(\''+list2[i2].regMemberNo+'\');" style="background-image: url('+list2[i2].profileImgUrl+'), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+              //html += '				<div class="performer" onclick="viewUserProfile(\''+list2[i2].regMemberNo+'\');" style="background-image: url('+list2[i2].profileImgUrl+'), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
               html += divPerformer;
               //html += '				<a href="javascript:playVideo(\''+list2[i2].videoNo+'\');" class="thumb">';
               html += "				<a href=\"javascript:playVideo('rankVideo', '" + list2[i2].videoNo + "', '10', '1', '" + list[i].chlgNo + "', null, null, '" + clickUseYn + '\');" class="thumb ' + blind + '">';
@@ -189,7 +189,7 @@
           var blind = '';
           var clickUseYn = '';
           var memberId = '@' + list[i].memberId;
-          var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list[i].regMemberNo + '\');" style="background-image:url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          var divPerformer = '<div class="performer" onclick="viewUserProfile(\'' + list[i].regMemberNo + '\');" style="background-image:url(../../rsc/front/images/common/ico_mypage.png);"></div>';
           if (list[i].delYn == 'Y' || list[i].videoViewYn == 'N') {
             blind = 'blind';
             clickUseYn = 'N';
@@ -197,10 +197,10 @@
           if (list[i].memberStatusCd == 'M20' || list[i].memberStatusCd == 'M99') {
             //memberId = "@"+list[i].memberId;
             memberId = list[i].memberStatusCd == 'M20' ? '정지회원' : '탈퇴회원';
-            divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + list[i].profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+            divPerformer = '<div class="performer" onclick="javascript:void(0);" style="background-image: url(' + list[i].profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
           }
           html += '<div class="challenger_list swiper-slide">';
-          //html += '	<div class="performer" onclick="viewUserProfile(\''+list[i].regMemberNo+'\');" style="background-image: url('+list[i].profileImgUrl+'), url(/as-is/rsc/front/images/common/ico_mypage.png);"></div>';
+          //html += '	<div class="performer" onclick="viewUserProfile(\''+list[i].regMemberNo+'\');" style="background-image: url('+list[i].profileImgUrl+'), url(../../rsc/front/images/common/ico_mypage.png);"></div>';
           html += divPerformer;
           //html += '	<a href="javascript:playVideo(\''+list[i].videoNo+'\');" class="thumb">';
           html += "	<a href=\"javascript:playVideo('rankVideo', '" + list[i].videoNo + "', '" + $('#challengerForm_' + chlgNo + ' #rowsPerPage').val() + "', '" + $('#challengerForm_' + chlgNo + ' #nowPage').val() + "', '" + chlgNo + "', null, null, '" + clickUseYn + '\');" class="thumb ' + blind + '">';
@@ -282,7 +282,7 @@
         <div class="ranking_slider" data-chlg-no="52">
           <div class="swiper-wrapper" id="swiper-wrapper-52">
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10154');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10154');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '302', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10154/10154_20221129_105708.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10154');">@baekdama</p>
@@ -292,7 +292,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '327', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10134/10134_20230105_014758.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10134');">@clubmeta_kakao</p>
@@ -302,7 +302,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10134');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '326', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10134/10134_20230104_052503.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10134');">@clubmeta_kakao</p>
@@ -312,7 +312,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '306', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10116/10116_20221129_021052.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10116');">@기타기타</p>
@@ -322,7 +322,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10166');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10166');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '308', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10166/10166_20221129_024350.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10166');">@TOBETEST</p>
@@ -332,7 +332,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10168');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10168');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '309', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10168/10168_20221129_024522.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10168');">@ljm</p>
@@ -342,7 +342,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="javascript:void(0);" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221129/1669694114585.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="javascript:void(0);" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221129/1669694114585.png), url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '304', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10162/10162_20221129_010350.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10162');">탈퇴회원</p>
@@ -352,7 +352,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10164');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10164');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '305', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10164/10164_20221129_015041.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10164');">@투비비빅</p>
@@ -362,7 +362,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10170');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10170');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '313', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10170/10170_20221129_035242.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10170');">@ttssssaerifj</p>
@@ -372,7 +372,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '314', '10', '1', '52', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10141/10141_20221129_041400.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10141');">@바셀2</p>
@@ -423,7 +423,7 @@
         <div class="ranking_slider" data-chlg-no="49">
           <div class="swiper-wrapper" id="swiper-wrapper-49">
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '324', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10113/10113_20221207_105050.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10113');">@Faker</p>
@@ -433,7 +433,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '321', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10113/10113_20221201_023122.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10113');">@Faker</p>
@@ -443,7 +443,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '320', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10113/10113_20221201_021607.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10113');">@Faker</p>
@@ -453,7 +453,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '323', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10113/10113_20221207_104931.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10113');">@Faker</p>
@@ -463,7 +463,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '292', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10113/10113_20221125_060636.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10113');">@Faker</p>
@@ -473,7 +473,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '289', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221125_053202.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -483,7 +483,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '294', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221126_031943.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -493,7 +493,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '297', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221126_032353.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -503,7 +503,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10152');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10152');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '322', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10152/10152_20221205_034934.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10152');">@</p>
@@ -513,7 +513,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '325', '10', '1', '49', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221213_103920.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -534,7 +534,7 @@
         <div class="ranking_slider" data-chlg-no="50">
           <div class="swiper-wrapper" id="swiper-wrapper-50">
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '291', '10', '1', '50', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10113/10113_20221125_055802.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10113');">@Faker</p>
@@ -544,7 +544,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '295', '10', '1', '50', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221126_032103.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -554,7 +554,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '299', '10', '1', '50', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221126_035630.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -564,7 +564,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '298', '10', '1', '50', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221126_032906.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -574,7 +574,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '296', '10', '1', '50', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221126_032303.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -584,7 +584,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10124');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '290', '10', '1', '50', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10124/10124_20221125_053442.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10124');">@naverTest</p>
@@ -615,7 +615,7 @@
         <div class="ranking_slider" data-chlg-no="48">
           <div class="swiper-wrapper" id="swiper-wrapper-48">
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10139');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10139');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '264', '10', '1', '48', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10139/10139_20221123_015929.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10139');">@Juhuyck</p>
@@ -625,7 +625,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10149');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10149');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '266', '10', '1', '48', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10149/10149_20221123_021343.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10149');">@kk</p>
@@ -635,7 +635,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '263', '10', '1', '48', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10116/10116_20221123_010837.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10116');">@기타기타</p>
@@ -645,7 +645,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10136');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10136');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '265', '10', '1', '48', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10136/10136_20221123_020847.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10136');">@123</p>
@@ -666,7 +666,7 @@
         <div class="ranking_slider" data-chlg-no="46">
           <div class="swiper-wrapper" id="swiper-wrapper-46">
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10113');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '251', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10113/10113_20221122_113750.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10113');">@Faker</p>
@@ -676,7 +676,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '260', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10141/10141_20221122_040322.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10141');">@바셀2</p>
@@ -686,7 +686,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="javascript:void(0);" style="background-image: url(), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="javascript:void(0);" style="background-image: url(), url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '254', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10128/10128_20221122_033108.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10128');">탈퇴회원</p>
@@ -696,7 +696,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10141');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '259', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10141/10141_20221122_040149.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10141');">@바셀2</p>
@@ -706,7 +706,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10126');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10126');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '253', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10126/10126_20221122_032022.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10126');">@iii</p>
@@ -716,7 +716,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="javascript:void(0);" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221122/1669100196096.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="javascript:void(0);" style="background-image: url(//app-dev.club-meta.io/upload/profile/20221122/1669100196096.png), url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '257', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10122/10122_20221122_035107.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10122');">탈퇴회원</p>
@@ -726,7 +726,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10147');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10147');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '258', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10147/10147_20221122_040053.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10147');">@엉뚱이</p>
@@ -736,7 +736,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10121');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10121');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '250', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10121/10121_20221122_113647.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10121');">@hook</p>
@@ -746,7 +746,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10116');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '261', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10116/10116_20221122_051419.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10116');">@기타기타</p>
@@ -756,7 +756,7 @@
               </div>
             </div>
             <div class="challenger_list swiper-slide">
-              <div class="performer" onclick="viewUserProfile('10126');" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"></div>
+              <div class="performer" onclick="viewUserProfile('10126');" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"></div>
               <a href="javascript:playVideo('rankVideo', '256', '10', '1', '46', null, null, '');" class="thumb"> <img src="//stream-dev.club-meta.io:8989/video/10126/10126_20221122_034113.png" alt="" /> </a>
               <div class="id">
                 <p onclick="viewUserProfile('10126');">@iii</p>

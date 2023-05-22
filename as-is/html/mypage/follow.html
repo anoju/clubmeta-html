@@ -267,7 +267,7 @@
           tmplt.attr('id', '');
           tmplt.attr('data-member-no', targetMemberNo);
           if (data.followPicFileUrl != null && data.followPicFileUrl != '') {
-            tmplt.find('.performer').css('background-image', 'url(' + data.followPicFileUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+            tmplt.find('.performer').css('background-image', 'url(' + data.followPicFileUrl + '), url(../../rsc/front/images/common/ico_mypage.png)');
           }
           tmplt.find('.p_userId').html(data.memberId);
 
@@ -336,7 +336,7 @@
 
       <div class="performer_list reset" id="div_followUserTemplate" style="display: none">
         <a>
-          <div class="performer" style="background-image: url(/as-is/rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
+          <div class="performer" style="background-image: url(../../rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
         </a>
         <div class="id">
           <a>

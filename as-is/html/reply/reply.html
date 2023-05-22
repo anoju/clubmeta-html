@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>CLUBMETA | 클럽메타</title>
-    <script class="__include" src="/as-is/html/include/head.js"></script>
+    <script class="__include" src="../include/head.js"></script>
   </head>
   <body>
     <!-- 댓글 -->
@@ -106,7 +106,7 @@
       </div>
 
       <div class="reply_btm">
-        <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(/as-is/rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
+        <div class="performer" style="background-image: url(//app-dev.club-meta.io/upload/profile/20230512/1683858146448.png), url(../../rsc/front/images/common/ico_mypage.png)"><!-- 퍼포머 프로필 사진 --></div>
         <div class="reply_form">
           <input type="text" name="cmmtCont" style="font-weight: 300" />
           <button onclick="fn_insertReply(event);" id="btnInsertReply">전송</button>
@@ -169,7 +169,7 @@
           if (result != null && result != '') {
             /*
             get('/api/myProfile').done(function (result) {
-              $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+              $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png)');
             });
             */
           }
@@ -250,7 +250,7 @@
         }
 
         if (d.memberStatusCd == 'M20' || d.memberStatusCd == 'M99') {
-          div.find('.performer').css('background-image', 'url(/as-is/rsc/front/images/common/ico_mypage.png)');
+          div.find('.performer').css('background-image', 'url(../../rsc/front/images/common/ico_mypage.png)');
           if (d.memberStatusCd == 'M20') {
             div.find('.p_memberId').html('정지회원');
           } else {
@@ -258,7 +258,7 @@
           }
           div.attr('data-member-no', '');
         } else {
-          div.find('.performer').css('background-image', 'url(' + d.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+          div.find('.performer').css('background-image', 'url(' + d.profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png)');
           div.find('.p_memberId').html(d.memberId);
           div.attr('data-member-no', d.memberNo);
         }
@@ -410,7 +410,7 @@
             // 프로필 이미지 표시
             /*
             get('/api/myProfile').done(function (result) {
-              $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(/as-is/rsc/front/images/common/ico_mypage.png)');
+              $('.reply_btm .performer').css('background-image', 'url(' + result.data.profileImgUrl + '), url(../../rsc/front/images/common/ico_mypage.png)');
             });
             */
           }
