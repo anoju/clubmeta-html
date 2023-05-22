@@ -1,6 +1,6 @@
 (function () {
   const pathAry = location.pathname.split('/');
-  const lootPathLength = pathAry.length - 3;
+  const lootPathLength = pathAry.length - (location.hostname.indexOf('github') > -1 ? 4 : 3);
   let loot = '';
   if (lootPathLength > 0) {
     for (let i = 0; i < lootPathLength; i++) {
