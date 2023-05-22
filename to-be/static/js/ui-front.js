@@ -38,6 +38,8 @@ const ui = {
       ui.animation.init();
       ui.animation.splitting();
       ui.chart.init();
+
+      ui.etc.guide();
     }
   },
   reInit: function () {
@@ -408,7 +410,8 @@ ui.common = {
     $page.each(function () {
       if (!$(this).is(':visible')) return;
       const $head = $(this).find(ui.className.header);
-      const $body = $(this).find(ui.className.body);
+      const $body = $head.siblings(ui.className.body);
+      console.log($head, $body);
       if ($head.length && $body.length && $head.css('position') === 'fixed') {
         $body.css('padding-top', $head.outerHeight());
       }
@@ -918,7 +921,7 @@ ui.etc = {
         $html += '</div>';
         $('body').append($html);
 
-        const $baseThemeColor = '#00caca';
+        const $baseThemeColor = '#ff69a0';
         const $input = $('.gd__theme_color input');
         const $color = $('.gd__theme_color .color');
         const $openBtn = $('.gd__theme_btn');
@@ -1209,7 +1212,7 @@ ui.button = {
     ui.button.imgBox();
     ui.tab.init();
 
-    ui.Touch.init();
+    ui.touch.init();
   }
 };
 // 탭
@@ -1957,14 +1960,14 @@ ui.tooltip = {
   }
 };
 // touch UI
-ui.Touch = {
+ui.touch = {
   wrapClass: '.ui-touch-rotate',
   itemsClass: '.rotate-items',
   itemClass: '.rotate-item',
   rotateItem: function () {
-    if (!$(ui.Touch.wrapClass + ' ' + ui.Touch.itemClass).length) return;
-    const $wrap = $(ui.Touch.wrapClass + ' ' + ui.Touch.itemClass);
-    const $items = $wrap.find(ui.Touch.itemClass);
+    if (!$(ui.touch.wrapClass + ' ' + ui.touch.itemClass).length) return;
+    const $wrap = $(ui.touch.wrapClass + ' ' + ui.touch.itemClass);
+    const $items = $wrap.find(ui.touch.itemClass);
     const $radius = $wrap.outerWidth() / 2;
     const $total = $items.length;
     const $theta = [];
@@ -2022,7 +2025,7 @@ ui.Touch = {
       ang = _angXY(ev) - angStart;
       const deg = radToDeg(ang);
       element.style.transform = 'rotate(' + deg + 'deg)';
-      const $items = element.querySelectorAll(ui.Touch.itemClass);
+      const $items = element.querySelectorAll(ui.touch.itemClass);
       $items.forEach(function (item) {
         item.style.transform = 'rotate(' + deg * -1 + 'deg)';
       });
@@ -2111,12 +2114,12 @@ ui.Touch = {
     });
   },
   init: function () {
-    if ($(ui.Touch.wrapClass).length) {
-      ui.Touch.rotateItem();
-      document.querySelectorAll(ui.Touch.wrapClass + ' ' + ui.Touch.itemClass).forEach(ui.Touch.rotate);
+    if ($(ui.touch.wrapClass).length) {
+      ui.touch.rotateItem();
+      document.querySelectorAll(ui.touch.wrapClass + ' ' + ui.touch.itemClass).forEach(ui.touch.rotate);
     }
 
-    ui.Touch.focus();
+    ui.touch.focus();
   }
 };
 
@@ -4587,5 +4590,1897 @@ const Loading = {
       .fadeOut(Loading.speed, function () {
         $(this).remove();
       });
+  }
+};
+
+//레이어팝업(Layer): 레이어 팝업은 #container 밖에 위치해야함
+const Layer = {
+  id: 'uiLayer',
+  popClass: 'popup',
+  pageClass: 'main-page',
+  wrapClass: 'page',
+  sclWrapClass: 'pop-scl-wrap',
+  headClass: 'page-head',
+  bodyClass: 'page-body',
+  footClass: 'pop-foot',
+  innerClass: 'section',
+  showClass: 'show',
+  etcCont: '.main-page:visigle .page',
+  focusedClass: 'pop__focused',
+  focusInClass: 'ui-focus-in',
+  removePopClass: 'ui-pop-remove',
+  closeRemoveClass: 'ui-pop-close-remove',
+  alertClass: 'ui-pop-alert',
+  lastPopClass: 'ui-pop-last',
+  agreePopClass: 'ui-pop-agree',
+  agreePopSwiperClass: 'ui-pop-agree-swiper',
+  scrollShowTitleClass: 'pop-fade-title',
+  bgNoCloseClass: 'bg-no-click',
+  beforeCont: [],
+  content: '',
+  like: function () {
+    const $delayTime = 2000;
+    const $wrap = $('#wrap').length ? $('#wrap') : $('body');
+    const $fileUrl = ui.basePath + '/temp/love.json';
+    const $html = '<div class="layer-like" aria-hidden="true"><div class="lottie" data-lottie="' + $fileUrl + '"></div></div>';
+    if ($('.layer-like').length) return;
+    // 넣고
+    $wrap.append($html);
+    // 보여주고
+    setTimeout(function () {
+      $('.layer-like').addClass('show');
+      ui.Common.lottie();
+      // 숨기고
+      setTimeout(function () {
+        $('.layer-like').removeClass('show');
+        // 지우고
+        setTimeout(function () {
+          $('.layer-like').remove();
+        }, 310);
+      }, $delayTime);
+    }, 10);
+  },
+  overlapChk: function () {
+    //focus 이벤트 시 중복열림 방지
+    const $focus = $(':focus');
+    if (!!event) {
+      if (event.type === 'focus' && $($focus).hasClass(Layer.focusedClass)) {
+        return false;
+      }
+    }
+    //같은 내용 중복열림 방지
+    if (Layer.beforeCont.indexOf(Layer.content) >= 0) {
+      return false;
+    } else {
+      Layer.beforeCont.push(Layer.content);
+    }
+    return true;
+  },
+  alertHtml: function (type, popId, btnActionId, btnCancelId) {
+    let $html = '<div id="' + popId + '" class="' + Layer.popClass + ' modal alert ' + Layer.alertClass + '" role="dialog" aria-hidden="true">';
+    $html += '<article class="' + Layer.wrapClass + '">';
+    $html += '<div class="' + Layer.headClass + '"><div><h1>안내</h1></div></div>';
+    $html += '<div class="' + Layer.bodyClass + '">';
+    $html += '<div class="' + Layer.innerClass + '">';
+    if (type === 'prompt') {
+      $html += '<div class="form-lbl mt-0">';
+      $html += '<label for="inpPrompt" role="alert" aria-live="assertive"></label>';
+      $html += '</div>';
+      $html += '<div class="form-item">';
+      $html += '<div class="input"><input type="text" id="inpPrompt" placeholder="입력해주세요."></div>';
+      $html += '</div>';
+    } else {
+      $html += '<div class="message">';
+      $html += '<div role="alert" aria-live="assertive"></div>';
+      $html += '</div>';
+    }
+    $html += '</div>';
+    $html += '</div>';
+    $html += '<div class="' + Layer.footClass + '">';
+    $html += '<div class="flex">';
+    if (type === 'confirm' || type === 'prompt') {
+      $html += '<button type="button" id="' + btnCancelId + '" class="button gray">취소</button>';
+    }
+    $html += '<button type="button" id="' + btnActionId + '" class="button primary">확인</button>';
+    $html += '</div>';
+    $html += '</div>';
+    $html += '</article>';
+    $html += '</div>';
+
+    if ($('#wrap').length) {
+      $('#wrap').append($html);
+    } else {
+      $('body').append($html);
+    }
+  },
+  alertEvt: function (type, option, callback, callback2, callback3, callback4, init) {
+    const $length = $('.' + Layer.alertClass).length;
+    const $popId = Layer.id + 'Alert' + $length;
+    const $actionId = $popId + 'ActionBtn';
+    const $cancelId = $popId + 'CancelBtn';
+
+    if (typeof option === 'object') {
+      Layer.content = option.content;
+    } else if (typeof option == 'string') {
+      //약식 설절
+      Layer.content = option;
+    }
+
+    //텍스트가 아닌 배열이나 객체일때 텍스트 변환
+    if (typeof Layer.content !== 'string') Layer.content = JSON.stringify(Layer.content);
+
+    //내용있는지 체크
+    if ($.trim(Layer.content) == '' || Layer.content == undefined) return false;
+
+    //중복팝업 체크
+    if (Layer.overlapChk() === false) return false;
+
+    //팝업그리기
+    Layer.alertHtml(type, $popId, $actionId, $cancelId);
+    const $pop = $('#' + $popId);
+    if (!!option.title || (typeof callback === 'string' && callback !== '')) {
+      const $insertTit = typeof callback === 'string' && callback !== '' ? callback : option.title;
+      $pop.find('.' + Layer.wrapClass + ' h1').html($insertTit);
+    }
+    let $actionTxt;
+    if (!!option.actionTxt) $actionTxt = option.actionTxt;
+    if (typeof callback2 === 'string' && callback2 !== '') $actionTxt = callback2;
+    if ($actionTxt) $('#' + $actionId).html($actionTxt);
+
+    let $cancelTxt;
+    if (!!option.cancelTxt) $cancelTxt = option.cancelTxt;
+    if (typeof callback3 === 'string' && callback3 !== '') $cancelTxt = callback3;
+    if ($cancelTxt) $('#' + $cancelId).html($cancelTxt);
+    // if ($actionTxt && $cancelTxt && $actionTxt.length > $cancelTxt.length + 4) $('#' + $cancelId).addClass('w-33fp');
+
+    const $htmlContent = Layer.content;
+    if (type === 'prompt') {
+      $pop.find('.form-lbl label').html($htmlContent);
+    } else {
+      const $textAry = $htmlContent.split(' '),
+        $textLengthAry = [];
+      for (let i = 0; i < $textAry.length; i++) {
+        $textLengthAry.push($textAry[i].length);
+      }
+      const $maxTxtLength = Math.max.apply(null, $textLengthAry);
+      if ($maxTxtLength > 20) $pop.find('.message>div').addClass('breakall');
+      $pop.find('.message>div').html($htmlContent);
+    }
+    if (!!option.init) option.init($pop[0]);
+    if (typeof init === 'function') init($pop[0]);
+    Layer.open('#' + $popId);
+
+    //click
+    let $result = '';
+    const $actionBtn = $('#' + $actionId);
+    const $cancelBtn = $('#' + $cancelId);
+    let $inpVal = '';
+    $actionBtn.on('click', function () {
+      $result = true;
+      $inpVal = $pop.find('.input input').val();
+
+      const $actionEvt = function () {
+        if (type === 'prompt') {
+          if (!!option.action) option.action($result, $inpVal);
+          if (!!option.callback) option.callback($result, $inpVal);
+          if (typeof callback === 'function') callback($result, $inpVal);
+          if (typeof callback2 === 'function') callback2($result, $inpVal);
+          if (typeof callback3 === 'function') callback3($result, $inpVal);
+          if (typeof callback4 === 'function') callback4($result, $inpVal);
+        } else {
+          if (!!option.action) option.action($result);
+          if (!!option.callback) option.callback($result);
+          if (typeof callback === 'function') callback($result);
+          if (typeof callback2 === 'function') callback2($result);
+          if (typeof callback3 === 'function') callback3($result);
+          if (typeof callback4 === 'function') callback4($result);
+        }
+      };
+      Layer.close('#' + $popId, $actionEvt);
+      // Layer.close('#' + $popId);
+      // setTimeout($actionEvt, 100);
+    });
+    $cancelBtn.on('click', function () {
+      $result = false;
+      const $cancelEvt = function () {
+        if (!!option.cancel) option.cancel();
+        if (!!option.callback) option.callback($result);
+        if (typeof callback === 'function') callback($result);
+        if (typeof callback2 === 'function') callback2($result);
+        if (typeof callback3 === 'function') callback3($result);
+        if (typeof callback4 === 'function') callback4($result);
+      };
+      Layer.close('#' + $popId, $cancelEvt);
+      // Layer.close('#' + $popId);
+      // setTimeout($cancelEvt, 100);
+    });
+  },
+  alert: function (option, callback, callback2, callback3, init) {
+    Layer.alertEvt('alert', option, callback, callback2, callback3, null, init);
+  },
+  confirm: function (option, callback, callback2, callback3, callback4, init) {
+    Layer.alertEvt('confirm', option, callback, callback2, callback3, callback4, init);
+  },
+  prompt: function (option, callback, callback2, callback3, callback4, init) {
+    Layer.alertEvt('prompt', option, callback, callback2, callback3, callback4, init);
+  },
+  keyEvt: function () {
+    //컨펌팝업 버튼 좌우 방할기로 포거스 이동
+    $(document).on('keydown', '.' + Layer.alertClass + ' .pop_btn .button', function (e) {
+      const $keyCode = e.keyCode ? e.keyCode : e.which;
+      let $tar = '';
+      if ($keyCode == 37) $tar = $(this).prev();
+      if ($keyCode == 39) $tar = $(this).next();
+      if (!!$tar) $tar.focus();
+    });
+  },
+  tooltip: function (contents, title) {
+    const tooltipPopId = 'uiPopToolTip';
+    let $html = '<div id="' + tooltipPopId + '" class="' + Layer.popClass + ' modal tooltip ' + Layer.removePopClass + '" role="dialog" aria-hidden="true">';
+    $html += '<article class="' + Layer.wrapClass + '">';
+    if (title !== undefined && title !== '') {
+      $html += '<div class="' + Layer.headClass + '">';
+      $html += '<div>';
+      $html += '<h1>' + title + '</h1>';
+      $html += '<a href="#" class="pop-close ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
+      $html += '</div>';
+      $html += '</div>';
+    }
+    $html += '<div class="' + Layer.bodyClass + '">';
+    $html += '<div class="' + Layer.innerClass + '">';
+    if (title === undefined) {
+      $html += '<a href="#" class="pop-close ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
+    }
+    $html += contents;
+    $html += '</div>';
+    $html += '</div>';
+    $html += '</article>';
+    $html += '</div>';
+
+    if ($('#wrap').length) {
+      $('#wrap').append($html);
+    } else {
+      $('body').append($html);
+    }
+    Layer.open('#' + tooltipPopId);
+  },
+  imgBoxIdx: 0,
+  imgBox: function (contents, idx) {
+    const $idx = idx ? idx : 0;
+    const imgPopId = 'uiPopImgBox' + Layer.imgBoxIdx;
+    let $html = '<div id="' + imgPopId + '" class="' + Layer.popClass + ' full pop-img-box ' + Layer.removePopClass + '" role="dialog" aria-hidden="true">';
+    $html += '<article class="' + Layer.wrapClass + '">';
+    $html += '<div class="' + Layer.headClass + '"><div><h1>이미지</h1><a href="#" class="pop-close" role="button" aria-label="팝업창 닫기"></a></div></div>';
+    $html += '<div class="' + Layer.bodyClass + '">';
+    $html += '<div class="ui-swiper _zoom img-box-swiper">';
+    $html += '<div class="swiper">';
+    $html += '<div class="swiper-wrapper"></div>';
+    $html += '</div>';
+    $html += '<div class="swiper-pagination"></div>';
+    $html += '</div>';
+    $html += '</div>';
+    $html += '</article>';
+    $html += '</div>';
+
+    if ($('#wrap').length) {
+      $('#wrap').append($html);
+    } else {
+      $('body').append($html);
+    }
+    Layer.imgBoxIdx += 1;
+    const $popup = $('#' + imgPopId);
+    let $contentsHtml = '';
+    contents.each(function () {
+      const $this = $(this);
+      const $img = $this.find('img');
+      const $src = $img.data('image') ? $img.data('image') : $img.attr('src');
+      // let isNoImg = $this.hasClass('no-img-bg');
+      // if ($this.find('.no-img-bg').length) isNoImg = true;
+      $contentsHtml += '<div class="swiper-slide">';
+      // $contentsHtml += isNoImg ? '<div class="swiper-zoom-container no-img-bg">' : '<div class="swiper-zoom-container">';
+      $contentsHtml += '<div class="swiper-zoom-container">';
+      $contentsHtml += '<img src="' + $src + '" alt="' + ($img.attr('alt') === undefined ? '' : $img.attr('alt')) + '" onerror="imgError(this)" />';
+      $contentsHtml += '</div>';
+      $contentsHtml += '</div>';
+    });
+    $popup.find('.swiper-wrapper').append($contentsHtml);
+    // $popup.find('.swiper-wrapper').children().addClass('swiper-zoom-container').removeClass('img-box').wrap('<div class="swiper-slide"></div>');
+
+    // img rotate
+    setTimeout(function () {
+      const $img = $popup.find('img');
+      $img.each(function () {
+        const $this = $(this);
+        const $imgW = $this[0].naturalWidth;
+        const $imgH = $this[0].naturalHeight;
+        const $src = $this.attr('src');
+
+        if ($imgW > $imgH) {
+          $this.after('<canvas></canvas>');
+          const $canvas = $this.next();
+          ui.Util.canvasRotateImg($canvas[0], $src, 270);
+          setTimeout(function () {
+            $this.remove();
+          }, 5);
+        }
+      });
+    }, 10);
+
+    let imgSwiper;
+    Layer.open(
+      $popup,
+      function () {
+        // const $popSwiper = $popup.find('.img-box-swiper');
+        // ui.Swiper.base($popSwiper);
+        const $popSwiper = $popup.find('.img-box-swiper .swiper');
+        const $popSwiperPagination = $popup.find('.img-box-swiper .swiper-pagination');
+        imgSwiper = new Swiper($popSwiper[0], {
+          pagination: {
+            el: $popSwiperPagination[0],
+            clickable: true
+          },
+          initialSlide: $idx,
+          zoom: true
+        });
+        $popup.find('.img-box-swiper').data('swiper', imgSwiper);
+      },
+      100
+    );
+    $popup.find('.pop-close').click(function (e) {
+      e.preventDefault();
+      Layer.close('#' + imgPopId, function () {
+        imgSwiper.destroy();
+      });
+    });
+  },
+  pdfIdx: 0,
+  pdf: function (url, title) {
+    const pdfPopId = 'uiPopPdf' + Layer.pdfIdx;
+    const $src = ui.basePath + '/pdfjs/web/viewer.html?file=' + url;
+    let $html = '<div id="' + pdfPopId + '" class="' + Layer.popClass + ' full pop-pdf ' + Layer.removePopClass + '" role="dialog" aria-hidden="true">';
+    $html += '<article class="' + Layer.wrapClass + '">';
+    $html += '<div class="' + Layer.headClass + '"><div><h1>' + title + '</h1><button type="button" class="pop-close ui-pop-close" aria-label="팝업창 닫기"></button></div></div>';
+    $html += '<div class="' + Layer.bodyClass + ' iframe-full-box">';
+    $html += '<iframe src="' + $src + '" frameborder="0"></iframe>';
+    $html += '</div>';
+    $html += '<div class="pop-foot"><div><div class="flex"><button type="button" class="button primary ui-pop-close">확인</button></div></div></div>';
+    $html += '</div>';
+    $html += '</article>';
+    $html += '</div>';
+
+    if ($('#wrap').length) {
+      $('#wrap').append($html);
+    } else {
+      $('body').append($html);
+    }
+    Layer.pdfIdx += 1;
+    Layer.open('#' + pdfPopId);
+  },
+  agreeAllIdx: 0,
+  agreeTitClassName: 'pop-agree-tit',
+  agreeBtnClassName: 'ui-pop-agree-btn',
+  agreeCheckedClassName: 'ui-pop-agree-checked',
+  agreeCheckboxClassName: 'ui-pop-agree-chk',
+  agreeAll: function ($ary) {
+    const $setPopup = function (targetId) {
+      const $input = $(targetId);
+      const $pop = $input.data('agree-pop');
+      $($pop)
+        .addClass(Layer.agreePopClass)
+        .find('.' + Layer.footClass + ' .button')
+        .data('agree-input', targetId);
+      return $pop;
+    };
+    const $popAry = [];
+    for (let i = 0; i < $ary.length; i++) {
+      const $inputId = $.trim($ary[i]);
+      const $pop = $setPopup($inputId);
+      const $obj = {
+        input: $inputId,
+        pop: $pop
+      };
+      $popAry.push($obj);
+    }
+
+    const agreePopId = 'uiPopAgreeAll' + Layer.agreeAllIdx;
+    let $html = '<div id="' + agreePopId + '" class="' + Layer.popClass + ' full ' + Layer.agreePopClass + ' ' + Layer.agreePopSwiperClass + ' ' + Layer.removePopClass + '" role="dialog" aria-hidden="true">';
+    $html += '<article class="' + Layer.wrapClass + '">';
+    $html += '<div class="' + Layer.headClass + '">';
+    $html += '  <div class="' + Layer.agreeTitClassName + '">';
+    $html += '    <div class="swiper-pagination" aria-hidden="true"></div>';
+    $html += '    <h1></h1>';
+    $html += '    <a href="#none" class="pop-close ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
+    $html += '  </div>';
+    $html += '</div>';
+    $html += '<div class="' + Layer.bodyClass + '">';
+    $html += '  <div class="ui-swiper agree-swiper">';
+    $html += '    <div class="swiper">';
+    $html += '      <div class="swiper-wrapper"></div>';
+    $html += '      </div>';
+    $html += '  </div>';
+    $html += '</div>';
+    $html += '<div class="' + Layer.footClass + '">';
+    $html += '  <div>';
+    // $html += '    <div class="flex">';
+    // $html += '      <a href="#none" class="button primary ui-pop-agree-all-btn" role="button"></a>';
+    // $html += '    </div>';
+    $html += '  </div>';
+    $html += '</div>';
+    $html += '</article>';
+    $html += '</div>';
+
+    if ($('#wrap').length) {
+      $('#wrap').append($html);
+    } else {
+      $('body').append($html);
+    }
+    Layer.agreeAllIdx += 1;
+    const $popup = $('#' + agreePopId);
+    const $popupTit = $popup.find('.' + Layer.headClass + ' .' + Layer.agreeTitClassName + ' h1');
+    const $popupWrapper = $popup.find('.swiper-wrapper');
+    const $popupFoot = $popup.find('.' + Layer.footClass);
+    for (let i = 0; i < $popAry.length; i++) {
+      const $inp = $popAry[i].input;
+      const $inpPop = $($popAry[i].pop);
+      const $inpPopTit = $inpPop.find('.' + Layer.headClass + ' h1').html();
+      $popupTit.append('<span>' + $inpPopTit + '</span>');
+      const $btnHtml = '<div class="flex"><button type="button" class="button primary ' + Layer.agreeCheckedClassName + '" role="button" data-agree-input="' + $inp + '" data-index="' + i + '">확인</button></div>';
+      $popupFoot.find('>div').append($btnHtml);
+      const $slideHtml = '<div class="swiper-slide"></div>';
+      $popupWrapper.append($slideHtml);
+      const $inpPopBody = $inpPop
+        .find('.' + Layer.bodyClass)
+        .children()
+        .clone();
+      $popupWrapper.find('.swiper-slide').last().append($inpPopBody);
+      if (i !== 0) {
+        $popupTit.find('>span').eq(i).hide();
+        $popupFoot.find('.flex').eq(i).hide();
+      }
+    }
+
+    let agreeSwiper;
+    Layer.open($popup, function () {
+      const $popWrap = $popup.find('.' + Layer.wrapClass);
+      const $popSwiper = $popup.find('.agree-swiper .swiper');
+      const $popSwiperPagination = $popup.find('.swiper-pagination');
+      agreeSwiper = new Swiper($popSwiper[0], {
+        pagination: {
+          el: $popSwiperPagination[0],
+          type: 'progressbar',
+          clickable: false
+        },
+        allowTouchMove: false,
+        autoHeight: true,
+        on: {
+          slideChangeTransitionEnd: function (e) {
+            const $idx = e.realIndex;
+            $popupTit.find('>span').eq($idx).show().siblings('span').hide();
+            $popupFoot.find('.flex').eq($idx).show().siblings().hide();
+            $popWrap.animate({ scrollTop: 0 }, 100).scroll();
+          }
+        }
+      });
+      $popup.find('.agree-swiper').data('swiper', agreeSwiper);
+      $popWrap.scroll();
+    });
+    $popup.find('.pop-close').click(function (e) {
+      e.preventDefault();
+      Layer.close('#' + agreePopId, function () {
+        agreeSwiper.destroy();
+      });
+    });
+  },
+  agree: function (element) {
+    const $ary = element.split(',');
+    const $setPopup = function (targetId) {
+      const $input = $(targetId);
+      const $pop = $input.data('agree-pop');
+      $($pop)
+        .addClass(Layer.agreePopClass)
+        .find('.' + Layer.footClass + ' .button')
+        .data('agree-input', targetId);
+      return $pop;
+    };
+
+    if ($ary.length > 1) {
+      Layer.agreeAll($ary);
+      /*
+      for (let i = 0; i < $ary.length; i++) {
+        const $inputId = $.trim($ary[$ary.length - i - 1]);
+        const $pop = $setPopup($inputId);
+        setTimeout(function () {
+          Layer.open($pop);
+        }, i * 100);
+      }
+      */
+    } else {
+      const $pop = $setPopup($ary[0]);
+      Layer.open($pop, function () {
+        $($pop)
+          .find('.' + Layer.bodyClass)
+          .scroll();
+      });
+    }
+  },
+  selectId: 'uiSelectLayer',
+  selectIdx: 0,
+  selectClass: 'ui-pop-select',
+  select: function (target, col) {
+    const $target = $(target);
+    const $targetVal = $target.val();
+    const $addClass = $target.data('class');
+    const $type = $target.data('type');
+    let $title = $target.attr('title');
+    const $popId = Layer.selectId + Layer.selectIdx;
+    const $length = $target.children().length;
+    let $option = '';
+    let $opDisabled = '';
+    let $opTxt = '';
+    let $opVal = '';
+    let $popHtml = '';
+    const $isTouch = $target.hasClass('is-swipe') ? true : false;
+    const $isTouchMove = $target.hasClass('is-swipe-move') ? true : false;
+    let $isFullPop = false;
+
+    Layer.selectIdx++;
+    if ($title == undefined) $title = '선택';
+    const $monthTxt = function (txt) {
+      let $txt = txt;
+      const $split = $txt.split('.');
+      if ($split.length == 2) {
+        $txt = $split[0] + '년 ' + $split[1] + '월';
+      } else if ($split.length == 3) {
+        $txt = $split[0] + '년 ' + $split[1] + '월 ' + $split[2] + '일';
+      } else {
+        $txt = $split.join('.');
+      }
+      return $txt;
+    };
+    $popHtml += '<div id="' + $popId + '" class="' + Layer.popClass + ' ' + ($isFullPop ? 'full' : 'bottom') + ($isTouch || $isTouchMove ? ' is-swipe' : '') + ($isTouchMove ? ' _touch-move' : '') + ' ' + Layer.selectClass + '" role="dialog" aria-hidden="true">';
+    $popHtml += '<article class="' + Layer.wrapClass + '">';
+    $popHtml += '<div class="' + Layer.headClass + '">';
+    $popHtml += '<div>';
+    $popHtml += '<h1>' + $title + '</h1>';
+    $popHtml += '<a href="#" class="pop-close ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
+    $popHtml += '</div>';
+    $popHtml += '</div>';
+    $popHtml += '<div class="' + Layer.bodyClass + '">';
+
+    $popHtml += '<ul class="select-item-wrap';
+    if (!!col) $popHtml += ' col' + col;
+    if ($addClass) $popHtml += ' ' + $addClass;
+    $popHtml += '">';
+    for (let i = 0; i < $length; i++) {
+      $option = $target.children().eq(i);
+      $opDisabled = $option.prop('disabled');
+      $opTxt = $option.data('txt') ? $option.data('txt') : $option.text();
+      $opSub = $option.data('sub');
+      $opVal = $option.attr('value');
+      if ($opVal != '') {
+        $popHtml += '<li>';
+        $popHtml += '<div class="select-item' + ($targetVal == $opVal ? ' selected' : '') + '">';
+        $popHtml += '<a href="#" class="ui-pop-select-btn' + ($opDisabled ? ' disabled' : '') + '" role="button" data-value="' + $opVal + '"';
+        if ($targetVal == $opVal) $popHtml += ' title="' + ($opTxt.length > 20 ? $opTxt.substring(20, $opTxt.lastIndexOf('(')) : $opTxt) + ' 선택됨"';
+        $popHtml += '>';
+        // $popHtml += '<div class="checkbox ty2"><i aria-hidden="true"></i></div>';
+        if ($opSub && $type === 'reverse') {
+          $popHtml += '<div class="select-item-txt">' + $opSub + '</div>';
+          $popHtml += '<div class="select-item-sub">' + $opTxt + '</div>';
+        } else {
+          if ($type === 'date') {
+            $popHtml += '<div class="select-item-txt">' + $monthTxt($opTxt) + '</div>';
+          } else {
+            $popHtml += '<div class="select-item-txt">' + $opTxt + '</div>';
+          }
+          if ($opSub) $popHtml += '<div class="select-item-sub">' + $opSub + '</div>';
+        }
+        $popHtml += '</a>';
+        $popHtml += '</div>';
+        $popHtml += '</li>';
+      }
+    }
+    $popHtml += '</ul>';
+    $popHtml += '</div>';
+    $popHtml += '</article>';
+    $popHtml += '</div>';
+
+    if ($('#wrap').length) {
+      $('#wrap').append($popHtml);
+    } else {
+      $('body').append($popHtml);
+    }
+
+    $target.data('popup', '#' + $popId);
+    const $pop = $('#' + $popId);
+    $pop.on('click', '.ui-pop-select-btn', function (e) {
+      e.preventDefault();
+      if (!$(this).hasClass('disabled')) {
+        const $btnVal = $(this).data('value');
+        // const $btnTxt = $(this).text();
+        $(this).parent().addClass('selected').closest('li').siblings().find('.selected').removeClass('selected');
+        ui.Form.selectSetVal($target, $btnVal);
+        Layer.close('#' + $popId, function () {
+          $target.change();
+        });
+      }
+    });
+  },
+  isSelectOpen: false,
+  selectOpen: function (select, e) {
+    const $select = $(select);
+    const $txtLengthArry = [];
+    if ($select.prop('disabled')) return false;
+    if ($select.find('option').length < 1) return console.log('select에 option 없음');
+    if ($select.find('option').length == 1 && $select.find('option').val() == '') return console.log('select에 option의 value가 0이라 리턴');
+    Layer.isSelectOpen = true;
+    $select.find('option').each(function () {
+      const $optVal = $(this).val();
+      const $optTxt = $(this).text();
+      if ($optVal != '') {
+        $txtLengthArry.push($optTxt.length);
+      }
+    });
+    /*
+    const $maxTxtLength = Math.max.apply(null, $txtLengthArry);
+ 
+     //들어갈수 있는 글자수 체크
+    const inWidthTxt = function(width,col){
+      const  _fontSize = 14;
+      const _paddingBorder = 28;
+      const _val = ((width/col)-_paddingBorder)/(_fontSize*0.9);
+      return Math.floor(_val);
+    };
+    const $winW = $(window).width();
+    const $contW = $winW - (17*2);
+    const $inTxt1 = inWidthTxt($contW,3);
+    const $inTxt2 = inWidthTxt($contW,2);
+
+    //글자수에따른 팝업 분류
+    if($maxTxtLength <= $inTxt1){
+      Layer.select($select,3);
+    }else if($maxTxtLength <= $inTxt2){
+      Layer.select($select,2);
+    }else{
+      Layer.select($select);
+    }
+    */
+    Layer.select($select);
+
+    const $pop = $select.data('popup');
+    Layer.open($pop, function () {
+      //if(!!e)$($pop).data('returnFocus',$currentTarget);
+    });
+  },
+  selectUI: function () {
+    //셀렉트 팝업
+    $(document).on('click', '.ui-select-open', function (e) {
+      e.preventDefault();
+      let $select = '';
+      if (Layer.isSelectOpen == false) {
+        $select = $($(this).attr('href'));
+        if (!$select.length) $select = $(this).prev('select');
+        Layer.selectOpen($select, e);
+      }
+    });
+    $(document).on('click', '.ui-select-lbl', function (e) {
+      e.preventDefault();
+      const $tar = $(this).is('a') ? $(this).attr('href') : '#' + $(this).attr('for');
+      $($tar).next('.ui-select-open').focus().click();
+    });
+  },
+  bottomTouch: function (tar) {
+    const $popup = $(tar);
+    const $wrap = $popup.find('.' + Layer.wrapClass);
+    const $head = $popup.find('.' + Layer.headClass);
+    const $body = $popup.find('.' + Layer.bodyClass);
+    const $foot = $popup.find('.' + Layer.footClass);
+    const $minHeight = ($head.outerHeight() ?? 0) + ($foot.outerHeight() ?? 0) + 50; // 50: body의 최소 높이값
+
+    let isMove = false;
+    const $animateSpeed = 300;
+    let $startH = 0;
+    let $startX = 0;
+    let $startY = 0;
+    let $distanceX = 0;
+    let $distanceY = 0;
+    let $directionX = false;
+    let $directionY = false;
+    let $duration = 0;
+    let $durationTimer;
+    // let $distanceAry = [];
+
+    $(tar)
+      .find('.' + Layer.headClass)
+      .on('touchstart mousedown', function (e) {
+        isMove = true;
+        const $this = $(this);
+        const $clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+        const $clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+        $startX = $clientX;
+        $startY = $clientY;
+        $startH = $this.closest('.' + Layer.wrapClass).outerHeight();
+        $distanceX = 0;
+        $distanceY = 0;
+        $directionX = false;
+        $directionY = false;
+        if ($this.data('first-height') === undefined) $this.data('first-height', $startH);
+        if ($this.data('is-full') === undefined) $this.data('is-full', false);
+        $duration = 0;
+        $durationTimer = setInterval(function () {
+          $duration += 10;
+        }, 10);
+        $wrap.stop(false, true);
+        if ($(tar).hasClass('_touch-move')) $(tar).addClass('_touch-moving');
+      });
+
+    $(tar)
+      .find('.' + Layer.headClass)
+      .on('touchmove mousemove', function (e) {
+        if (!isMove) return false;
+        const $this = $(this);
+        const $clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+        const $clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+        $distanceX = $clientX - $startX;
+        $distanceY = $clientY - $startY;
+        // console.log($distanceX, $distanceY)
+
+        // const $min = $(tar).hasClass('_touch-move') ? $firstHeight:0;
+        const $min = $minHeight;
+        const $max = $(tar).hasClass('_touch-move') ? $popup.height() : $popup.outerHeight();
+        const $height = Math.max($min, Math.min($max, $startH - $distanceY));
+
+        $wrap.css({ 'max-height': $height, height: $height });
+        //$body.css('max-height', $height);
+        if (!$(tar).hasClass('_touch-move')) {
+          if ($popup.hasClass('full')) {
+            // $isFull = true;
+            $this.data('is-full', true);
+            $popup.removeClass('full').addClass('bottom');
+          }
+        }
+        /*
+        if($duration%10 === 0){
+          const $lastVal = $distanceAry.length ? $distanceAry[$distanceAry.length-1] : 0;
+          $distanceAry.push($distanceY - $lastVal);
+        }*/
+      });
+
+    $(tar)
+      .find('.' + Layer.headClass)
+      .on('touchend mouseup mouseleave', function (e) {
+        if (!isMove) return false;
+        isMove = false;
+        const $this = $(this);
+        const $isFull = $this.data('is-full');
+        const $clientX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
+        const $clientY = e.type === 'touchend' ? e.changedTouches[0].clientY : e.clientY;
+        $distanceX = $clientX - $startX;
+        $distanceY = $clientY - $startY;
+        if ($distanceX !== 0) $directionX = $distanceX > 0 ? 'right' : 'left';
+        if ($distanceY !== 0) $directionY = $distanceY > 0 ? 'down' : 'up';
+        const $firstHeight = $this.data('first-height');
+        const $min = $minHeight;
+        const $max = $(tar).hasClass('_touch-move') ? $popup.height() : $popup.outerHeight();
+
+        clearInterval($durationTimer);
+        const $powerRatio = $duration === 0 || $distanceY === 0 ? 0 : Math.abs($distanceY) / $duration;
+        const $power = (1 + Math.round($powerRatio * 3)) * Math.round($powerRatio * 30);
+        const $powerDistance = Math.round((($distanceY * -1) / $duration) * $power);
+        if ($(tar).hasClass('_touch-move')) {
+          $(tar).removeClass('_touch-moving');
+
+          const $wrapHeight = $wrap.outerHeight();
+          const $endHeight = Math.max($min, Math.min($max, $wrapHeight + $powerDistance));
+          const $endSpeed = Math.min(2000, Math.abs($powerDistance * 10));
+          $wrap
+            .stop(true, false)
+            .removeCss('max-height')
+            .animate({ height: $endHeight }, $endSpeed, 'easeOutQuint', function () {
+              $wrap.css('max-height', $endHeight);
+            });
+        } else {
+          if (Math.abs($distanceY) > 50) {
+            if ($popup.hasClass('bottom') && !$isFull) {
+              if ($directionY === 'up') {
+                $popup.css('padding-top', 0);
+                $wrap
+                  .stop(true, false)
+                  .removeCss('max-height')
+                  .animate({ height: '100%' }, $animateSpeed, function () {
+                    $wrap.removeCss('height');
+                    $popup.removeClass('bottom').addClass('full');
+                    $popup.removeCss('padding-top');
+                  });
+              } else if ($directionY === 'down') {
+                Layer.close(tar);
+              }
+            }
+            // console.log($isFull, $directionY, $firstHeight);
+            if ($isFull && $directionY === 'down') {
+              $wrap.removeCss('max-height').animate({ height: $firstHeight }, $animateSpeed, function () {
+                // $isFull = false;
+                $this.data('is-full', false);
+                $wrap.removeCss('height').css('max-height', $firstHeight);
+                $this.removeData('first-height');
+              });
+            }
+          } else {
+            if ($isFull) {
+              $popup.css('padding-top', 0);
+              $wrap
+                .stop(true, false)
+                .removeCss('max-height')
+                .animate({ height: '100%' }, $animateSpeed, function () {
+                  // $isFull = false;
+                  $this.data('is-full', false);
+                  $wrap.removeCss('height');
+                  $popup.removeClass('bottom').addClass('full');
+                  $popup.removeCss('padding-top');
+                });
+            } else {
+              $wrap.removeCss('max-height').animate({ height: $firstHeight }, $animateSpeed, function () {
+                $wrap.removeCss('height').css('max-height', $firstHeight);
+                $this.removeData('first-height');
+              });
+            }
+          }
+        }
+
+        $this.removeData('is-full');
+        // $distanceAry = [];
+      });
+  },
+  toast: function (txt, fn, type, delayTime) {
+    if (type === undefined) type = 'toast';
+    const $isAlarm = type === 'alarm';
+    const $isFn = !!fn;
+    const $className = '.' + type + '-box';
+
+    if (delayTime == undefined) delayTime = 2000;
+
+    let $boxHtml = '<div class="' + $className.substring(1) + '">';
+    $boxHtml += '<div>';
+    if ($isFn) {
+      $boxHtml += '<a href="#" role="button" class="txt">' + txt + '</a>';
+    } else {
+      $boxHtml += '<div class="txt">' + txt + '</div>';
+    }
+    if ($isAlarm) {
+      $boxHtml += '<button type="button" class="close" aria-label="닫기"></button>';
+    }
+    $boxHtml += '</div>';
+    $boxHtml += '</div>';
+    $('#container').before($boxHtml);
+    const $toast = $($className).last();
+    const $toastClose = function () {
+      $toast.removeClass('on');
+      $toast.one('transitionend', function () {
+        $(this).remove();
+      });
+    };
+    const $spaceH = $('.bottom-fixed-space').outerHeight();
+    if ($spaceH) {
+      // const $top = parseInt($toast.css('bottom'));
+      // $toast.css('bottom', $top + $spaceH);
+      $toast.css('bottom', $spaceH);
+    }
+    $toast.addClass('on');
+    let $closeTime;
+    if (!$isAlarm) {
+      $closeTime = setTimeout($toastClose, delayTime);
+    }
+    if ($isFn) {
+      $toast.find('a.txt').one('click', function (e) {
+        e.preventDefault();
+        fn();
+
+        // 이벤트 실행시 바로 닫기
+        clearTimeout($closeTime);
+        $toastClose();
+      });
+    }
+  },
+  alarm: function (txt, fn, delayTime) {
+    Layer.toast(txt, fn, 'alarm', delayTime);
+  },
+  page: function (elment) {
+    const $elment = $(elment);
+    /*
+    $elment.each(function () {
+      const $this = $(this);
+      if (!$this.closest('.popup').length) {
+        $this.addClass('page');
+        const $body = $this.find('.pop-body');
+        const $foot = $this.find('.pop-foot');
+        if ($body.length && $foot.length) $body.addClass('next-foot');
+      }
+    });
+    */
+
+    if ($elment.closest('.' + Layer.popClass).length) {
+      $elment.removeClass(Layer.pageClass);
+      return;
+    }
+    const $wrap = $elment.hasClass(Layer.wrapClass) ? $elment : $elment.find('.' + Layer.wrapClass);
+    const $body = $wrap.find('.' + Layer.bodyClass);
+    const $foot = $wrap.find('.' + Layer.footClass);
+    if ($body.length && $foot.length) {
+      if ($foot.css('position') === 'fixed') {
+        //$body.css('padding-bottom', $foot.outerHeight());
+        $body.addClass('next-foot-fixed');
+      } else {
+        $body.addClass('next-foot');
+      }
+    }
+
+    Layer.fixed($wrap);
+    $(window).scroll(function () {
+      Layer.fixed($wrap);
+    });
+  },
+  loadIdx: 0,
+  load: function ($url, $type) {
+    const popId = 'popLoad-' + Layer.loadIdx;
+    Layer.loadIdx += 1;
+    let $html = '<div id="' + popId + '" class="' + Layer.popClass + ' ' + $type + ' ' + Layer.removePopClass + '" role="dialog" aria-hidden="true">';
+    $html += '</div>';
+
+    if ($('#wrap').length) {
+      $('#wrap').append($html);
+    } else {
+      $('body').append($html);
+    }
+
+    const $pop = $('#' + popId);
+    const $loadId = '#load';
+    $pop.load($url + ' ' + $loadId, function (res, sta, xhr) {
+      const $this = $(this);
+      if (sta == 'success') {
+        const $popWrap = $('#' + popId).find($loadId);
+        if ($popWrap.hasClass(Layer.wrapClass)) {
+          $popWrap.removeAttr('id');
+        } else {
+          $popWrap.children().unwrap();
+        }
+        $('#' + popId)
+          .find('.' + Layer.wrapClass)
+          .removeClass(Layer.pageClass);
+        $('#' + popId)
+          .find('.' + Layer.headClass + ' .pop-close')
+          .addClass('ui-pop-close');
+        Layer.open('#' + popId);
+        /*
+        if ($(res).find('script').length) {
+          $(res)
+            .find('script')
+            .each(function () {
+              $(this).appendTo($this);
+            });
+        }
+        */
+      } else {
+        $('#' + popId).remove();
+      }
+    });
+  },
+  reOpen: false,
+  btnTop: {
+    button: '.btn-pop-top',
+    label: '팝업 상단으로 이동',
+    text: 'TOP',
+    min: 100,
+    onClass: 'on',
+    scrollSpeed: 300
+  },
+  openEl: '',
+  openPop: [],
+  opening: 0,
+  open: function (tar, callback, callbackTime) {
+    const $popup = $(tar);
+    const $popWrap = $popup.find('.' + Layer.wrapClass);
+    //만약 팝업 없을때
+    if (!$popup.length || !$popWrap.length) {
+      if (!Layer.reOpen) {
+        Layer.reOpen = true;
+        console.log(tar, '팝업없음, 0.5초 후 open 재시도');
+        setTimeout(function () {
+          Layer.open(tar, callback);
+        }, 500);
+      } else {
+        Layer.reOpen = false;
+        console.log(tar, '재시도해도 팝업없음');
+      }
+      return;
+    }
+
+    Layer.opening++;
+    const $idx = $popup.index('.' + Layer.popClass);
+    const $show = $('.' + Layer.popClass + '.' + Layer.showClass).not('.' + Layer.alertClass).length;
+    const $alertShow = $('.' + Layer.popClass + '.' + Layer.showClass + '.' + Layer.alertClass).length;
+    let $id = $popup.attr('id');
+    let $lastPop = '';
+
+    //z-index
+    if ($popup.hasClass(Layer.alertClass && !$alertShow)) {
+      $popup.css('z-index', '+=' + $alertShow);
+    } else if ($show) {
+      $popup.css('z-index', '+=' + $show);
+    }
+
+    //id없을때
+    if ($id == undefined) {
+      $id = Layer.id + $idx;
+      $popup.attr('id', $id);
+    }
+
+    //last 체크
+    if (Layer.openPop.length) $lastPop = Layer.openPop[Layer.openPop.length - 1];
+    if (!$popup.hasClass(Layer.alertClass)) {
+      if (Layer.openPop.length) {
+        let $last;
+        $.each(Layer.openPop, function () {
+          const $this = '' + this;
+          if (!$($this).hasClass(Layer.alertClass)) $last = $this;
+        });
+        $($last).removeClass(Layer.lastPopClass);
+      }
+      $popup.addClass(Layer.lastPopClass);
+    }
+    if (Layer.openPop.indexOf('#' + $id) < 0) Layer.openPop.push('#' + $id);
+
+    // bg close
+    //  && !$popup.hasClass('full')
+    if (!$popup.hasClass(Layer.alertClass) && !$popup.hasClass(Layer.bgNoCloseClass)) {
+      const $bgClick = '<div class="pop-bg-close ui-pop-close" role="button" aria-label="팝업창 닫기"></div>';
+      if (!$popup.find('.pop-bg-close').length) $popup.prepend($bgClick);
+    }
+
+    // full 팝업일때 top버튼(btn-pop-btn) 적용
+    const $btnTopHtml = '<button type="button" class="' + Layer.btnTop.button.substring(1) + '" title="' + Layer.btnTop.label + '" aria-label="' + Layer.btnTop.label + '">' + Layer.btnTop.text + '</button>';
+    if ($popup.hasClass('full') && !$popup.find(Layer.btnTop.button).length && !$popup.hasClass('not-top-btn')) {
+      $popWrap.append($btnTopHtml);
+    }
+
+    // delay time
+    const $openDelay = 20 * Layer.opening;
+    const $showDelay = 510;
+    const $callbackDelay = !!callbackTime ? callbackTime : $showDelay - 60;
+
+    //pop-scl-wrap: PC용
+    if (ui.PC.any() && ($popup.hasClass('modal') || $popup.hasClass('bottom')) && !$popup.find('.' + Layer.sclWrapClass).length) {
+      $popWrap.wrap('<div class="' + Layer.sclWrapClass + '"></div>');
+      if ($popWrap.hasClass('pop-body-scroll')) $popWrap.parent().addClass('pop-body-scroll');
+    }
+
+    //scl-title-hide
+    if ($popup.find('.' + Layer.scrollShowTitleClass).length) $popup.find('.' + Layer.headClass + ' h1').addClass('scl-title-hide');
+
+    //show
+    $popup.attr('aria-hidden', false);
+    $popup.css('display', 'flex');
+
+    const $FocusEvt = function () {
+      //리턴 포커스
+      let $focusEl = '';
+      try {
+        if (event.currentTarget != document) {
+          $focusEl = $(event.currentTarget);
+        } else {
+          $focusEl = $(document.activeElement);
+        }
+      } catch (error) {
+        $focusEl = $(document.activeElement);
+      }
+
+      if (Layer.openEl != '' && !$focusEl.is($focusableEl)) $focusEl = $(Layer.openEl);
+      if ($($lastPop).data('returnFocus') == $focusEl) $focusEl = $(Layer.openEl);
+      if ($($focusEl).is($focusableEl)) {
+        $popup.data('returnFocus', $focusEl);
+        $focusEl.addClass(Layer.focusedClass);
+        if ($focusEl.hasClass('btn-select')) $focusEl.closest('.select').addClass('focused');
+      }
+      //팝업 in 포커스
+      if (!ui.Mobile.any()) {
+        //PC
+        if ($popup.hasClass(Layer.alertClass)) {
+          $popup.find('.pop-foot .button').last().focus();
+        } else {
+          $popup.attr({ tabindex: 0 }).focus();
+        }
+      } else {
+        let $first = '';
+        let $focusInEl = $popup.find('.' + Layer.focusInClass);
+        let $thisTxt = '';
+        let $childrenTxt = '';
+        //모바일
+        if ($popup.find('.' + Layer.headClass + ' h1').length) {
+          $popup.attr({ tabindex: 0 }).focus();
+        } else if ($popup.find('.' + Layer.headClass + ' .pop-close').length) {
+          $popup.find('.' + Layer.headClass + ' .pop-close').focus();
+        } else {
+          if (!$focusInEl.length) {
+            $focusInEl = $popup.find('.' + Layer.bodyClass);
+            $first = $focusInEl.children().not('br').first();
+            if ($first.text() == '' || $first.attr('aria-hidden') == 'true') $first = $first.next();
+            $thisTxt = $.trim($focusInEl.text());
+            $childrenTxt = $.trim($first.text());
+            while ($focusInEl.children().not('br').length && $thisTxt.indexOf($childrenTxt) == 0) {
+              $focusInEl = $first;
+              $first = $first.children().not('br').first();
+              if ($first.text() == '' || $first.attr('aria-hidden') == 'true') $first = $first.next();
+              $thisTxt = $.trim($focusInEl.text());
+              $childrenTxt = $.trim($first.text());
+            }
+            $focusInEl.addClass(Layer.focusInClass);
+          }
+          if (!$focusInEl.is($focusableEl)) $focusInEl.attr('tabindex', -1);
+          $focusInEl.focus();
+        }
+      }
+    };
+
+    setTimeout(function () {
+      //웹접근성
+      $(Layer.etcCont).attr('aria-hidden', true);
+      if (Layer.openPop.length && $lastPop) $($lastPop).attr('aria-hidden', true);
+      const $tit = $popup.find('.' + Layer.headClass + ' h1');
+      if ($tit.length) {
+        if ($tit.attr('id') == undefined) {
+          $tit.attr('id', $id + 'Label');
+          $popup.attr('aria-labelledby', $id + 'Label');
+        } else {
+          $popup.attr('aria-labelledby', $tit.attr('id'));
+        }
+      }
+
+      //popup(bottom:select)의 여러개의 tab-panel 높이 동일하게(안그럼 탭클릭 시 왔다리 갔다리함)
+      // if ($popup.hasClass('bottom') && $popup.find('.tab-panel').length > 1) {
+      //   $popup.sameHeight('.tab-panel');
+      // }
+
+      //팝업안 swiper
+      if ($popup.find('.ui-swiper').length) ui.Swiper.update($popup.find('.ui-swiper'));
+
+      //열기
+      Body.lock();
+      $popup.addClass(Layer.showClass);
+      setTimeout(function () {
+        $popup.addClass(Layer.showClass + '-end');
+      }, $showDelay);
+      const $popSclWrap = $popWrap.hasClass('pop-body-scroll') ? $popup.find('.' + Layer.bodyClass) : $popWrap;
+      $popSclWrap.scrollTop(0);
+
+      //height swipe 기능
+      if ($popup.hasClass('is-swipe') && !$popup.hasClass('is-swipe__init')) {
+        $popup.addClass('is-swipe__init');
+        Layer.bottomTouch(tar);
+      }
+
+      //iframe
+      if ($('iframe.load-height').length) ui.Util.iframe();
+
+      //focus
+      if (!ui.Mobile.any()) Layer.focusMove(tar);
+
+      //position
+      Layer.position(tar);
+      let fixedChkIdx = 0;
+      const fixedChk = function () {
+        if (fixedChkIdx > 5) return;
+        Layer.fixed($popWrap);
+        fixedChkIdx += 1;
+        setTimeout(function () {
+          fixedChk();
+        }, 100);
+      };
+      fixedChk();
+
+      //resize
+      setTimeout(function () {
+        Layer.resize();
+        ui.Tab.resize();
+      }, 10);
+
+      //callback
+      setTimeout(function () {
+        $FocusEvt();
+        if (!!callback) callback();
+        $popup.trigger('Layer.show');
+      }, $callbackDelay);
+      Layer.opening--;
+    }, $openDelay);
+  },
+  close: function (tar, callback, callbackTime) {
+    const $popup = $(tar);
+    if (!$popup.hasClass(Layer.showClass)) return console.log(tar, '해당팝업 안열려있음');
+    if ($popup.hasClass('morphing') && !$popup.hasClass('morphing-close')) {
+      Layer.morphing.close(tar, callback);
+      return;
+    }
+    const $id = $popup.attr('id');
+    let $closeDelay = 510;
+    let $callbackDelay = !!callbackTime ? callbackTime : 510;
+    let $lastPop = '';
+    const $visible = $('.' + Layer.popClass + '.' + Layer.showClass).length;
+
+    Layer.openPop.splice(Layer.openPop.indexOf('#' + $id), 1);
+    if (Layer.openPop.length) $lastPop = Layer.openPop[Layer.openPop.length - 1];
+    if (!$popup.hasClass(Layer.alertClass)) {
+      if (Layer.openPop.length) {
+        let $last;
+        $.each(Layer.openPop, function () {
+          const $this = '' + this;
+          if (!$($this).hasClass(Layer.alertClass)) $last = $this;
+        });
+        $($last).addClass(Layer.lastPopClass);
+      }
+      $popup.removeClass(Layer.lastPopClass);
+    }
+    if ($visible == 1) {
+      Body.unlock();
+      $(Layer.etcCont).removeAttr('aria-hidden');
+    }
+    if ($lastPop != '') $($lastPop).attr('aria-hidden', false);
+
+    //포커스
+    const $focusEvt = function () {
+      const $returnFocus = $popup.data('returnFocus');
+      if ($returnFocus != undefined) {
+        $returnFocus.removeClass(Layer.focusedClass).focus();
+        if ($returnFocus.hasClass('btn-select')) $returnFocus.closest('.select').removeClass('focused');
+        //플루팅 버튼
+        if ($returnFocus.closest('.floating-btn').length && $returnFocus.closest('.floating-btn').hasClass('pop-on')) {
+          $returnFocus.closest('.floating-btn').removeCss('z-index').removeClass('pop-on');
+        }
+      } else {
+        //리턴 포커스가 없을때
+        if ($('#header').length) {
+          if ($('.head-back').length) {
+            $('.head-back').focus();
+          } else {
+            $('#header').attr({ tabindex: 0 }).focus();
+          }
+        } else {
+          // $popup.find(':focus').blur();
+          $('#container').find($focusableEl).first().focus();
+        }
+      }
+    };
+    setTimeout(function () {
+      $focusEvt();
+    }, 100);
+
+    //ui-scroll-btn
+    const $scrollBtn = $popup.find('.ui-scroll-btn');
+    let $scrollBtnHide = false;
+    if ($scrollBtn.length && !$scrollBtn.is(':visible')) {
+      $scrollBtnHide = true;
+    }
+
+    //닫기
+    $popup.removeClass(Layer.showClass + '-end');
+    if ($popup.find('.next-foot-fixed').length) {
+      const $popWrap = $popup.find('.' + Layer.wrapClass);
+      const $popSclWrap = $popWrap.hasClass('pop-body-scroll') ? $popup.find('.' + Layer.bodyClass) : $popWrap;
+      $popSclWrap.scrollTop(0);
+    }
+    $popup.removeClass(Layer.showClass).data('focusMove', false).data('popPosition', false);
+    $popup.attr('aria-hidden', 'true').removeAttr('tabindex aria-labelledby');
+    if ($popup.hasClass('no_motion')) $closeDelay = 10;
+
+    const $closeAfter = function () {
+      $popup.removeAttr('style');
+      if ($popup.hasClass('is-swipe')) {
+        $popup.find('.' + Layer.wrapClass).removeCss('height');
+        if ($popup.hasClass('full')) $popup.removeClass('full').addClass('bottom');
+      }
+      $popup
+        .find('.' + Layer.headClass)
+        .removeAttr('style')
+        .removeClass('shadow')
+        .find('h1')
+        .removeAttr('tabindex');
+      $popup.find('.' + Layer.bodyClass).removeAttr('tabindex style');
+      $popup.find('.' + Layer.focusInClass).removeAttr('tabindex');
+      if ($popup.find('.pop-close.last_focus').length) $popup.find('.pop-close.last_focus').remove();
+
+      // 닫을 때 없어져야하는 요소
+      if ($popup.find('.' + Layer.closeRemoveClass).length) $popup.find('.' + Layer.closeRemoveClass).remove();
+
+      // 닫기 후 팝업 자체가 없어지는 케이스
+      if ($popup.hasClass(Layer.alertClass) || $popup.hasClass(Layer.selectClass) || $popup.hasClass(Layer.removePopClass)) {
+        if ($popup.hasClass(Layer.selectClass)) Layer.isSelectOpen = false;
+        if ($popup.hasClass(Layer.alertClass)) {
+          const $content = $popup.find('.message>div').html();
+          Layer.beforeCont.splice(Layer.beforeCont.indexOf($content), 1);
+        }
+        $popup.remove();
+      }
+
+      //ui-scroll-btn
+      if ($scrollBtnHide) $scrollBtn.removeAttr('style').next().hide();
+
+      // 약관
+      if ($popup.hasClass(Layer.agreePopClass)) {
+        $popup.find('.' + Layer.agreeBtnClassName).remove();
+        $popup.find('.' + Layer.agreeCheckedClassName).removeClass(Layer.agreeCheckedClassName);
+      }
+    };
+    setTimeout(function () {
+      $closeAfter();
+    }, $closeDelay);
+
+    setTimeout(function () {
+      //callback
+      if (!!callback) callback();
+
+      $popup.trigger('Layer.hide');
+    }, $callbackDelay);
+
+    /*
+    const $wrap = $popup.find('.' + Layer.wrapClass);
+    $wrap.on('transitionend', function () {
+      $closeAfter();
+      $wrap.off('transitionend');
+    });
+    */
+  },
+  resize: function () {
+    const $popup = $('.' + Layer.popClass + '.' + Layer.showClass);
+    if (!$popup.length) return;
+    const headHeight = function (headCont, contentCont) {
+      const $headH = headCont.children().outerHeight();
+      const $position = headCont.css('position');
+      const $padTop = parseInt(contentCont.css('padding-top'));
+      if ($headH > $padTop) {
+        contentCont.css('padding-top', $headH);
+      }
+    };
+    const footHeight = function (footCont, contentCont) {
+      const $footH = footCont.children().outerHeight();
+      const $padBottom = parseInt(contentCont.css('padding-bottom'));
+      if ($footH > $padBottom) {
+        contentCont.css('padding-bottom', $footH);
+      }
+    };
+    $popup.each(function () {
+      const $this = $(this);
+      const $wrap = $this.find('.' + Layer.wrapClass);
+      const $head = $wrap.find('.' + Layer.headClass);
+      const $body = $wrap.find('.' + Layer.bodyClass);
+      const $foot = $wrap.find('.' + Layer.footClass);
+      // const $tit = $head.find('h1');
+
+      $head.removeAttr('style').removeClass('shadow');
+      $body.removeAttr('tabindex style');
+
+      const $footH = $foot.outerHeight() ? $foot.outerHeight() : $foot.children().outerHeight();
+      const $bodyPdB = parseInt($body.css('padding-bottom'));
+
+      // if ($head.length) headHeight($head, $body);
+      // if ($foot.length) footHeight($foot, $body);
+      if ($foot.length && ($foot.css('position') === 'fixed' || $foot.children().css('position') === 'fixed') && $footH !== $bodyPdB) $body.css('padding-bottom', $footH);
+
+      //레이어팝업
+      //컨텐츠 스크롤이 필요할때
+      const $height = $this.height();
+      // const  $popHeight = $this.find('.'+Layer.wrapClass).outerHeight();
+      if ($this.hasClass('bottom') || $this.hasClass('modal')) $wrap.css('max-height', $height);
+
+      //팝업 헤더 shadow
+      Layer.fixed($wrap);
+
+      //바텀시트 선택요소로 스크롤
+      if ($this.hasClass(Layer.selectClass) && $this.find('.selected').length && !$wrap.hasClass('scrolling')) {
+        const $headH = $head.outerHeight();
+        const $wrapH = $wrap.outerHeight();
+        const $wrapH2 = $wrap.get(0).scrollHeight;
+        const $selected = $wrap.find('.selected');
+        const $selectedH = $selected.outerHeight();
+        const $selectedTop = $selected.position().top;
+
+        if ($wrapH < $wrapH2) {
+          $wrap.addClass('scrolling');
+          const $sclTop = $selectedTop - $wrapH + $wrapH / 2 - $selectedH / 2 + $headH / 2;
+          $wrap.animate({ scrollTop: $sclTop }, 300, function () {
+            $wrap.removeClass('scrolling');
+          });
+        }
+      }
+    });
+  },
+  fixed: function (el) {
+    //  pop fixed
+    let $wrap = $(el);
+    if ($wrap.find('.' + Layer.wrapClass).length) $wrap = $wrap.find('.' + Layer.wrapClass);
+    if ($wrap.closest('.' + Layer.wrapClass).length) $wrap = $wrap.closest('.' + Layer.wrapClass);
+    // if ($wrap.closest('.' + Layer.sclWrapClass).length) $wrap = $wrap.closest('.' + Layer.sclWrapClass);
+    const $head = $wrap.find('.' + Layer.headClass);
+    const $foot = $wrap.find('.' + Layer.footClass);
+    if ($wrap.hasClass('pop-body-scroll')) $wrap = $wrap.find('.' + Layer.bodyClass);
+    const $scrollTop = $wrap.hasClass(Layer.pageClass) ? $(window).scrollTop() : $wrap.scrollTop();
+    const $scrollHeight = $wrap.hasClass(Layer.pageClass) ? $('body').get(0).scrollHeight : $wrap[0].scrollHeight;
+    const $wrapHeight = $wrap.hasClass(Layer.pageClass) ? $(window).height() : $wrap.outerHeight();
+    const $topClassName = 'pop-top-fixed';
+    const $bottomClassName = 'pop-bottom-fixed';
+    if ($head.length) {
+      if ($scrollTop > 0) {
+        $head.addClass($topClassName);
+      } else {
+        $head.removeClass($topClassName);
+      }
+    }
+
+    if ($foot.length) {
+      if ($scrollTop + $wrapHeight >= $scrollHeight - 10) {
+        $foot.removeClass($bottomClassName);
+      } else {
+        $foot.addClass($bottomClassName);
+      }
+    }
+    const $fixed = $wrap.find('.pop-fixed');
+    const $wrapTop = $wrap.position().top;
+    if ($fixed.length) {
+      $fixed.each(function () {
+        const $this = $(this);
+        const $offsetTop = $this.data('top') !== undefined ? $this.data('top') : Math.max(0, getOffset(this).top);
+        const $topMargin = ui.Common.getTopFixedHeight($this, $topClassName);
+        let $topEl = $this;
+        const $top = $offsetTop - $wrapTop;
+        if ($scrollTop + $topMargin > $top) {
+          $this.data('top', $offsetTop);
+          $this.addClass($topClassName);
+          if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
+          if ($topMargin !== parseInt($topEl.css('top')) && $topEl.css('position') === 'fixed') $topEl.css('top', $topMargin);
+          if ($head.hasClass($topClassName)) $head.addClass('end-fixed');
+        } else {
+          $this.removeData('top');
+          if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
+          $topEl.removeCss('top');
+          $this.removeClass($topClassName);
+          if (($head.hasClass($topClassName) && $wrap.find('.' + $topClassName).length === 1) || !$wrap.find('.' + $topClassName).length) $head.removeClass('end-fixed');
+        }
+      });
+    }
+  },
+  position: function (tar) {
+    const $popup = $(tar);
+    if (!$popup.hasClass(Layer.showClass)) return false;
+    if ($popup.data('popPosition') == true) return false;
+    $popup.data('popPosition', true);
+    let $wrap = $popup.find('.' + Layer.wrapClass);
+    // if ($wrap.closest('.' + Layer.sclWrapClass).length) $wrap = $wrap.closest('.' + Layer.sclWrapClass);
+    if ($wrap.hasClass('pop-body-scroll')) $wrap = $wrap.find('.' + Layer.bodyClass);
+    let $wrapH = $wrap.outerHeight();
+    let $wrapSclH = $wrap[0].scrollHeight;
+    const $head = $popup.find('.' + Layer.headClass);
+    const $body = $popup.find('.' + Layer.bodyClass);
+    const $foot = $popup.find('.' + Layer.footClass);
+    const $btnTop = $popup.find(Layer.btnTop.button);
+    const btnTopOn = function () {
+      $btnTop.attr('aria-hidden', 'false').addClass(Layer.btnTop.onClass);
+    };
+    const btnTopOff = function () {
+      $btnTop.attr('aria-hidden', 'true').removeClass(Layer.btnTop.onClass);
+    };
+
+    const $isAgree = $popup.hasClass(Layer.agreePopClass);
+    const $isAgreeSwiper = $popup.hasClass(Layer.agreePopSwiperClass);
+    const $agreeScrollTxt = '끝까지 내려보기';
+    const $agreeCheckedTxt = '동의하기';
+    const $footBtn = $foot.find('.button');
+
+    const $agreeBtnhtml = '<button type="button" class="' + Layer.agreeBtnClassName + ' button primary">' + $agreeScrollTxt + '</button>';
+    let $agreeBodyChk = $body.find('.' + Layer.agreeCheckboxClassName);
+
+    if ($foot.length) {
+      if ($foot.css('position') === 'fixed') {
+        $body.addClass('next-foot-fixed');
+        // const $pdBottom = parseInt($body.css('padding-bottom'));
+        // const $footH = $foot.outerHeight();
+        // if ($pdBottom !== $footH) $body.css('padding-bottom', $footH);
+      } else {
+        $body.addClass('next-foot');
+      }
+
+      // btn-pop-top bottom
+      if ($btnTop.length) $btnTop.css('bottom', $foot.outerHeight());
+
+      if ($isAgree) {
+        $footBtn.each(function (i) {
+          const $this = $(this);
+          let $agreeInput = $($this.data('agree-input'));
+          const $agreeCheckedTxt2 = $footBtn.data('txt');
+          if ($agreeInput.prop('checked')) {
+            if ($agreeCheckedTxt2) {
+              if ($this.html() !== $agreeCheckedTxt2) $this.html($agreeCheckedTxt2);
+              $this.removeData('txt');
+            }
+          } else {
+            if (!$agreeCheckedTxt2) $this.data('txt', $footBtn.html());
+            $this.html($agreeCheckedTxt).addClass(Layer.agreeCheckedClassName).hide().before($agreeBtnhtml);
+            // if ($wrapH < $wrapSclH)$this.hide().before($agreeBtnhtml);
+            let $agreeBody = $body;
+            if ($isAgreeSwiper) $agreeBody = $body.find('.swiper-slide').eq(i);
+            $agreeBodyChk = $agreeBody.find('.' + Layer.agreeCheckboxClassName);
+            const $agreeBodyChkChecked = $agreeBody.find('.' + Layer.agreeCheckboxClassName + ':checked');
+            if ($agreeBodyChk.length && $agreeBodyChk.length !== $agreeBodyChkChecked.length) {
+              $this.prop('disabled', true);
+            }
+          }
+        });
+      }
+    }
+
+    const scrollElOn = function () {
+      $wrap.find('.pop-scroll-hide').addClass('hidden');
+    };
+    const showElOff = function () {
+      $wrap.find('.pop-scroll-hide').removeClass('hidden');
+    };
+
+    const $scrollBtnEvt = function (tar) {
+      const $scrollBtn = tar;
+      if (!$scrollBtn.length) return;
+      const $sclWrap = $popup.find('.' + Layer.sclWrapClass).length ? $popup.find('.' + Layer.sclWrapClass) : $popup.find('.' + Layer.wrapClass);
+      const $innerHeight = $sclWrap.height();
+      const $scrollTop = $sclWrap.scrollTop();
+      const $scrollHeight = $sclWrap[0].scrollHeight;
+      const $mainBtn = $scrollBtn.next('.button');
+      if ($innerHeight + $scrollTop + 30 > $scrollHeight) {
+        // $scrollBtn.remove();
+        $scrollBtn.hide();
+        $mainBtn.show();
+      }
+    };
+
+    const $scrollEndEvt = function (scrllTopVal) {
+      const $SclTop = $wrap.scrollTop();
+      if ($SclTop > Layer.btnTop.min) {
+        btnTopOff();
+      }
+    };
+
+    let $animation = $wrap.find('[data-animation]');
+    if ($animation.length) {
+      setTimeout(function () {
+        ui.Animation.sclCheckIn($animation, $wrap);
+      }, 500);
+    }
+
+    let $lastSclTop = 0;
+    let $timer;
+    if (!$wrap.data('_ui-init')) {
+      $wrap.data('_ui-init', true);
+      $wrap.on('scroll', function () {
+        const $this = $(this);
+        const $agreeBtn = $this.find('.' + Layer.agreeBtnClassName);
+        const $wrapSclTop = $this.scrollTop();
+        const $wrapH = $this.outerHeight();
+        const $wrapSclH = $this[0].scrollHeight;
+
+        if (!$('html').hasClass('input-focus')) scrollElOn();
+        clearTimeout($timer);
+        $timer = setTimeout(function () {
+          showElOff();
+        }, 500);
+
+        // btn-pop-top show
+        if ($btnTop.length) {
+          if ($wrapSclTop > Layer.btnTop.min) {
+            if ($('html').hasClass('input-focus') && ui.Mobile.any()) return;
+            btnTopOn();
+          } else {
+            btnTopOff();
+          }
+        }
+
+        //ui-scroll-btn
+        const $scrollBtn = $popup.find('.ui-scroll-btn');
+        if ($scrollBtn.length && $scrollBtn.is(':visible')) $scrollBtnEvt($scrollBtn);
+
+        //약관
+        if ($isAgree && $agreeBtn.length) {
+          if ($lastSclTop === 0) $lastSclTop = -1;
+          if ($wrapSclTop + $wrapH >= $wrapSclH - 10 && $lastSclTop < $wrapSclTop) {
+            $agreeBtn.each(function () {
+              const $parent = $(this).parent();
+              if ($parent.is(':visible')) {
+                $(this).next().show();
+                $(this).remove();
+              }
+            });
+          }
+          $lastSclTop = $wrapSclTop;
+        }
+
+        // 고정확인
+        Layer.fixed($this);
+
+        // bg origin
+        const $sclHead = $this.find('.ui-pop-header-bg-origin');
+        const $headH = $head.outerHeight();
+        if ($head.length && $sclHead.length) {
+          if ($sclHead.offset().top - $headH < $headH) {
+            $head.addClass('bg-origin');
+          } else {
+            $head.removeClass('bg-origin');
+          }
+        }
+
+        // title show
+        const $fadeTitle = $this.find('.' + Layer.scrollShowTitleClass);
+        const $headerTit = $head.find('h1');
+        if ($fadeTitle.length && $headerTit.length) ui.Common.scrollShowTitle($fadeTitle[0], $this[0], $head[0], $headerTit[0]);
+      });
+
+      $wrap.on(
+        'scroll',
+        _.debounce(function () {
+          $scrollEndEvt();
+        }, 1500)
+      );
+      $wrap.on('click', function () {
+        setTimeout(function () {
+          $wrap.scroll();
+        }, 50);
+      });
+
+      $wrap.on(
+        'scroll resize',
+        _.debounce(function () {
+          $animation = $wrap.find('[data-animation]');
+          if ($animation.length) ui.Animation.sclCheckIn($animation, $wrap);
+        }, 100)
+      );
+    }
+
+    Layer.resize();
+    // Layer.fixed($wrap);
+  },
+  focusMove: function (tar) {
+    if (!$(tar).hasClass(Layer.showClass)) return false;
+    if ($(tar).data('focusMove') == true) return false;
+    $(tar).data('focusMove', true);
+    const $tar = $(tar);
+    const $focusaEls = $tar.find($focusableEl);
+    let $isFirstBackTab = false;
+
+    $focusaEls.on('keydown', function (e) {
+      const $keyCode = e.keyCode ? e.keyCode : e.which;
+      const $focusable = $tar.find($focusableEl).not('.last_focus');
+      const $focusLength = $focusable.length;
+      const $firstFocus = $focusable.first();
+      const $lastFocus = $focusable.last();
+      const $index = $focusable.index(this);
+
+      $isFirstBackTab = false;
+      if ($index == $focusLength - 1) {
+        //last
+        if ($keyCode == 9) {
+          if (!e.shiftKey) {
+            $firstFocus.focus();
+            e.preventDefault();
+          }
+        }
+      } else if ($index == 0) {
+        //first
+        if ($keyCode == 9) {
+          if (e.shiftKey) {
+            $isFirstBackTab = true;
+            $lastFocus.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    });
+
+    $tar.on('keydown', function (e) {
+      const $keyCode = e.keyCode ? e.keyCode : e.which;
+      const $focusable = $tar.find($focusableEl).not('.last_focus');
+      const $lastFocus = $focusable.last();
+
+      if (e.target == this && $keyCode == 9) {
+        if (e.shiftKey) {
+          $lastFocus.focus();
+          e.preventDefault();
+        }
+      }
+    });
+
+    $(document).on('focusin', $tar.selector + ' .last_focus', function (e) {
+      const $focusable = $tar.find($focusableEl).not('.last_focus');
+      const $firstFocus = $focusable.first();
+      const $lastFocus = $focusable.last();
+      if ($isFirstBackTab) {
+        $lastFocus.focus();
+      } else {
+        $firstFocus.focus();
+      }
+    });
+  },
+  init: function () {
+    if ($('.' + Layer.popClass + '.' + Layer.showClass + '[aria-hidden="true"]').length) {
+      Layer.open('.' + Layer.popClass + '.' + Layer.showClass + '[aria-hidden="true"]');
+    }
+    const $winpop = $('.' + Layer.wrapClass + '.' + Layer.pageClass);
+    if ($winpop.length) {
+      Layer.page($winpop);
+    }
+
+    $(document).on('click', $focusableEl, function (e) {
+      Layer.openEl = e.currentTarget;
+    });
+    setTimeout(function () {
+      Layer.openEl = '';
+    }, 100);
+
+    //열기
+    $(document).on('click', '.ui-pop-open', function (e) {
+      e.preventDefault();
+      const $pop = $(this).attr('href');
+      const $currentTarget = $(e.currentTarget);
+      if (!$pop.length) return;
+      if ($($pop).hasClass('morphing')) {
+        Layer.morphing.open(this, $pop, function () {
+          $($pop).data('returnFocus', $currentTarget);
+        });
+      } else {
+        Layer.open($pop, function () {
+          $($pop).data('returnFocus', $currentTarget);
+        });
+      }
+    });
+
+    //닫기
+    $(document).on('click', '.ui-pop-close', function (e) {
+      e.preventDefault();
+      let $pop = $(this).attr('href');
+      if ($pop == '#' || $pop == '#none' || $pop == undefined) $pop = $(this).closest('.' + Layer.popClass);
+      if ($pop.length) Layer.close($pop);
+    });
+
+    /*
+    $(document).on('click', '.popup .pop-wrap', function (e) {
+      const $this = $(this);
+      let $wrap = $this;
+      if ($wrap.closest('.' + Layer.sclWrapClass).length) $wrap = $wrap.closest('.' + Layer.sclWrapClass);
+      if ($wrap.hasClass('pop-body-scroll')) $wrap = $wrap.find('.' + Layer.bodyClass);
+      $wrap.scroll();
+    });
+    */
+
+    // btn-pop-top
+    $(document).on('click', '.btn-pop-top', function (e) {
+      e.preventDefault();
+      const $this = $(this);
+      let $wrap = $this.closest('.' + Layer.wrapClass);
+      // if ($wrap.closest('.' + Layer.sclWrapClass).length) $wrap = $wrap.closest('.' + Layer.sclWrapClass);
+      if ($wrap.hasClass('pop-body-scroll')) $wrap = $wrap.find('.' + Layer.bodyClass);
+      $wrap.animate({ scrollTop: 0 }, Layer.btnTop.scrollSpeed);
+    });
+
+    Layer.keyEvt();
+    Layer.selectUI();
+
+    $(document).on('click', '[data-popup]', function (e) {
+      e.preventDefault();
+      const $popup = $(this).data('popup');
+      Layer.load($popup, 'full');
+    });
+    $(document).on('click', '[data-popup-full]', function (e) {
+      e.preventDefault();
+      const $popup = $(this).data('popup-full');
+      Layer.load($popup, 'full');
+    });
+    $(document).on('click', '[data-popup-modal]', function (e) {
+      e.preventDefault();
+      const $popup = $(this).data('popup-modal');
+      Layer.load($popup, 'modal');
+    });
+    $(document).on('click', '[data-popup-bottom]', function (e) {
+      e.preventDefault();
+      const $popup = $(this).data('popup-bottom');
+      Layer.load($popup, 'bottom');
+    });
+    $(document).on('click', '[data-popup-left]', function (e) {
+      e.preventDefault();
+      const $popup = $(this).data('popup-left');
+      Layer.load($popup, 'side-left');
+    });
+    $(document).on('click', '[data-popup-right]', function (e) {
+      e.preventDefault();
+      const $popup = $(this).data('popup-right');
+      Layer.load($popup, 'side-right');
+    });
+
+    // 알람박스 닫기
+    $(document).on('click', '.alarm-box .close', function (e) {
+      e.preventDefault();
+      const $box = $(this).closest('.alarm-box');
+      $box.removeClass('on');
+      $box.on('transitionend', function () {
+        $(this).remove();
+      });
+    });
+
+    // 약관
+    $(document).on('click', '[data-agree-pop]', function (e) {
+      const $this = $(this);
+      const $thisId = $this.attr('id');
+      const $pop = $this.data('agree-pop');
+      if ($this.prop('checked')) {
+        Layer.agree('#' + $thisId);
+        return false;
+      } else {
+        const $popChk = $($pop).find('.' + Layer.agreeCheckboxClassName);
+        if ($popChk.length) $popChk.prop('checked', false);
+      }
+    });
+    $(document).on('click', '[data-agree-check]', function (e) {
+      const $this = $(this);
+      const $check = $this.data('agree-check');
+      if ($this.prop('checked')) {
+        Layer.agree($check);
+        return false;
+      }
+    });
+
+    $(document).on('change', '.' + Layer.agreeCheckboxClassName, function () {
+      const $this = $(this);
+      const $chkBody = $this.closest('.swiper-slide').length ? $this.closest('.swiper-slide') : $this.closest('.' + Layer.bodyClass);
+      const $idx = $chkBody.hasClass('swiper-slide') ? $chkBody.index('.swiper-slide') : 0;
+      const $chk = $chkBody.find('.' + Layer.agreeCheckboxClassName);
+      const $chkChecked = $chkBody.find('.' + Layer.agreeCheckboxClassName + ':checked');
+      const $popup = $chkBody.closest('.' + Layer.popClass);
+      const $footBtn = $popup.find('.' + Layer.agreeCheckedClassName);
+      const $chkBtn = $footBtn.eq($idx);
+      if ($chk.length === $chkChecked.length) {
+        $chkBtn.prop('disabled', false);
+      } else {
+        $chkBtn.prop('disabled', true);
+      }
+    });
+
+    $(document).on('click', '.' + Layer.agreeBtnClassName, function (e) {
+      e.preventDefault();
+      const $wrap = $(this).closest('.' + Layer.wrapClass);
+      const $sclMove = $wrap[0].scrollHeight - $wrap.outerHeight();
+      $wrap.animate({ scrollTop: $sclMove }, 300);
+      $(this)
+        .parent()
+        .find('.' + Layer.agreeCheckedClassName)
+        .show();
+      $(this).remove();
+    });
+    $(document).on('click', '.' + Layer.agreeCheckedClassName, function (e) {
+      e.preventDefault();
+      const $pop = $(this).closest('.' + Layer.popClass);
+      const $isAgreeSwiper = $pop.hasClass(Layer.agreePopSwiperClass);
+      const $btnInput = $($(this).data('agree-input'));
+      $btnInput.prop('checked', true).change();
+      if ($isAgreeSwiper) {
+        const $swiper = $pop.find('.agree-swiper').data('swiper');
+        const $swiperIdx = $swiper.realIndex;
+        if ($swiperIdx < $swiper.slides.length - 1) {
+          $swiper.slideTo($swiperIdx + 1, 300);
+        } else {
+          Layer.close($pop);
+        }
+      }
+    });
+
+    //pdf
+    $(document).on('click', '[data-agree-pdf]', function (e) {
+      e.preventDefault();
+      let $url = $(this).data('agree-pdf');
+      if (!$url) return;
+      if ($url.indexOf('.pdf') !== $url.length - 4) $url = $url + '.pdf';
+      let $title = '약관상세';
+      const $pdfTit = $(this).data('agree-pdf-title');
+      if ($pdfTit) $title = $pdfTit;
+      Layer.pdf($url, $title);
+    });
   }
 };
