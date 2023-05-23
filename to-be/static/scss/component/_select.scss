@@ -288,10 +288,10 @@
     }
   }
   &.selected > a {
-    color: var(--strong-txt-color);
-    .select-item-sub {
-      color: var(--base-txt-color);
-    }
+    color: var(--primary-color);
+    // .select-item-sub {
+    //   color: var(--base-txt-color);
+    // }
     &:after {
       opacity: 1;
     }

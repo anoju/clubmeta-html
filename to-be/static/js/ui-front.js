@@ -10,6 +10,9 @@ const ui = {
     wrap: '.page',
     mainWrap: '.main-page',
     header: '.page-head',
+    headerInner: '.head-inner',
+    headerLeft: '.head-left',
+    headerRight: '.head-right',
     title: '.head-title',
     body: '.page-body',
     btnTop: '.btn-page-top',
@@ -413,7 +416,6 @@ ui.common = {
       if (!$(this).is(':visible')) return;
       const $head = $(this).find(ui.className.header);
       const $body = $head.siblings(ui.className.body);
-      console.log($head, $body);
       if ($head.length && $body.length && $head.css('position') === 'fixed') {
         $body.css('padding-top', $head.outerHeight());
       }
@@ -2076,12 +2078,13 @@ ui.touch = {
     });
 
     // bottom fixed focus
+    /*
     let $startY = null;
     let isParent = false;
-    const $bottomInp = $('.pop-foot, ' + ui.className.bottomFixed).find('input, textarea');
+    const $bottomInp = $(ui.className.bottomFixed).find('input, textarea');
     $(document).on('touchstart', function (e) {
       const $target = $(e.target);
-      if ($target.closest('.pop-foot').length || $target.closest(ui.className.bottomFixed).length) {
+      if ($target.closest(ui.className.bottomFixed).length) {
         isParent = true;
       } else {
         if ($isFocus && $bottomInp.is(':focus')) {
@@ -2102,7 +2105,6 @@ ui.touch = {
         const $target = $(e.target);
         const $clientY = e.touches[0].clientY;
         let $closest;
-        if ($target.closest('.pop-foot').length) $closest = $target.closest('.pop-foot');
         if ($target.closest(ui.className.bottomFixed).length) $closest = $target.closest(ui.className.bottomFixed).children();
         if (!$closest) return;
         const $closestTop = $target.closest(ui.className.popup).length ? $closest.offset().top : $closest.offset().top - $(window).scrollTop();
@@ -2112,6 +2114,7 @@ ui.touch = {
         }
       }
     });
+    */
   },
   init: function () {
     if ($(ui.touch.wrapClass).length) {
@@ -2186,7 +2189,7 @@ ui.form = {
         let $wrapClass;
         if ($this.closest('.' + Layer.popClass).length) {
           isPop = true;
-          $wrapClass = $this.closest('.' + Layer.sclWrapClass).length ? Layer.sclWrapClass : Layer.wrapClass;
+          $wrapClass = Layer.wrapClass;
           $wrap = $this.closest('.' + $wrapClass);
         }
         const $wrapH = $wrap.height();
@@ -2195,7 +2198,7 @@ ui.form = {
         const $elHeight = $el.outerHeight();
         const $elEnd = $elTop + $elHeight;
         const $topGap = isPop ? getTopFixedHeight($this, 'pop-top-fixed') : getTopFixedHeight($this);
-        const $bottomGap = isPop ? $wrap.find('.' + Layer.footClass).outerHeight() : $(ui.className.bottomFixedSpace).outerHeight();
+        const $bottomGap = $wrap.find(ui.className.bottomFixedSpace).length ? $wrap.find(ui.className.bottomFixedSpace).outerHeight() : $wrap.find('.' + Layer.footClass).outerHeight();
         let $move;
         const $start = ($topGap ? $topGap : 0) + 10;
         const $end = $wrapH - ($bottomGap ? $bottomGap : 0) - 10;
@@ -2512,13 +2515,6 @@ ui.form = {
     const $lineH = parseInt($(elem).css('line-height'));
     const $pd = parseInt($(elem).css('padding-top')) + parseInt($(elem).css('padding-bottom'));
     $(elem).css('height', $count * $lineH + $pd);
-
-    if ($('.body-dim').length) {
-      let $closest = $(elem).closest('.pop-foot');
-      if ($(elem).closest(ui.className.bottomFixed).length) $closest = $(elem).closest(ui.className.bottomFixed).children();
-      const $closestH = $closest.outerHeight();
-      $('.body-dim').css('bottom', $closestH);
-    }
   },
   textarea: function () {
     // ui.form.textareaSpace();
@@ -4185,8 +4181,8 @@ ui.animation = {
       let $bottomFixedH = 0;
       if ($isWin && $('.bottom-fixed-space').length) {
         $bottomFixedH = $('.bottom-fixed-space').height();
-      } else if ($wrap.find('.pop-foot').length) {
-        $bottomFixedH = $wrap.find('.pop-foot').height();
+      } else if ($wrap.find(ui.className.bottomFixed + ':visible').length) {
+        $bottomFixedH = $wrap.find(ui.className.bottomFixed + ':visible').height();
       }
       const $wrapTop = $scrollTop + $topFixedH;
       const $wrapCenter = $scrollTop + ($wHeight - $topFixedH - $bottomFixedH) / 2;
@@ -4597,17 +4593,17 @@ const Loading = {
 const Layer = {
   id: 'uiLayer',
   //className: {
-  popClass: 'popup',
-  pageClass: 'main-page',
-  wrapClass: 'page',
-  sclWrapClass: 'pop-scl-wrap',
-  headClass: 'page-head',
-  headInnerClass: 'head-inner',
-  bodyClass: 'page-body',
-  footClass: 'pop-foot',
+  popClass: ui.className.popup.slice(1),
+  pageClass: ui.className.mainWrap.slice(1),
+  wrapClass: ui.className.wrap.slice(1),
+  headClass: ui.className.header.slice(1),
+  headInnerClass: ui.className.headerInner.slice(1),
+  headLeftClass: ui.className.headerLeft.slice(1),
+  headRightClass: ui.className.headerRight.slice(1),
+  bodyClass: ui.className.body.slice(1),
   innerClass: 'section',
   showClass: 'show',
-  etcCont: '.main-page:visible .page',
+  etcCont: ui.className.wrap + ':visible',
   focusedClass: 'pop__focused',
   focusInClass: 'ui-focus-in',
   removePopClass: 'ui-pop-remove',
@@ -4774,6 +4770,15 @@ const Layer = {
       //열기
       Body.lock();
       $popup.addClass(Layer.showClass);
+      $popWrap.scrollTop(0);
+      /*
+      const $animation = $popWrap.find('[data-animation]');
+      if ($animation.length) {
+        $animation.each(function () {
+          $(this).removeClass($(this).data('animation'));
+        });
+      }
+      */
 
       //iframe
       if ($popup.find('iframe.load-height').length) ui.util.iframe();
@@ -4816,11 +4821,15 @@ const Layer = {
     return dfd.promise();
   },
   close: function (tar, callback, callbackTime) {
+    const dfd = $.Deferred();
     const $popup = $(tar);
-    if (!$popup.hasClass(Layer.showClass)) return console.log(tar, '해당팝업 안열려있음');
     if ($popup.hasClass('morphing') && !$popup.hasClass('morphing-close')) {
       Layer.morphing.close(tar, callback);
       return;
+    }
+    if (!$popup.hasClass(Layer.showClass)) {
+      dfd.reject();
+      return console.log(tar, '해당팝업 안열려있음');
     }
     const $id = $popup.attr('id');
     let $closeDelay = 510;
@@ -4877,14 +4886,14 @@ const Layer = {
 
     //닫기
     $popup.removeClass(Layer.showClass + '-end');
+    /*
     if ($popup.find('.next-foot-fixed').length) {
       const $popWrap = $popup.find('.' + Layer.wrapClass);
-      const $popSclWrap = $popWrap.hasClass('pop-body-scroll') ? $popup.find('.' + Layer.bodyClass) : $popWrap;
-      $popSclWrap.scrollTop(0);
+      $popWrap.scrollTop(0);
     }
+    */
     $popup.removeClass(Layer.showClass).data('focusMove', false).data('popPosition', false);
     $popup.attr('aria-hidden', 'true').removeAttr('tabindex aria-labelledby');
-    if ($popup.hasClass('no_motion')) $closeDelay = 10;
 
     const $closeAfter = function () {
       $popup.removeAttr('style');
@@ -4895,7 +4904,6 @@ const Layer = {
       $popup
         .find('.' + Layer.headClass)
         .removeAttr('style')
-        .removeClass('shadow')
         .find('h1')
         .removeAttr('tabindex');
       $popup.find('.' + Layer.bodyClass).removeAttr('tabindex style');
@@ -4914,16 +4922,16 @@ const Layer = {
         $popup.remove();
       }
     };
-    setTimeout(function () {
+
+    const transitionEndEvt = function () {
       $closeAfter();
-    }, $closeDelay);
 
-    setTimeout(function () {
-      //callback
-      if (!!callback) callback();
-
+      // $popup.addClass(Layer.showClass + '-end');
       $popup.trigger('Layer.hide');
-    }, $callbackDelay);
+      dfd.resolve();
+      $popup.off('transitionend', transitionEndEvt);
+    };
+    $popup.on('transitionend', transitionEndEvt);
 
     /*
     const $wrap = $popup.find('.' + Layer.wrapClass);
@@ -4932,13 +4940,14 @@ const Layer = {
       $wrap.off('transitionend');
     });
     */
+    return dfd.promise();
   },
 
   alertHtml: function (type, popId, btnActionId, btnCancelId) {
     let $html = '<div id="' + popId + '" class="' + Layer.popClass + ' modal alert ' + Layer.alertClass + '" role="dialog" aria-hidden="true">';
     $html += '<article class="' + Layer.wrapClass + '">';
-    $html += '<div class="' + Layer.headClass + '"><div><h1>안내</h1></div></div>';
-    $html += '<div class="' + Layer.bodyClass + '">';
+    $html += '<header class="' + Layer.headClass + '"><div class="' + Layer.headInnerClass + '"><div class="' + Layer.headLeftClass + ' full"><h1>안내</h1></div></div></header>';
+    $html += '<main class="' + Layer.bodyClass + '">';
     $html += '<div class="' + Layer.innerClass + '">';
     if (type === 'prompt') {
       $html += '<div class="form-lbl mt-0">';
@@ -4953,9 +4962,9 @@ const Layer = {
       $html += '</div>';
     }
     $html += '</div>';
-    $html += '</div>';
-    $html += '<div class="' + Layer.footClass + '">';
-    $html += '<div class="flex">';
+    $html += '</main>';
+    $html += '<div class="btn-wrap bottom-fixed">';
+    $html += '<div class="flex full">';
     if (type === 'confirm' || type === 'prompt') {
       $html += '<button type="button" id="' + btnCancelId + '" class="button gray">취소</button>';
     }
@@ -5108,13 +5117,17 @@ const Layer = {
     };
     $popHtml += '<div id="' + $popId + '" class="' + Layer.popClass + ' ' + ($isFullPop ? 'full' : 'bottom') + ($isTouch || $isTouchMove ? ' is-swipe' : '') + ($isTouchMove ? ' _touch-move' : '') + ' ' + Layer.selectClass + '" role="dialog" aria-hidden="true">';
     $popHtml += '<article class="' + Layer.wrapClass + '">';
-    $popHtml += '<div class="' + Layer.headClass + '">';
-    $popHtml += '<div>';
+    $popHtml += '<header class="' + Layer.headClass + '">';
+    $popHtml += '<div class="' + Layer.headInnerClass + '">';
+    $popHtml += '<div class="' + Layer.headLeftClass + ' full">';
     $popHtml += '<h1>' + $title + '</h1>';
-    $popHtml += '<a href="#" class="head-close button not ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
+    $popHtml += '</div>';
+    $popHtml += '<div class="' + Layer.headRightClass + '">';
+    $popHtml += '<a href="#" class="head-close head-btn ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
     $popHtml += '</div>';
     $popHtml += '</div>';
-    $popHtml += '<div class="' + Layer.bodyClass + '">';
+    $popHtml += '</header>';
+    $popHtml += '<main class="' + Layer.bodyClass + '">';
 
     $popHtml += '<ul class="select-item-wrap';
     if (!!col) $popHtml += ' col' + col;
@@ -5150,7 +5163,7 @@ const Layer = {
       }
     }
     $popHtml += '</ul>';
-    $popHtml += '</div>';
+    $popHtml += '</main>';
     $popHtml += '</article>';
     $popHtml += '</div>';
 
@@ -5168,7 +5181,7 @@ const Layer = {
         const $btnVal = $(this).data('value');
         // const $btnTxt = $(this).text();
         $(this).parent().addClass('selected').closest('li').siblings().find('.selected').removeClass('selected');
-        ui.Form.selectSetVal($target, $btnVal);
+        ui.form.selectSetVal($target, $btnVal);
         Layer.close('#' + $popId, function () {
           $target.change();
         });
@@ -5190,30 +5203,6 @@ const Layer = {
         $txtLengthArry.push($optTxt.length);
       }
     });
-    /*
-    const $maxTxtLength = Math.max.apply(null, $txtLengthArry);
- 
-     //들어갈수 있는 글자수 체크
-    const inWidthTxt = function(width,col){
-      const  _fontSize = 14;
-      const _paddingBorder = 28;
-      const _val = ((width/col)-_paddingBorder)/(_fontSize*0.9);
-      return Math.floor(_val);
-    };
-    const $winW = $(window).width();
-    const $contW = $winW - (17*2);
-    const $inTxt1 = inWidthTxt($contW,3);
-    const $inTxt2 = inWidthTxt($contW,2);
-
-    //글자수에따른 팝업 분류
-    if($maxTxtLength <= $inTxt1){
-      Layer.select($select,3);
-    }else if($maxTxtLength <= $inTxt2){
-      Layer.select($select,2);
-    }else{
-      Layer.select($select);
-    }
-    */
     Layer.select($select);
 
     const $pop = $select.data('popup');
@@ -5303,30 +5292,28 @@ const Layer = {
         contentCont.css('padding-top', $headH);
       }
     };
-    const footHeight = function (footCont, contentCont) {
-      const $footH = footCont.children().outerHeight();
-      const $padBottom = parseInt(contentCont.css('padding-bottom'));
-      if ($footH > $padBottom) {
-        contentCont.css('padding-bottom', $footH);
-      }
+    const bottomFixedHeight = function (fixedEl, bodyEl) {
+      const $bottomFixedH = fixedEl.children().outerHeight();
+      const $padBottom = parseInt(bodyEl.css('padding-bottom'));
+      if ($bottomFixedH > $padBottom) bodyEl.css('padding-bottom', $bottomFixedH);
     };
     $popup.each(function () {
       const $this = $(this);
       const $wrap = $this.find('.' + Layer.wrapClass);
       const $head = $wrap.find('.' + Layer.headClass);
       const $body = $wrap.find('.' + Layer.bodyClass);
-      const $foot = $wrap.find('.' + Layer.footClass);
+      const $bottomFixed = $body.siblings(ui.className.bottomFixed);
       // const $tit = $head.find('h1');
 
-      $head.removeAttr('style').removeClass('shadow');
+      $head.removeAttr('style');
       $body.removeAttr('tabindex style');
 
-      const $footH = $foot.outerHeight() ? $foot.outerHeight() : $foot.children().outerHeight();
+      const $bottomFixedH = $bottomFixed.outerHeight() ? $bottomFixed.outerHeight() : $bottomFixed.children().outerHeight();
       const $bodyPdB = parseInt($body.css('padding-bottom'));
 
       // if ($head.length) headHeight($head, $body);
-      // if ($foot.length) footHeight($foot, $body);
-      if ($foot.length && ($foot.css('position') === 'fixed' || $foot.children().css('position') === 'fixed') && $footH !== $bodyPdB) $body.css('padding-bottom', $footH);
+      // if ($bottomFixed.length) bottomFixedHeight($bottomFixed, $body);
+      if ($bottomFixed.length && ($bottomFixed.css('position') === 'fixed' || $bottomFixed.children().css('position') === 'fixed') && $bottomFixedH !== $bodyPdB) $body.css('padding-bottom', $bottomFixedH);
 
       //레이어팝업
       //컨텐츠 스크롤이 필요할때
@@ -5334,7 +5321,7 @@ const Layer = {
       // const  $popHeight = $this.find('.'+Layer.wrapClass).outerHeight();
       if ($this.hasClass('bottom') || $this.hasClass('modal')) $wrap.css('max-height', $height);
 
-      //팝업 헤더 shadow
+      //팝업 fixed
       Layer.fixed($wrap);
 
       //바텀시트 선택요소로 스크롤
@@ -5361,10 +5348,9 @@ const Layer = {
     let $wrap = $(el);
     if ($wrap.find('.' + Layer.wrapClass).length) $wrap = $wrap.find('.' + Layer.wrapClass);
     if ($wrap.closest('.' + Layer.wrapClass).length) $wrap = $wrap.closest('.' + Layer.wrapClass);
-    // if ($wrap.closest('.' + Layer.sclWrapClass).length) $wrap = $wrap.closest('.' + Layer.sclWrapClass);
     const $head = $wrap.find('.' + Layer.headClass);
-    const $foot = $wrap.find('.' + Layer.footClass);
-    if ($wrap.hasClass('pop-body-scroll')) $wrap = $wrap.find('.' + Layer.bodyClass);
+    const $body = $wrap.find('.' + Layer.bodyClass);
+    const $bottomFixed = $body.siblings(ui.className.bottomFixed);
     const $scrollTop = $wrap.hasClass(Layer.pageClass) ? $(window).scrollTop() : $wrap.scrollTop();
     const $scrollHeight = $wrap.hasClass(Layer.pageClass) ? $('body').get(0).scrollHeight : $wrap[0].scrollHeight;
     const $wrapHeight = $wrap.hasClass(Layer.pageClass) ? $(window).height() : $wrap.outerHeight();
@@ -5378,11 +5364,11 @@ const Layer = {
       }
     }
 
-    if ($foot.length) {
+    if ($bottomFixed.length) {
       if ($scrollTop + $wrapHeight >= $scrollHeight - 10) {
-        $foot.removeClass($bottomClassName);
+        $bottomFixed.removeClass($bottomClassName);
       } else {
-        $foot.addClass($bottomClassName);
+        $bottomFixed.addClass($bottomClassName);
       }
     }
     const $fixed = $wrap.find('.pop-fixed');
@@ -5399,13 +5385,13 @@ const Layer = {
           $this.addClass($topClassName);
           if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
           if ($topMargin !== parseInt($topEl.css('top')) && $topEl.css('position') === 'fixed') $topEl.css('top', $topMargin);
-          if ($head.hasClass($topClassName)) $head.addClass('end-fixed');
+          // if ($head.hasClass($topClassName)) $head.addClass('end-fixed');
         } else {
           $this.removeData('top');
           if ($topEl.css('position') !== 'fixed' && $topEl.css('position') !== 'sticky') $topEl = $topEl.children();
           $topEl.removeCss('top');
           $this.removeClass($topClassName);
-          if (($head.hasClass($topClassName) && $wrap.find('.' + $topClassName).length === 1) || !$wrap.find('.' + $topClassName).length) $head.removeClass('end-fixed');
+          // if (($head.hasClass($topClassName) && $wrap.find('.' + $topClassName).length === 1) || !$wrap.find('.' + $topClassName).length) $head.removeClass('end-fixed');
         }
       });
     }
@@ -5416,8 +5402,6 @@ const Layer = {
     if ($popup.data('popPosition') == true) return false;
     $popup.data('popPosition', true);
     let $wrap = $popup.find('.' + Layer.wrapClass);
-    // if ($wrap.closest('.' + Layer.sclWrapClass).length) $wrap = $wrap.closest('.' + Layer.sclWrapClass);
-    if ($wrap.hasClass('pop-body-scroll')) $wrap = $wrap.find('.' + Layer.bodyClass);
     let $wrapH = $wrap.outerHeight();
     let $wrapSclH = $wrap[0].scrollHeight;
     const $head = $popup.find('.' + Layer.headClass);
