@@ -288,6 +288,7 @@
     }
   }
   &.selected > a {
+    font-weight: 500;
     color: var(--primary-color);
     // .select-item-sub {
     //   color: var(--base-txt-color);

@@ -977,7 +977,7 @@ ui.btnTop = {
   min: 100,
   onClass: 'on',
   hoverClass: 'hover',
-  scrollSpeed: 300,
+  scrollSpeed: 200,
   append: function () {
     const $wrap = $(ui.className.wrap);
     if (!$wrap.length) return;
@@ -1006,10 +1006,13 @@ ui.btnTop = {
         e.preventDefault();
         const $page = $(this).closest(ui.className.wrap);
         if ($page.closest(ui.className.popup).length) {
-          const $body = $page.find(ui.className.body);
-          ui.scroll.wrapTop($body, 0, ui.btnTop.scrollSpeed);
+          ui.scroll.wrapTop($page, 0, ui.btnTop.scrollSpeed).then(function () {
+            console.log('팝업 스크롤');
+          });
         } else {
-          ui.scroll.top(0, ui.btnTop.scrollSpeed);
+          ui.scroll.top(0, ui.btnTop.scrollSpeed).then(function () {
+            console.log('페이지 스크롤');
+          });
           $page.find($focusableEl).first().focus();
         }
       })
@@ -2197,7 +2200,7 @@ ui.form = {
         $elTop = isPop ? $elTop - $wrap.offset().top : $elTop - $scrollTop;
         const $elHeight = $el.outerHeight();
         const $elEnd = $elTop + $elHeight;
-        const $topGap = isPop ? getTopFixedHeight($this, 'pop-top-fixed') : getTopFixedHeight($this);
+        const $topGap = isPop ? getTopFixedHeight($this, 'top-fixed') : getTopFixedHeight($this);
         const $bottomGap = $wrap.find(ui.className.bottomFixedSpace).length ? $wrap.find(ui.className.bottomFixedSpace).outerHeight() : $wrap.find('.' + Layer.footClass).outerHeight();
         let $move;
         const $start = ($topGap ? $topGap : 0) + 10;
@@ -3872,10 +3875,15 @@ ui.scroll = {
     }
     return $obj;
   },
-  top: function (val, speed, callback) {
-    ui.scroll.wrapTop('html, body', val, speed, callback);
+  top: function (val, speed) {
+    const dfd = $.Deferred();
+    ui.scroll.wrapTop('html, body', val, speed).then(function () {
+      dfd.resolve();
+    });
+    return dfd.promise();
   },
-  wrapTop: function (wrap, val, speed, callback) {
+  wrapTop: function (wrap, val, speed) {
+    const dfd = $.Deferred();
     let $top = 0;
     if (speed == undefined) speed = 300;
     if ($.isNumeric(val)) {
@@ -3886,8 +3894,9 @@ ui.scroll = {
     $(wrap)
       .stop(true, false)
       .animate({ scrollTop: $top }, speed, function () {
-        if (!!callback) callback();
+        dfd.resolve();
       });
+    return dfd.promise();
   },
   center: function (el, speed, direction) {
     let $parent = $(el).parent();
@@ -4177,7 +4186,7 @@ ui.animation = {
       const $wrap = $(wrap);
       const $wHeight = $wrap.height();
       const $scrollTop = $wrap.scrollTop();
-      const $topFixedH = $isWin ? getTopFixedHeight($el) : getTopFixedHeight($el, 'pop-top-fixed');
+      const $topFixedH = $isWin ? getTopFixedHeight($el) : getTopFixedHeight($el, 'top-fixed');
       let $bottomFixedH = 0;
       if ($isWin && $('.bottom-fixed-space').length) {
         $bottomFixedH = $('.bottom-fixed-space').height();
@@ -4807,7 +4816,7 @@ const Layer = {
 
       //callback
       const transitionEndEvt = function () {
-        // $popup.addClass(Layer.showClass + '-end');
+        $popup.addClass(Layer.showClass + '-end');
         $FocusEvt();
         $popup.trigger('Layer.show');
         dfd.resolve();
@@ -5354,8 +5363,8 @@ const Layer = {
     const $scrollTop = $wrap.hasClass(Layer.pageClass) ? $(window).scrollTop() : $wrap.scrollTop();
     const $scrollHeight = $wrap.hasClass(Layer.pageClass) ? $('body').get(0).scrollHeight : $wrap[0].scrollHeight;
     const $wrapHeight = $wrap.hasClass(Layer.pageClass) ? $(window).height() : $wrap.outerHeight();
-    const $topClassName = 'pop-top-fixed';
-    const $bottomClassName = 'pop-bottom-fixed';
+    const $topClassName = 'top-fixed';
+    const $bottomEndClassName = 'end-fixed';
     if ($head.length) {
       if ($scrollTop > 0) {
         $head.addClass($topClassName);
@@ -5366,9 +5375,9 @@ const Layer = {
 
     if ($bottomFixed.length) {
       if ($scrollTop + $wrapHeight >= $scrollHeight - 10) {
-        $bottomFixed.removeClass($bottomClassName);
+        $bottomFixed.addClass($bottomEndClassName);
       } else {
-        $bottomFixed.addClass($bottomClassName);
+        $bottomFixed.removeClass($bottomEndClassName);
       }
     }
     const $fixed = $wrap.find('.pop-fixed');
@@ -5406,6 +5415,15 @@ const Layer = {
     let $wrapSclH = $wrap[0].scrollHeight;
     const $head = $popup.find('.' + Layer.headClass);
     const $body = $popup.find('.' + Layer.bodyClass);
+    const $bottomFixed = $body.siblings(ui.className.bottomFixed);
+    let $bottomFixedH = 0;
+    if ($bottomFixed.length) {
+      $bottomFixedH = $bottomFixed.children().css('position') === 'fixed' ? $bottomFixed.children().outerHeight() : $bottomFixed.outerHeight();
+    }
+
+    const $btnTop = $popup.find(ui.className.btnTop);
+    console.log($body, $bottomFixed, $bottomFixedH);
+    if ($btnTop.length) $btnTop.closest('.floating-btn').css('bottom', !$bottomFixedH ? 24 : $bottomFixedH + 10);
 
     let $animation = $wrap.find('[data-animation]');
     if ($animation.length) {
@@ -5421,6 +5439,13 @@ const Layer = {
       $wrap.on('scroll', function () {
         const $this = $(this);
         const $wrapSclTop = $this.scrollTop();
+
+        if ($wrapSclTop > ui.btnTop.min) {
+          if ($('html').hasClass('input-focus') && ui.mobile.any()) return;
+          ui.btnTop.on($btnTop);
+        } else {
+          ui.btnTop.off($btnTop);
+        }
 
         // 고정확인
         Layer.fixed($this);
@@ -5438,6 +5463,12 @@ const Layer = {
           $animation = $wrap.find('[data-animation]');
           if ($animation.length) ui.animation.sclCheckIn($animation, $wrap);
         }, 100)
+      );
+      $wrap.on(
+        'scroll',
+        _.debounce(function () {
+          ui.btnTop.off($btnTop);
+        }, 1500)
       );
     }
 
