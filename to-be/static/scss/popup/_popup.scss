@@ -39,6 +39,7 @@
     outline: none;
   }
   .page {
+    min-height: auto;
     overflow: hidden auto;
     -webkit-overflow-scrolling: touch;
     &.pop-body-scroll {
@@ -60,10 +61,6 @@
     transition: transform var(--pop-move-time), margin var(--pop-move-time), opacity var(--pop-move-time), visibility var(--pop-move-time);
     visibility: hidden;
     opacity: 0;
-  }
-  .head-title {
-    justify-content: flex-start;
-    padding-left: 0;
   }
 
   .page-body {
@@ -208,15 +205,6 @@
   &.bottom,
   &.modal {
     .page-head {
-      h1 {
-        text-align: left;
-        font-size: 2rem;
-        line-height: 2.8rem;
-        font-weight: bold;
-      }
-      .pop-close {
-        margin-top: 0;
-      }
       &:not(.no-title) + .page-body {
         padding-top: 0;
       }
@@ -333,11 +321,13 @@
       visibility: visible;
       opacity: 1;
     }
+    /*
     &.show-end {
       > .page {
         transform: none;
       }
     }
+    */
   }
   .pop-close.last-focus {
     position: absolute;

@@ -131,4 +131,11 @@
   &.outer {
     @include outer;
   }
+  .popup .page > & {
+    position: sticky;
+    bottom: 0;
+    > div {
+      position: static;
+    }
+  }
 }
