@@ -23,7 +23,9 @@ const ui = {
     bottomFixedSpace: '.bottom-fixed-space'
   },
   basePath: function () {
-    return '/to-be/static';
+    let rtnVal = '/to-be/static';
+    if (location.hostname.indexOf('github') > -1) rtnVal = '/club-html' + rtnVal;
+    return rtnVal;
   },
   isInit: false,
   init: function () {
