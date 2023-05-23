@@ -1000,7 +1000,7 @@ ui.btnTop = {
     if (!$wrap.length) return;
     $wrap.each(function () {
       if ($(this).find(ui.className.btnTop).length || $(this).find(ui.className.body).hasClass('not-top-btn')) return;
-      let btnHtml = '<a href="#" class="button not ' + ui.className.btnTop.slice(1) + '" title="' + ui.btnTop.label + '" role="button" aria-label="' + ui.btnTop.label + '">' + ui.btnTop.text + '</a>';
+      let btnHtml = '<a href="#" class="btn ' + ui.className.btnTop.slice(1) + '" title="' + ui.btnTop.label + '" role="button" aria-label="' + ui.btnTop.label + '">' + ui.btnTop.text + '</a>';
       if ($(this).find(ui.className.floatingBtn).length) {
         $(this).find(ui.className.floatingBtn).append(btnHtml);
       } else {
