@@ -634,7 +634,7 @@ ui.common = {
     };
     if (typeof lottie === 'undefined') {
       const $url = ui.basePath() + '/js/lib/lottie.5.7.13.min.js';
-      ui.util.loadScript($url, $lottieInit);
+      ui.util.loadScript($url).then($lottieInit);
     } else {
       $lottieInit();
     }
@@ -757,7 +757,8 @@ ui.util = {
     }
     return $returnVal;
   },
-  loadScript: function (url, callback) {
+  loadScript: function (url) {
+    const dfd = $.Deferred();
     const script = document.createElement('script');
     script.type = 'text/javascript';
     if (script.readyState) {
@@ -765,17 +766,18 @@ ui.util = {
       script.onreadystatechange = function () {
         if (script.readyState == 'loaded' || script.readyState == 'complete') {
           script.onreadystatechange = null;
-          callback();
+          dfd.resolve();
         }
       };
     } else {
       //Others
       script.onload = function () {
-        callback();
+        dfd.resolve();
       };
     }
     script.src = url;
     document.getElementsByTagName('head')[0].appendChild(script);
+    return dfd.promise();
   },
   paint: function () {
     if (!$('.smooth-corners').length) return;
@@ -4024,15 +4026,17 @@ ui.scroll = {
       });
     });
   },
-  loading: function (el, showCallback, hideCallback) {
+  loading: function (el, repeatType) {
+    const $repeatType = repeatType === undefined ? true : repeatType;
+    const dfd = $.Deferred();
     const io = new IntersectionObserver(
       function (entries, observer) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
-            if (showCallback === false) observer.unobserve(entry.target);
-            else if (!!showCallback) showCallback();
+            if ($repeatType === false) observer.unobserve(entry.target);
+            dfd.resolve();
           } else {
-            if (!!hideCallback) hideCallback();
+            dfd.reject();
           }
         });
       },
@@ -4044,8 +4048,10 @@ ui.scroll = {
     $items.forEach(function (odj) {
       io.observe(odj);
     });
+    return dfd.promise();
   },
-  inScreen: function (topEl, bototomEl, callback) {
+  inScreen: function (topEl, bototomEl) {
+    const dfd = $.Deferred();
     if (!bototomEl) bototomEl = topEl;
     const $scrollTop = $(window).scrollTop();
     let $winHeight = $(window).height();
@@ -4065,12 +4071,14 @@ ui.scroll = {
     }
 
     if ($scroll == '') {
-      if (!!callback) callback();
+      dfd.resolve();
     } else {
-      ui.scroll.top($scroll, 200, function () {
-        if (!!callback) callback();
+      ui.scroll.top($scroll).then(function () {
+        dfd.resolve();
       });
     }
+
+    return dfd.promise();
   },
   init: function () {
     ui.scroll.horizonScl();
@@ -4829,11 +4837,13 @@ const Layer = {
 
     return dfd.promise();
   },
-  close: function (tar, callback, callbackTime) {
+  close: function (tar) {
     const dfd = $.Deferred();
     const $popup = $(tar);
     if ($popup.hasClass('morphing') && !$popup.hasClass('morphing-close')) {
-      Layer.morphing.close(tar, callback);
+      Layer.morphing.close(tar).then(function () {
+        dfd.resolve();
+      });
       return;
     }
     if (!$popup.hasClass(Layer.showClass)) {
@@ -4841,8 +4851,6 @@ const Layer = {
       return console.log(tar, '해당팝업 안열려있음');
     }
     const $id = $popup.attr('id');
-    let $closeDelay = 510;
-    let $callbackDelay = !!callbackTime ? callbackTime : 510;
     let $lastPop = '';
     const $visible = $('.' + Layer.popClass + '.' + Layer.showClass).length;
 
@@ -5574,5 +5582,163 @@ const Layer = {
         $(this).remove();
       });
     });
+  }
+};
+Layer.morphing = {
+  is: false,
+  open: function (btn, target) {
+    const dfd = $.Deferred();
+    const $btn = $(btn);
+    const $pop = $(target);
+    const $currentTarget = $(btn);
+    if (!$pop.length || Layer.morphing.is) return;
+    Layer.morphing.is = true;
+    Body.lock();
+    let $bgEl;
+    let $toMin;
+    let $width;
+    let $height;
+    let $left;
+    let $top;
+    let $radius;
+    let $scale;
+    const $getScaleValue = function (topValue, leftValue, radiusValue) {
+      const windowW = $(window).width();
+      const windowH = $(window).height();
+      const maxDistHor = leftValue > windowW / 2 ? leftValue : windowW - leftValue;
+      const maxDistVert = topValue > windowH / 2 ? topValue : windowH - topValue;
+      return Math.ceil(Math.sqrt(Math.pow(maxDistHor, 2) + Math.pow(maxDistVert, 2)) / radiusValue);
+    };
+    const $wrap = $btn.closest(ui.className.wrap);
+    $wrap.addClass('overflow-hidden');
+    const $position = function () {
+      const $popId = $pop.attr('id');
+      $width = $btn.outerWidth();
+      $height = $btn.outerHeight();
+      const $offset = $btn.offset();
+      // $top = $offset.top - $(window).scrollTop();
+      // $left = $offset.left - $(window).scrollLeft();
+      $top = $offset.top - $wrap.offset().top;
+      $left = $offset.left - $wrap.offset().left;
+      const $bg = $btn.css('background-color');
+      const $border = $btn.css('border');
+      const $borderWidth = parseInt($btn.css('border-width'));
+      const $borderRadius = parseInt($btn.css('border-radius'));
+      const $shadow = $btn.css('box-shadow');
+      let $style = '';
+      $style += 'left:' + $left + 'px;';
+      $style += 'top:' + $top + 'px;';
+      $style += 'width:' + $width + 'px;';
+      $style += 'height:' + $height + 'px;';
+      $style += 'border-radius:' + $borderRadius + 'px;';
+      if ($bg !== 'rgba(0, 0, 0, 0)') $style += 'background:' + $bg + ';';
+      if ($borderWidth) $style += 'border:' + $border + ';';
+      if ($shadow !== 'none') $style += 'box-shadow:' + $shadow + ';';
+      $bgEl = '.morphing-bg[data-pop="#' + $popId + '"]';
+      if (!$($bgEl).length) {
+        const $html = '<div class="morphing-bg" data-pop="#' + $popId + '" style="' + $style + '"></div>';
+        $($pop).before($html);
+      } else {
+        $($bgEl).removeAttr('style').attr('style', $style);
+      }
+
+      $($bgEl).data('left', $left);
+      $($bgEl).data('top', $top);
+      $($bgEl).data('width', $width);
+      $($bgEl).data('height', $height);
+      $($bgEl).data('border-radius', $borderRadius);
+
+      $toMin = $width < $height ? $width : $height;
+      $radius = $toMin / 2;
+      $scale = $getScaleValue($left, $top, $radius);
+    };
+    $position();
+    setTimeout(function () {
+      $btn.addClass('morphing-btn-hidden');
+    }, 300);
+    const tl = anime.timeline({
+      // easing: 'easeOutExpo',
+      // easing: 'linear',
+      easing: 'easeOutQuad',
+      duration: 300
+    });
+    tl.add({
+      targets: $bgEl,
+      opacity: 1
+    })
+      .add({
+        targets: $bgEl,
+        left: $left + ($width - $toMin) / 2 + 'px',
+        top: $top + ($height - $toMin) / 2 + 'px',
+        width: $toMin + 'px',
+        height: $toMin + 'px',
+        borderRadius: $radius + 'px'
+      })
+      .add({
+        targets: $bgEl,
+        duration: 500,
+        scale: $scale,
+        complete: function () {
+          Layer.open($pop).then(function () {
+            $($pop).data('returnFocus', $currentTarget);
+            dfd.resolve();
+          });
+        }
+      });
+    return dfd.promise();
+  },
+  close: function (target) {
+    const dfd = $.Deferred();
+    const $pop = $(target);
+    const $btn = $pop.data('returnFocus');
+    const $wrap = $btn.closest(ui.className.wrap);
+
+    $pop.addClass('morphing-close');
+    const $popClose = function () {
+      const $popId = $pop.attr('id');
+      const $bgEl = '.morphing-bg[data-pop="#' + $popId + '"]';
+      const $left = $($bgEl).data('left');
+      const $top = $($bgEl).data('top');
+      const $width = $($bgEl).data('width');
+      const $height = $($bgEl).data('height');
+      const $radius = $($bgEl).data('border-radius');
+      const tl = anime.timeline({
+        easing: 'easeOutQuad',
+        duration: 300
+      });
+      tl.add({
+        targets: $bgEl,
+        duration: 500,
+        scale: 1,
+        complete: function () {
+          $wrap.removeClass('overflow-hidden');
+        }
+      })
+        .add({
+          targets: $bgEl,
+          left: $left,
+          top: $top,
+          width: $width,
+          height: $height,
+          borderRadius: $radius,
+          complete: function () {
+            $btn.removeClass('morphing-btn-hidden');
+          }
+        })
+        .add({
+          targets: $bgEl,
+          opacity: 0,
+          complete: function () {
+            $($bgEl).remove();
+            Layer.morphing.is = false;
+          }
+        });
+    };
+    Layer.close(target, function () {
+      $pop.removeClass('morphing-close');
+      $popClose();
+      dfd.resolve();
+    });
+    return dfd.promise();
   }
 };
