@@ -23,7 +23,7 @@ const ui = {
     bottomFixedSpace: '.bottom-fixed-space'
   },
   basePath: function () {
-    return '/to-be/static/';
+    return '/to-be/static';
   },
   isInit: false,
   init: function () {
@@ -601,7 +601,7 @@ ui.common = {
       // if ($headerTit.hasClass('scl-title-hide')) $headerTit.removeClass('scl-title-hide').removeAttr('style');
     }
   },
-  lottie: function () {
+  lottie: function (readyEvt, completeEvt) {
     const $lottie = $('[data-lottie]');
     if (!$lottie.length) return;
     if (!location.host) {
@@ -609,8 +609,9 @@ ui.common = {
     }
     const $lottieInit = function () {
       $lottie.each(function () {
+        const _this = this;
         const $this = $(this);
-        // $(this).empty();
+        // $this.empty();
         if (!$this.hasClass('lottie__init')) {
           const $data = $this.data('lottie');
           $this.addClass('lottie__init').removeAttr('data-lottie').aria('hidden', true);
@@ -628,12 +629,24 @@ ui.common = {
             autoplay: $autoplayOpt,
             path: $data
           });
-          $(this).data('lottie-opt', $lottieOpt);
+          $this.data('lottie-opt', $lottieOpt);
+          $lottieOpt.addEventListener('config_ready', function () {
+            if (!!readyEvt) readyEvt(_this, $lottieOpt);
+          });
+          if ($loopOpt) {
+            $lottieOpt.addEventListener('loopComplete', function () {
+              if (!!completeEvt) completeEvt(_this, $lottieOpt);
+            });
+          } else {
+            $lottieOpt.addEventListener('complete', function () {
+              if (!!completeEvt) completeEvt(_this, $lottieOpt);
+            });
+          }
         }
       });
     };
     if (typeof lottie === 'undefined') {
-      const $url = ui.basePath() + '/js/lib/lottie.5.7.13.min.js';
+      const $url = ui.basePath() + '/js/lib/lottie.5.11.0.min.js';
       ui.util.loadScript($url).then($lottieInit);
     } else {
       $lottieInit();
@@ -4029,8 +4042,8 @@ ui.scroll = {
     });
   },
   loading: function (el, repeatType) {
-    const $repeatType = repeatType === undefined ? true : repeatType;
     const dfd = $.Deferred();
+    const $repeatType = repeatType === undefined ? true : repeatType;
     const io = new IntersectionObserver(
       function (entries, observer) {
         entries.forEach(function (entry) {
@@ -4548,9 +4561,10 @@ const Body = {
 //로딩함수
 const Loading = {
   className: {
-    wrap: '.loading-wrap'
+    wrap: '.loading-wrap',
+    box: '.loading-lottie'
   },
-  speed: 150,
+  speed: 200,
   open: function (txt) {
     let $html = '<div class="' + Loading.className.wrap.slice(1) + '" class="hide">';
     $html += '<div class="tl">';
@@ -4577,34 +4591,40 @@ const Loading = {
     */
 
     // lottie 타입
-    const $file = ui.basePath + '/lottie/loading.json';
-    $html += '<div class="loading-lottie" role="img"';
+    const $file = ui.basePath() + '/lottie/loading.json';
+    $html += '<div class="' + Loading.className.box.slice(1) + '" role="img"';
     if (!txt) {
       $html += ' aria-label="화면을 불러오는중입니다."';
     }
     $html += '>';
     $html += '<div class="lottie _loop" data-lottie="' + $file + '" aria-hidden="true"></div>';
     $html += '</div>';
+    $html += '</div>';
+    $html += '</div>';
+    $html += '</div>';
 
-    if (!!txt) {
-      $html += '<div class="txt">' + txt + '</div>';
+    if (!$(Loading.className.wrap).length) {
+      $('body').prepend($html);
+      setTimeout(function () {
+        if ($(Loading.className.wrap + ' .lottie').length) {
+          ui.common.lottie(function (target) {
+            if ($(target).closest(Loading.className.wrap).length) {
+              $(Loading.className.wrap).stop(true, false).fadeIn(Loading.speed);
+            }
+          });
+        }
+      }, 5);
+    } else {
+      $(Loading.className.wrap).stop(true, false).fadeIn(Loading.speed);
     }
-    $html += '</div>';
-    $html += '</div>';
-    $html += '</div>';
-
-    if (!$(Loading.className.wrap).length) $('body').prepend($html);
-    $(Loading.className.wrap).stop(true, false).fadeIn(Loading.speed);
-    setTimeout(function () {
-      if ($(Loading.className.wrap + ' .lottie').length) ui.common.lottie();
-    }, 10);
+    if (!!txt) {
+      $(Loading.className.wrap + ' ' + Loading.className.box).after('<div class="txt">' + txt + '</div>');
+    } else {
+      $(Loading.className.wrap + ' .txt').remove();
+    }
   },
   close: function () {
-    $(Loading.className.wrap)
-      .stop(true, false)
-      .fadeOut(Loading.speed, function () {
-        $(this).remove();
-      });
+    $(Loading.className.wrap).stop(true, false).fadeOut(Loading.speed);
   }
 };
 
@@ -4916,10 +4936,6 @@ const Layer = {
 
     const $closeAfter = function () {
       $popup.removeAttr('style');
-      if ($popup.hasClass('is-swipe')) {
-        $popup.find('.' + Layer.wrapClass).removeCss('height');
-        if ($popup.hasClass('full')) $popup.removeClass('full').addClass('bottom');
-      }
       $popup
         .find('.' + Layer.headClass)
         .removeAttr('style')
@@ -5116,8 +5132,6 @@ const Layer = {
     let $opTxt = '';
     let $opVal = '';
     let $popHtml = '';
-    const $isTouch = $target.hasClass('is-swipe') ? true : false;
-    const $isTouchMove = $target.hasClass('is-swipe-move') ? true : false;
     let $isFullPop = false;
 
     Layer.selectIdx++;
@@ -5134,7 +5148,7 @@ const Layer = {
       }
       return $txt;
     };
-    $popHtml += '<div id="' + $popId + '" class="' + Layer.popClass + ' ' + ($isFullPop ? 'full' : 'bottom') + ($isTouch || $isTouchMove ? ' is-swipe' : '') + ($isTouchMove ? ' _touch-move' : '') + ' ' + Layer.selectClass + '" role="dialog" aria-hidden="true">';
+    $popHtml += '<div id="' + $popId + '" class="' + Layer.popClass + ' ' + ($isFullPop ? 'full' : 'bottom') + ' ' + Layer.selectClass + '" role="dialog" aria-hidden="true">';
     $popHtml += '<article class="' + Layer.wrapClass + '">';
     $popHtml += '<header class="' + Layer.headClass + '">';
     $popHtml += '<div class="' + Layer.headInnerClass + '">';
