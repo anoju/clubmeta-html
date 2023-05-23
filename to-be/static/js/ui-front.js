@@ -3001,7 +3001,8 @@ ui.form = {
       });
     }
   },
-  jqCalendar: function (element, callback, defaultDate) {
+  jqCalendar: function (element, defaultDate) {
+    const dfd = $.Deferred();
     //jquery UI datepicker
     const $dimmedClass = 'datepicker-dimmed';
     const swipeArr = $('<div class="swipe-arr" aria-hidden="true"><i class="arr top"></i><i class="arr bottom"></i><i class="arr left"></i><i class="arr right"></i></div>');
@@ -3253,7 +3254,7 @@ ui.form = {
             if ($isInline) calendarOpen($this, ob);
 
             //콜백
-            if (!!callback) callback();
+            dfd.resolve();
           },
           onClose: function (d, ob) {
             //닫을때
@@ -3293,6 +3294,7 @@ ui.form = {
         }
       });
     }
+    return dfd.promise();
   }
 };
 
