@@ -264,12 +264,9 @@
   &.pop-fixed {
     position: sticky;
     top: 4rem;
-    z-index: 10;
   }
-  &.top-fixed,
-  &.pop-top-fixed {
-    // border-top-color: #f4f4f4;
-    // @include dimm-white;
+  &.top-fixed {
+    @include dimm-white;
     z-index: 10;
   }
   .tab-line {

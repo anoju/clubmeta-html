@@ -23,12 +23,10 @@
     &:first-child {
       padding-top: var(--base-padding);
     }
-    /*
     &.last,
     &:last-child {
       padding-bottom: var(--base-padding);
     }
-    */
   }
   > div:first-child:not(.section) + .section {
     padding-top: var(--base-padding);
