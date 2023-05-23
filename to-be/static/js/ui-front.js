@@ -2205,9 +2205,9 @@ ui.form = {
         let isPop = false;
         let $wrap = $(window);
         let $wrapClass;
-        if ($this.closest('.' + Layer.popClass).length) {
+        if ($this.closest('.' + Layer.className.popup).length) {
           isPop = true;
-          $wrapClass = Layer.wrapClass;
+          $wrapClass = Layer.className.wrap;
           $wrap = $this.closest('.' + $wrapClass);
         }
         const $wrapH = $wrap.height();
@@ -4631,29 +4631,25 @@ const Loading = {
 //레이어팝업(Layer): 레이어 팝업은 #container 밖에 위치해야함
 const Layer = {
   id: 'uiLayer',
-  //className: {
-  popClass: ui.className.popup.slice(1),
-  pageClass: ui.className.mainWrap.slice(1),
-  wrapClass: ui.className.wrap.slice(1),
-  headClass: ui.className.header.slice(1),
-  headInnerClass: ui.className.headerInner.slice(1),
-  headLeftClass: ui.className.headerLeft.slice(1),
-  headRightClass: ui.className.headerRight.slice(1),
-  bodyClass: ui.className.body.slice(1),
-  innerClass: 'section',
-  showClass: 'show',
-  etcCont: ui.className.wrap + ':visible',
-  focusedClass: 'pop__focused',
-  focusInClass: 'ui-focus-in',
-  removePopClass: 'ui-pop-remove',
-  closeRemoveClass: 'ui-pop-close-remove',
-  alertClass: 'ui-pop-alert',
-  lastPopClass: 'ui-pop-last',
-  agreePopClass: 'ui-pop-agree',
-  agreePopSwiperClass: 'ui-pop-agree-swiper',
-  scrollShowTitleClass: 'pop-fade-title',
-  bgNoCloseClass: 'bg-no-click',
-  //},
+  className: {
+    popup: ui.className.popup.slice(1),
+    wrap: ui.className.wrap.slice(1),
+    header: ui.className.header.slice(1),
+    headerInner: ui.className.headerInner.slice(1),
+    headerLeft: ui.className.headerLeft.slice(1),
+    headerRight: ui.className.headerRight.slice(1),
+    body: ui.className.body.slice(1),
+    inner: 'section',
+    active: 'show',
+    etcCont: ui.className.mainWrap + ':visible',
+    focused: 'pop__focused',
+    focusIn: 'ui-focus-in',
+    removePopup: 'ui-pop-remove',
+    closeRemove: 'ui-pop-close-remove',
+    alert: 'ui-pop-alert',
+    lastPopup: 'ui-pop-last',
+    bgNoClose: 'bg-no-click'
+  },
   reOpen: false,
   openEl: '',
   openPop: [],
@@ -4661,7 +4657,7 @@ const Layer = {
   open: function (tar) {
     const dfd = $.Deferred();
     const $popup = $(tar);
-    const $popWrap = $popup.find('.' + Layer.wrapClass);
+    const $popWrap = $popup.find('.' + Layer.className.wrap);
 
     //만약 팝업 없을때
     if (!$popup.length || !$popWrap.length) {
@@ -4682,9 +4678,9 @@ const Layer = {
     Layer.opening++;
 
     //z-index
-    const $showLength = $('.' + Layer.popClass + '.' + Layer.showClass).not('.' + Layer.alertClass).length;
-    const $alertShowLength = $('.' + Layer.popClass + '.' + Layer.showClass + '.' + Layer.alertClass).length;
-    if ($popup.hasClass(Layer.alertClass && !$alertShowLength)) {
+    const $showLength = $('.' + Layer.className.popup + '.' + Layer.className.active).not('.' + Layer.className.alert).length;
+    const $alertShowLength = $('.' + Layer.className.popup + '.' + Layer.className.active + '.' + Layer.className.alert).length;
+    if ($popup.hasClass(Layer.className.alert && !$alertShowLength)) {
       $popup.css('z-index', '+=' + $alertShowLength);
     } else if ($showLength) {
       $popup.css('z-index', '+=' + $showLength);
@@ -4692,7 +4688,7 @@ const Layer = {
 
     //id없을때
     let $id = $popup.attr('id');
-    const $idx = $popup.index('.' + Layer.popClass);
+    const $idx = $popup.index('.' + Layer.className.popup);
     if ($id === undefined) {
       $id = Layer.id + $idx;
       $popup.attr('id', $id);
@@ -4701,22 +4697,22 @@ const Layer = {
     //last 체크
     let $lastPop = '';
     if (Layer.openPop.length) $lastPop = Layer.openPop[Layer.openPop.length - 1];
-    if (!$popup.hasClass(Layer.alertClass)) {
+    if (!$popup.hasClass(Layer.className.alert)) {
       if (Layer.openPop.length) {
         let $last;
         $.each(Layer.openPop, function () {
           const $this = '' + this;
-          if (!$($this).hasClass(Layer.alertClass)) $last = $this;
+          if (!$($this).hasClass(Layer.className.alert)) $last = $this;
         });
-        $($last).removeClass(Layer.lastPopClass);
+        $($last).removeClass(Layer.className.lastPopup);
       }
-      $popup.addClass(Layer.lastPopClass);
+      $popup.addClass(Layer.className.lastPopup);
     }
     if (Layer.openPop.indexOf('#' + $id) < 0) Layer.openPop.push('#' + $id);
 
     // bg close
     //  && !$popup.hasClass('full')
-    if (!$popup.hasClass(Layer.alertClass) && !$popup.hasClass(Layer.bgNoCloseClass)) {
+    if (!$popup.hasClass(Layer.className.alert) && !$popup.hasClass(Layer.className.bgNoClose)) {
       const $bgClick = '<div class="pop-bg-close ui-pop-close" role="button" aria-label="팝업창 닫기"></div>';
       if (!$popup.find('.pop-bg-close').length) $popup.prepend($bgClick);
     }
@@ -4746,30 +4742,30 @@ const Layer = {
       if ($($lastPop).data('returnFocus') == $focusEl) $focusEl = $(Layer.openEl);
       if ($($focusEl).is($focusableEl)) {
         $popup.data('returnFocus', $focusEl);
-        $focusEl.addClass(Layer.focusedClass);
+        $focusEl.addClass(Layer.className.focused);
         if ($focusEl.hasClass('btn-select')) $focusEl.closest('.select').addClass('focused');
       }
       //팝업 in 포커스
       if (!ui.mobile.any()) {
         //PC
-        if ($popup.hasClass(Layer.alertClass)) {
+        if ($popup.hasClass(Layer.className.alert)) {
           $popup.find('.bottem-fixed .button').last().focus();
         } else {
           $popup.attr({ tabindex: 0 }).focus();
         }
       } else {
         let $first = '';
-        let $focusInEl = $popup.find('.' + Layer.focusInClass);
+        let $focusInEl = $popup.find('.' + Layer.className.focusIn);
         let $thisTxt = '';
         let $childrenTxt = '';
         //모바일
-        if ($popup.find('.' + Layer.headClass + ' h1').length) {
+        if ($popup.find('.' + Layer.className.header + ' h1').length) {
           $popup.attr({ tabindex: 0 }).focus();
-        } else if ($popup.find('.' + Layer.headClass + ' .head-close').length) {
-          $popup.find('.' + Layer.headClass + ' .head-close').focus();
+        } else if ($popup.find('.' + Layer.className.header + ' .head-close').length) {
+          $popup.find('.' + Layer.className.header + ' .head-close').focus();
         } else {
           if (!$focusInEl.length) {
-            $focusInEl = $popup.find('.' + Layer.bodyClass);
+            $focusInEl = $popup.find('.' + Layer.className.body);
             $first = $focusInEl.children().not('br').first();
             if ($first.text() == '' || $first.attr('aria-hidden') == 'true') $first = $first.next();
             $thisTxt = $.trim($focusInEl.text());
@@ -4781,7 +4777,7 @@ const Layer = {
               $thisTxt = $.trim($focusInEl.text());
               $childrenTxt = $.trim($first.text());
             }
-            $focusInEl.addClass(Layer.focusInClass);
+            $focusInEl.addClass(Layer.className.focusIn);
           }
           if (!$focusInEl.is($focusableEl)) $focusInEl.attr('tabindex', -1);
           $focusInEl.focus();
@@ -4791,9 +4787,9 @@ const Layer = {
 
     setTimeout(function () {
       //웹접근성
-      $(Layer.etcCont).attr('aria-hidden', true);
+      $(Layer.className.etc).attr('aria-hidden', true);
       if (Layer.openPop.length && $lastPop) $($lastPop).attr('aria-hidden', true);
-      const $tit = $popup.find('.' + Layer.headClass + ' h1');
+      const $tit = $popup.find('.' + Layer.className.header + ' h1');
       if ($tit.length) {
         if ($tit.attr('id') == undefined) {
           $tit.attr('id', $id + 'Label');
@@ -4808,7 +4804,7 @@ const Layer = {
 
       //열기
       Body.lock();
-      $popup.addClass(Layer.showClass);
+      $popup.addClass(Layer.className.active);
       $popWrap.scrollTop(0);
       /*
       const $animation = $popWrap.find('[data-animation]');
@@ -4846,7 +4842,7 @@ const Layer = {
 
       //callback
       const transitionEndEvt = function () {
-        $popup.addClass(Layer.showClass + '-end');
+        $popup.addClass(Layer.className.active + '-end');
         $FocusEvt();
         $popup.trigger('Layer.show');
         dfd.resolve();
@@ -4868,30 +4864,30 @@ const Layer = {
       });
       return;
     }
-    if (!$popup.hasClass(Layer.showClass)) {
+    if (!$popup.hasClass(Layer.className.active)) {
       dfd.reject();
       return console.log(tar, '해당팝업 안열려있음');
     }
     const $id = $popup.attr('id');
     let $lastPop = '';
-    const $visible = $('.' + Layer.popClass + '.' + Layer.showClass).length;
+    const $visible = $('.' + Layer.className.popup + '.' + Layer.className.active).length;
 
     Layer.openPop.splice(Layer.openPop.indexOf('#' + $id), 1);
     if (Layer.openPop.length) $lastPop = Layer.openPop[Layer.openPop.length - 1];
-    if (!$popup.hasClass(Layer.alertClass)) {
+    if (!$popup.hasClass(Layer.className.alert)) {
       if (Layer.openPop.length) {
         let $last;
         $.each(Layer.openPop, function () {
           const $this = '' + this;
-          if (!$($this).hasClass(Layer.alertClass)) $last = $this;
+          if (!$($this).hasClass(Layer.className.alert)) $last = $this;
         });
-        $($last).addClass(Layer.lastPopClass);
+        $($last).addClass(Layer.className.lastPopup);
       }
-      $popup.removeClass(Layer.lastPopClass);
+      $popup.removeClass(Layer.className.lastPopup);
     }
     if ($visible == 1) {
       Body.unlock();
-      $(Layer.etcCont).removeAttr('aria-hidden');
+      $(Layer.className.etc).removeAttr('aria-hidden');
     }
     if ($lastPop != '') $($lastPop).attr('aria-hidden', false);
 
@@ -4899,7 +4895,7 @@ const Layer = {
     const $focusEvt = function () {
       const $returnFocus = $popup.data('returnFocus');
       if ($returnFocus != undefined) {
-        $returnFocus.removeClass(Layer.focusedClass).focus();
+        $returnFocus.removeClass(Layer.className.focused).focus();
         if ($returnFocus.hasClass('btn-select')) $returnFocus.closest('.select').removeClass('focused');
         //플루팅 버튼
         if ($returnFocus.closest('.floating-btn').length && $returnFocus.closest('.floating-btn').hasClass('pop-on')) {
@@ -4924,33 +4920,33 @@ const Layer = {
     }, 100);
 
     //닫기
-    $popup.removeClass(Layer.showClass + '-end');
+    $popup.removeClass(Layer.className.active + '-end');
     /*
     if ($popup.find('.next-foot-fixed').length) {
-      const $popWrap = $popup.find('.' + Layer.wrapClass);
+      const $popWrap = $popup.find('.' + Layer.className.wrap);
       $popWrap.scrollTop(0);
     }
     */
-    $popup.removeClass(Layer.showClass).data('focusMove', false).data('popPosition', false);
+    $popup.removeClass(Layer.className.active).data('focusMove', false).data('popPosition', false);
     $popup.attr('aria-hidden', 'true').removeAttr('tabindex aria-labelledby');
 
     const $closeAfter = function () {
       $popup.removeAttr('style');
       $popup
-        .find('.' + Layer.headClass)
+        .find('.' + Layer.className.header)
         .removeAttr('style')
         .find('h1')
         .removeAttr('tabindex');
-      $popup.find('.' + Layer.bodyClass).removeAttr('tabindex style');
-      $popup.find('.' + Layer.focusInClass).removeAttr('tabindex');
+      $popup.find('.' + Layer.className.body).removeAttr('tabindex style');
+      $popup.find('.' + Layer.className.focusIn).removeAttr('tabindex');
 
       // 닫을 때 없어져야하는 요소
-      if ($popup.find('.' + Layer.closeRemoveClass).length) $popup.find('.' + Layer.closeRemoveClass).remove();
+      if ($popup.find('.' + Layer.className.closeRemove).length) $popup.find('.' + Layer.className.closeRemove).remove();
 
       // 닫기 후 팝업 자체가 없어지는 케이스
-      if ($popup.hasClass(Layer.alertClass) || $popup.hasClass(Layer.selectClass) || $popup.hasClass(Layer.removePopClass)) {
+      if ($popup.hasClass(Layer.className.alert) || $popup.hasClass(Layer.selectClass) || $popup.hasClass(Layer.className.removePopup)) {
         if ($popup.hasClass(Layer.selectClass)) Layer.isSelectOpen = false;
-        if ($popup.hasClass(Layer.alertClass)) {
+        if ($popup.hasClass(Layer.className.alert)) {
           const $content = $popup.find('.message>div').html();
           Layer.beforeCont.splice(Layer.beforeCont.indexOf($content), 1);
         }
@@ -4961,7 +4957,7 @@ const Layer = {
     const transitionEndEvt = function () {
       $closeAfter();
 
-      // $popup.addClass(Layer.showClass + '-end');
+      // $popup.addClass(Layer.className.active + '-end');
       $popup.trigger('Layer.hide');
       dfd.resolve();
       $popup.off('transitionend', transitionEndEvt);
@@ -4969,7 +4965,7 @@ const Layer = {
     $popup.on('transitionend', transitionEndEvt);
 
     /*
-    const $wrap = $popup.find('.' + Layer.wrapClass);
+    const $wrap = $popup.find('.' + Layer.className.wrap);
     $wrap.on('transitionend', function () {
       $closeAfter();
       $wrap.off('transitionend');
@@ -4979,11 +4975,11 @@ const Layer = {
   },
 
   alertHtml: function (type, popId, btnActionId, btnCancelId) {
-    let $html = '<div id="' + popId + '" class="' + Layer.popClass + ' modal alert ' + Layer.alertClass + '" role="dialog" aria-hidden="true">';
-    $html += '<article class="' + Layer.wrapClass + '">';
-    $html += '<header class="' + Layer.headClass + '"><div class="' + Layer.headInnerClass + '"><div class="' + Layer.headLeftClass + ' full"><h1>안내</h1></div></div></header>';
-    $html += '<main class="' + Layer.bodyClass + '">';
-    $html += '<div class="' + Layer.innerClass + '">';
+    let $html = '<div id="' + popId + '" class="' + Layer.className.popup + ' modal alert ' + Layer.className.alert + '" role="dialog" aria-hidden="true">';
+    $html += '<article class="' + Layer.className.wrap + '">';
+    $html += '<header class="' + Layer.className.header + '"><div class="' + Layer.className.headerInner + '"><div class="' + Layer.className.headerLeft + ' full"><h1>안내</h1></div></div></header>';
+    $html += '<main class="' + Layer.className.body + '">';
+    $html += '<div class="' + Layer.className.inner + '">';
     if (type === 'prompt') {
       $html += '<div class="form-lbl mt-0">';
       $html += '<label for="inpPrompt" role="alert" aria-live="assertive"></label>';
@@ -5018,7 +5014,7 @@ const Layer = {
   alertEvt: function (type, option, title, actionTxt, cancelTxt, init) {
     const dfd = $.Deferred();
 
-    const $length = $('.' + Layer.alertClass).length;
+    const $length = $('.' + Layer.className.alert).length;
     const $popId = Layer.id + 'Alert' + $length;
     const $actionId = $popId + 'ActionBtn';
     const $cancelId = $popId + 'CancelBtn';
@@ -5044,7 +5040,7 @@ const Layer = {
     const $pop = $('#' + $popId);
     if (!!option.title || (typeof title === 'string' && title !== '')) {
       const $insertTit = typeof title === 'string' && title !== '' ? title : option.title;
-      $pop.find('.' + Layer.wrapClass + ' h1').html($insertTit);
+      $pop.find('.' + Layer.className.wrap + ' h1').html($insertTit);
     }
     let $actionTxt;
     if (!!option.actionTxt) $actionTxt = option.actionTxt;
@@ -5108,7 +5104,7 @@ const Layer = {
   },
   alertKeyEvt: function () {
     //컨펌팝업 버튼 좌우 방할기로 포커스 이동
-    $(document).on('keydown', '.' + Layer.alertClass + ' .bottom-fixed .button', function (e) {
+    $(document).on('keydown', '.' + Layer.className.alert + ' .bottom-fixed .button', function (e) {
       const $keyCode = e.keyCode ? e.keyCode : e.which;
       let $tar = '';
       if ($keyCode == 37) $tar = $(this).prev();
@@ -5148,19 +5144,19 @@ const Layer = {
       }
       return $txt;
     };
-    $popHtml += '<div id="' + $popId + '" class="' + Layer.popClass + ' ' + ($isFullPop ? 'full' : 'bottom') + ' ' + Layer.selectClass + '" role="dialog" aria-hidden="true">';
-    $popHtml += '<article class="' + Layer.wrapClass + '">';
-    $popHtml += '<header class="' + Layer.headClass + '">';
-    $popHtml += '<div class="' + Layer.headInnerClass + '">';
-    $popHtml += '<div class="' + Layer.headLeftClass + ' full">';
+    $popHtml += '<div id="' + $popId + '" class="' + Layer.className.popup + ' ' + ($isFullPop ? 'full' : 'bottom') + ' ' + Layer.selectClass + '" role="dialog" aria-hidden="true">';
+    $popHtml += '<article class="' + Layer.className.wrap + '">';
+    $popHtml += '<header class="' + Layer.className.header + '">';
+    $popHtml += '<div class="' + Layer.className.headerInner + '">';
+    $popHtml += '<div class="' + Layer.className.headerLeft + ' full">';
     $popHtml += '<h1>' + $title + '</h1>';
     $popHtml += '</div>';
-    $popHtml += '<div class="' + Layer.headRightClass + '">';
+    $popHtml += '<div class="' + Layer.className.headerRight + '">';
     $popHtml += '<a href="#" class="head-close head-btn ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
     $popHtml += '</div>';
     $popHtml += '</div>';
     $popHtml += '</header>';
-    $popHtml += '<main class="' + Layer.bodyClass + '">';
+    $popHtml += '<main class="' + Layer.className.body + '">';
 
     $popHtml += '<ul class="select-item-wrap';
     if (!!col) $popHtml += ' col' + col;
@@ -5315,7 +5311,7 @@ const Layer = {
   },
 
   resize: function () {
-    const $popup = $('.' + Layer.popClass + '.' + Layer.showClass);
+    const $popup = $('.' + Layer.className.popup + '.' + Layer.className.active);
     if (!$popup.length) return;
     const headHeight = function (headCont, contentCont) {
       const $headH = headCont.children().outerHeight();
@@ -5332,9 +5328,9 @@ const Layer = {
     };
     $popup.each(function () {
       const $this = $(this);
-      const $wrap = $this.find('.' + Layer.wrapClass);
-      const $head = $wrap.find('.' + Layer.headClass);
-      const $body = $wrap.find('.' + Layer.bodyClass);
+      const $wrap = $this.find('.' + Layer.className.wrap);
+      const $head = $wrap.find('.' + Layer.className.header);
+      const $body = $wrap.find('.' + Layer.className.body);
       const $bottomFixed = $body.siblings(ui.className.bottomFixed);
       // const $tit = $head.find('h1');
 
@@ -5351,7 +5347,7 @@ const Layer = {
       //레이어팝업
       //컨텐츠 스크롤이 필요할때
       const $height = $this.height();
-      // const  $popHeight = $this.find('.'+Layer.wrapClass).outerHeight();
+      // const  $popHeight = $this.find('.'+Layer.className.wrap).outerHeight();
       if ($this.hasClass('bottom') || $this.hasClass('modal')) $wrap.css('max-height', $height);
 
       //팝업 fixed
@@ -5379,14 +5375,14 @@ const Layer = {
   fixed: function (el) {
     //  pop fixed
     let $wrap = $(el);
-    if ($wrap.find('.' + Layer.wrapClass).length) $wrap = $wrap.find('.' + Layer.wrapClass);
-    if ($wrap.closest('.' + Layer.wrapClass).length) $wrap = $wrap.closest('.' + Layer.wrapClass);
-    const $head = $wrap.find('.' + Layer.headClass);
-    const $body = $wrap.find('.' + Layer.bodyClass);
+    if ($wrap.find('.' + Layer.className.wrap).length) $wrap = $wrap.find('.' + Layer.className.wrap);
+    if ($wrap.closest('.' + Layer.className.wrap).length) $wrap = $wrap.closest('.' + Layer.className.wrap);
+    const $head = $wrap.find('.' + Layer.className.header);
+    const $body = $wrap.find('.' + Layer.className.body);
     const $bottomFixed = $body.siblings(ui.className.bottomFixed);
-    const $scrollTop = $wrap.hasClass(Layer.pageClass) ? $(window).scrollTop() : $wrap.scrollTop();
-    const $scrollHeight = $wrap.hasClass(Layer.pageClass) ? $('body').get(0).scrollHeight : $wrap[0].scrollHeight;
-    const $wrapHeight = $wrap.hasClass(Layer.pageClass) ? $(window).height() : $wrap.outerHeight();
+    const $scrollTop = $wrap.scrollTop();
+    const $scrollHeight = $wrap[0].scrollHeight;
+    const $wrapHeight = $wrap.outerHeight();
     const $topClassName = 'top-fixed';
     const $bottomEndClassName = 'end-fixed';
     if ($head.length) {
@@ -5431,14 +5427,14 @@ const Layer = {
   },
   position: function (tar) {
     const $popup = $(tar);
-    if (!$popup.hasClass(Layer.showClass)) return false;
+    if (!$popup.hasClass(Layer.className.active)) return false;
     if ($popup.data('popPosition') == true) return false;
     $popup.data('popPosition', true);
-    let $wrap = $popup.find('.' + Layer.wrapClass);
+    let $wrap = $popup.find('.' + Layer.className.wrap);
     let $wrapH = $wrap.outerHeight();
     let $wrapSclH = $wrap[0].scrollHeight;
-    const $head = $popup.find('.' + Layer.headClass);
-    const $body = $popup.find('.' + Layer.bodyClass);
+    const $head = $popup.find('.' + Layer.className.header);
+    const $body = $popup.find('.' + Layer.className.body);
     const $bottomFixed = $body.siblings(ui.className.bottomFixed);
     let $bottomFixedH = 0;
     if ($bottomFixed.length) {
@@ -5500,7 +5496,7 @@ const Layer = {
     // Layer.fixed($wrap);
   },
   focusMove: function (tar) {
-    if (!$(tar).hasClass(Layer.showClass)) return false;
+    if (!$(tar).hasClass(Layer.className.active)) return false;
     if ($(tar).data('focusMove') == true) return false;
     $(tar).data('focusMove', true);
     const $tar = $(tar);
@@ -5550,8 +5546,8 @@ const Layer = {
     });
   },
   init: function () {
-    if ($('.' + Layer.popClass + '.' + Layer.showClass + '[aria-hidden="true"]').length) {
-      Layer.open('.' + Layer.popClass + '.' + Layer.showClass + '[aria-hidden="true"]');
+    if ($('.' + Layer.className.popup + '.' + Layer.className.active + '[aria-hidden="true"]').length) {
+      Layer.open('.' + Layer.className.popup + '.' + Layer.className.active + '[aria-hidden="true"]');
     }
 
     $(document).on('click', $focusableEl, function (e) {
@@ -5582,7 +5578,7 @@ const Layer = {
     $(document).on('click', '.ui-pop-close', function (e) {
       e.preventDefault();
       let $pop = $(this).attr('href');
-      if ($pop == '#' || $pop == '#none' || $pop == undefined) $pop = $(this).closest('.' + Layer.popClass);
+      if ($pop == '#' || $pop == '#none' || $pop == undefined) $pop = $(this).closest('.' + Layer.className.popup);
       if ($pop.length) Layer.close($pop);
     });
 
