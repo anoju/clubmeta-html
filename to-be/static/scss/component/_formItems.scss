@@ -173,6 +173,7 @@ i.require {
 .validate-item {
   &.is-error {
     .input {
+      border-color: var(--alert-txt-color);
       input:not(:focus) {
         color: var(--alert-txt-color);
         // @include bg-etc(1.6rem auto, right 1.2rem center);
@@ -180,12 +181,14 @@ i.require {
       }
     }
     .select {
+      border-color: var(--alert-txt-color);
       select,
       .btn-select {
         color: var(--alert-txt-color);
       }
     }
     .textarea {
+      border-color: var(--alert-txt-color);
       textarea:not(:focus) {
         color: var(--alert-txt-color);
       }

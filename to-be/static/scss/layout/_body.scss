@@ -9,9 +9,9 @@
   flex-direction: column;
   // height: 100%;
   &:first-child {
-    padding-top: 4rem;
+    padding-top: var(--header-height);
     html.ios & {
-      @include ios-top(padding-top, 4rem);
+      @include ios-top(padding-top, var(--header-height));
     }
   }
   > section,

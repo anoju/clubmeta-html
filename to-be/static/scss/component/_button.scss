@@ -94,7 +94,7 @@
     height: 5.2rem;
     border-radius: 1.2rem;
   }
-  .popup:not(.modal) .pop-foot &:not(.h48):not(.h38):not(.h32):not(.h24),
+  .popup:not(.modal) .page > .bottom-fixed &:not(.h48):not(.h38):not(.h32):not(.h24),
   &.h60 {
     height: 6rem;
     font-size: 1.8rem;
@@ -126,7 +126,7 @@
     color: #fff;
     &.disabled:not(.line),
     &:disabled:not(.line) {
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.6);
     }
 
     &.disabled2:not(.line) {

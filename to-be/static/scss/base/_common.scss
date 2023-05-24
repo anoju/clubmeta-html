@@ -483,9 +483,16 @@ html.pc {
 }
 
 // margin
-.mg-autox {
+.mg-auto {
+  margin: auto !important;
+}
+.mg-auto-x {
   margin-left: auto !important;
   margin-right: auto !important;
+}
+.mg-auto-y {
+  margin-top: auto !important;
+  margin-bottom: auto !important;
 }
 .ml-auto {
   margin-left: auto !important;
@@ -503,11 +510,11 @@ html.pc {
   .mg-#{$i} {
     margin: $i * 0.1rem !important;
   }
-  .mg-#{$i}x {
+  .mg-#{$i}-x {
     margin-left: $i * 0.1rem !important;
     margin-right: $i * 0.1rem !important;
   }
-  .mg-#{$i}y {
+  .mg-#{$i}-y {
     margin-top: $i * 0.1rem !important;
     margin-bottom: $i * 0.1rem !important;
   }
@@ -528,11 +535,11 @@ html.pc {
   .mg-#{$i*5 + 100} {
     margin: $i * 0.5rem + 10rem !important;
   }
-  .mg-#{$i*5 + 100}x {
+  .mg-#{$i*5 + 100}-x {
     margin-left: $i * 0.5rem + 10rem !important;
     margin-right: $i * 0.5rem + 10rem !important;
   }
-  .mg-#{$i*5 + 100}y {
+  .mg-#{$i*5 + 100}-y {
     margin-top: $i * 0.5rem + 10rem !important;
     margin-bottom: $i * 0.5rem + 10rem !important;
   }
@@ -569,11 +576,11 @@ html.pc {
   .pd-#{$i} {
     padding: $i * 0.1rem !important;
   }
-  .pd-#{$i}x {
+  .pd-#{$i}-x {
     padding-left: $i * 0.1rem !important;
     padding-right: $i * 0.1rem !important;
   }
-  .pd-#{$i}y {
+  .pd-#{$i}-y {
     padding-top: $i * 0.1rem !important;
     padding-bottom: $i * 0.1rem !important;
   }
@@ -594,11 +601,11 @@ html.pc {
   .pd-#{$i*5 + 100} {
     padding: $i * 0.5rem + 10rem !important;
   }
-  .pd-#{$i*5 + 100}x {
+  .pd-#{$i*5 + 100}-x {
     padding-left: $i * 0.5rem + 10rem !important;
     padding-right: $i * 0.5rem + 10rem !important;
   }
-  .pd-#{$i*5 + 100}y {
+  .pd-#{$i*5 + 100}-y {
     padding-top: $i * 0.5rem + 10rem !important;
     padding-bottom: $i * 0.5rem + 10rem !important;
   }
