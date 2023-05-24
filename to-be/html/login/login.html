@@ -8,19 +8,41 @@
     <title>CLUBMETA | 클럽메타</title>
   </head>
   <body>
-    <div class="section">
-      <div class="t-right">
-        <button type="button" class="head-close button" role="button" aria-label="화면닫기" style="height: 3.6rem; background-repeat: no-repeat; background-position: center"></button>
+    <article class="page">
+      <!-- 헤더 -->
+      <header class="page-head">
+        <div class="head-inner">
+          <div class="head-right">
+            <button type="button" class="head-close head-btn" aria-label="닫기"></button>
+          </div>
+        </div>
+      </header>
+      <!-- //헤더 -->
+
+      <!-- 컨테이너(컨텐츠) -->
+      <main class="page-body">
+        <div class="section">
+          <h1 class="tit-h1">CLUBMETA APP에 로그인</h1>
+          <div class="btn-wrap vertical mt-30">
+            <button type="button" class="button line gray">전화 또는 이메일 로그인</button>
+            <button type="button" class="button" style="background-color: #fee500">카카오로 로그인</button>
+            <button type="button" class="button fc-white" style="background-color: #03c75a">네이버로 로그인</button>
+            <button type="button" class="button line">구글로 로그인</button>
+          </div>
+        </div>
+      </main>
+      <!-- 컨테이너(컨텐츠) -->
+
+      <!-- 하단고정 -->
+      <div class="btn-wrap bottom-fixed">
+        <div>
+          <div>아직 계정이 없으신가요?</div>
+          <div class="flex mt-8">
+            <button type="button" class="button line primary">회원가입</button>
+          </div>
+        </div>
       </div>
-      <div class="mt-60 mb-16">
-        <h1 class="fz-24"><b>CLUBMETA APP</b>에 로그인</h1>
-      </div>
-      <div class="pd-8y">
-        <div class="btn-wrap mg-8y"><button type="button" class="fc-white bg-black button round">전화 또는 이메일 로그인</button></div>
-        <div class="btn-wrap mg-8y"><button type="button" class="bg-yellow button round">카카오로 로그인</button></div>
-        <div class="btn-wrap mg-8y"><button type="button" class="fc-white button round" style="background-color: #03c75a">네이버로 로그인</button></div>
-        <div class="btn-wrap mg-8y"><button type="button" class="bg-white button round">구글로 로그인</button></div>
-      </div>
-    </div>
+      <!-- //하단고정 -->
+    </article>
   </body>
 </html>
