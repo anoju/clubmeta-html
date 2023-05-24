@@ -67,6 +67,7 @@ const ui = {
     if (ui.isLoadInit) return;
     ui.isLoadInit = true;
     ui.common.loadInit();
+    ui.common.scrollEvt();
     ui.button.loadInit();
     ui.form.loadInit();
     ui.list.loadInit();
@@ -445,8 +446,11 @@ ui.common = {
     const $wrap = $(ui.className.mainWrap);
     if (!$wrap.length) return;
     $wrap.each(function () {
-      if (!$(this).find(ui.className.bottomFixedSpace).length) {
-        $(this).append('<div class="' + ui.className.bottomFixedSpace.slice(1) + '" aria-hidden="true"></div>');
+      const $this = $(this);
+      let target = $this;
+      if (!$this.find(ui.className.bottomFixedSpace).length) {
+        if (target.find(ui.className.body).length) target = target.find(ui.className.body);
+        target.append('<div class="' + ui.className.bottomFixedSpace.slice(1) + '" aria-hidden="true"></div>');
       }
     });
   },
@@ -547,12 +551,11 @@ ui.common = {
           } else {
             $this.removeClass('fixed-none');
           }
+        }
+        if ($SclTop + $Height > $scrollHeight - 3 || $this.hasClass('fixed-none')) {
+          $this.removeClass('ing-fixed');
         } else {
-          if ($SclTop + $Height > $scrollHeight - 3) {
-            $this.addClass('end-fixed');
-          } else {
-            $this.removeClass('end-fixed');
-          }
+          $this.addClass('ing-fixed');
         }
       });
     }
@@ -4213,8 +4216,9 @@ ui.animation = {
       const $scrollTop = $wrap.scrollTop();
       const $topFixedH = $isWin ? getTopFixedHeight($el) : getTopFixedHeight($el, 'top-fixed');
       let $bottomFixedH = 0;
-      if ($isWin && $('.bottom-fixed-space').length) {
-        $bottomFixedH = $('.bottom-fixed-space').height();
+      const $bottomFixedSpace = $(ui.className.mainWrap + ':visible ' + ui.className.bottomFixedSpace);
+      if ($isWin && $bottomFixedSpace.length) {
+        $bottomFixedH = $bottomFixedSpace.height();
       } else if ($wrap.find(ui.className.bottomFixed + ':visible').length) {
         $bottomFixedH = $wrap.find(ui.className.bottomFixed + ':visible').height();
       }
@@ -5286,7 +5290,8 @@ const Layer = {
         $(this).remove();
       });
     };
-    const $spaceH = $('.bottom-fixed-space').outerHeight();
+    const $bottomFixedSpace = $(ui.className.mainWrap + ':visible ' + ui.className.bottomFixedSpace);
+    const $spaceH = $bottomFixedSpace.outerHeight();
     if ($spaceH) {
       // const $top = parseInt($toast.css('bottom'));
       // $toast.css('bottom', $top + $spaceH);
