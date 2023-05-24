@@ -83,10 +83,9 @@
             <div class="txt-list">
               <ul>
                 <li class="dot">아래 ID 빼고 대부분의 ID는 임시 ID 입니다. 변경해서 사용하셔도 됩니다. (예: popup, input, select 등등)</li>
-                <li class="dot">변경하면 안되는 ID: 레이아웃 관련된 ID (#wrap, #header, #footer, #container, #contents 등등)</li>
                 <li class="dot">input, select, textarea의 id를 변경할때 <strong class="underline fc-black">label의 for 값도 같이 변경</strong>해야 연결됩니다.</li>
                 <li class="dot">
-                  popup의 마크업은 <strong class="underline fc-black"><span class="fc-red">#container</span> 밖에 위치해야합니다.</strong>
+                  popup의 마크업은 다른 .page 영역안에 있으면 안되고 <strong class="underline fc-black"><span class="fc-red">body태그</span> 아래 위치해야합니다.</strong>
                 </li>
               </ul>
             </div>
