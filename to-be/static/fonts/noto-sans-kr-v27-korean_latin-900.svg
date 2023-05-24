@@ -4,6 +4,7 @@
 <defs>
 <font id="NotoSansKR" horiz-adv-x="1000" vert-adv-y="1000" >
   <font-face 
+    font-family="Noto Sans KR Black"
     font-weight="900"
     font-stretch="normal"
     units-per-em="1000"
