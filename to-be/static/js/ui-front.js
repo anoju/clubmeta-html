@@ -2491,6 +2491,7 @@ ui.form = {
     $(document).on('keyup focusin', '.input input, .textarea.del textarea', function () {
       insertDel(this);
     });
+    /*
     $(document).on('focusout', '.input:not(.show-del) input, .textarea.del:not(.show-del) textarea', function () {
       const $this = $(this);
       if ($this.siblings('.btn-inp-del').length) {
@@ -2501,6 +2502,7 @@ ui.form = {
         $this.data('removeDelBtn', removeDelBtn);
       }
     });
+    */
     $(document).on('click', '.btn-inp-del', function () {
       const $inp = $(this).prev();
       $inp.val('').change().focus().keyup();

@@ -101,7 +101,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 0 2rem var(--base-padding);
+    padding: 0 var(--base-padding) var(--base-padding);
     transition: box-shadow 0.3s;
     z-index: 50;
     // pointer-events: none;

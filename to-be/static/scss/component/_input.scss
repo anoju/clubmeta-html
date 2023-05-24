@@ -129,14 +129,11 @@
     display: flex;
     align-items: center;
   }
-  .del {
+  .btn-inp-del {
     margin-right: 0.8rem;
     &:last-child {
       margin-right: 1.6rem;
     }
-    // + .btn-inp-pwd{
-    // 	margin-left: 0.8rem;
-    // }
   }
   .btn-inp-pwd {
     @include text-blind;
@@ -147,11 +144,13 @@
     flex: 0 0 1.6rem;
     margin-right: 1.6rem;
     overflow: hidden;
-    background: url(../images/icon/Ico-eye-off@3x.png) no-repeat center center / contain;
+    @include bg-etc;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17.495' height='17.495'%3E%3Cdefs%3E%3Cstyle%3E .cls-2%7Bfill:none;stroke:%23000;stroke-linecap:round;stroke-linejoin:round;stroke-width:2px%7D %3C/style%3E%3C/defs%3E%3Cg id='Icon-eye-off' transform='translate(.748 .707)'%3E%3Cpath id='패스_108' data-name='패스 108' class='cls-2' d='M12.293 13.293a6.713 6.713 0 0 1-3.96 1.373C3.667 14.667 1 9.333 1 9.333a12.3 12.3 0 0 1 3.373-3.96m2.56-1.213a6.08 6.08 0 0 1 1.4-.16C13 4 15.667 9.333 15.667 9.333a12.334 12.334 0 0 1-1.44 2.127m-4.48-.713A2 2 0 1 1 6.92 7.92' transform='translate(-.333 -1.293)'/%3E%3Cpath id='선_109' data-name='선 109' class='cls-2' transform='translate(.667 .707)' d='m0 0 14.667 14.667'/%3E%3C/g%3E%3C/svg%3E");
   }
 
   input[type='text'] ~ .btn-inp-pwd {
-    background-image: url(../images/icon/Ico-eye-on@3x.png);
+    @include bg-etc;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16.667' height='16'%3E%3Cdefs%3E%3Cstyle%3E .cls-2%7Bfill:none;stroke:%23000;stroke-linecap:round;stroke-linejoin:round;stroke-width:2px%7D %3C/style%3E%3C/defs%3E%3Cg id='Icon-eye' transform='translate(.333)'%3E%3Cpath id='패스_109' data-name='패스 109' class='cls-2' d='M1 9.333S3.667 4 8.333 4s7.333 5.333 7.333 5.333S13 14.667 8.333 14.667 1 9.333 1 9.333z' transform='translate(-.333 -1.333)'/%3E%3Ccircle id='타원_23' data-name='타원 23' class='cls-2' cx='2' cy='2' r='2' transform='translate(6 6)'/%3E%3C/g%3E%3C/svg%3E");
   }
   &:not(.form-box) {
     & + :is(.flex, .input, .select, .textarea) {

@@ -329,15 +329,16 @@ html.pc {
   & + :is(.flex, .input, .select, .textarea) {
     margin-top: var(--item-margin-y);
   }
-  // &:not(.not-full, .justify-start, .justify-center, .justify-end, .space-between, .space-around, .space-evenly, .flex-11, .flex-10, .flex-01, .flex-00, .flex-wrap, .flex-column) {
-  //   > *:not(.unit) {
-  //     width: 100%;
-  //   }
-  // }
+  > :is(.input, .select, .textarea) + :is(.input, .select, .textarea) {
+    margin-top: 0;
+  }
   > * + * {
     margin-left: var(--item-margin-x);
   }
   &.full {
+    > :is(.input, .select, .textarea) + :is(.input, .select, .textarea) {
+      margin-top: 0;
+    }
     > *:not(.unit):not(i) {
       width: 100%;
     }
@@ -357,9 +358,6 @@ html.pc {
     align-items: center;
     font-size: 1.5rem;
     padding: 0 0.2rem;
-  }
-  > :is(.input, .select) + :is(.input, .select) {
-    margin-top: 0;
   }
 
   > .button {
