@@ -30,7 +30,7 @@
   white-space: normal;
   word-break: normal;
   word-wrap: break-word;
-  transition: all 0.3s;
+  // transition: all 0.3s;
   &.bottom {
     top: auto;
     bottom: 100%;
@@ -62,7 +62,7 @@
 .tooltip-inner {
   min-height: 5rem;
   padding: 1.6rem 3rem 1.6rem 1.6rem;
-  margin: 0 var(--base-padding);
+  // margin: 0 var(--base-padding);
   border-radius: 0.8rem;
   // box-shadow: 0 0 2rem rgba(0, 0, 0, 0.1);
   color: #fff;
