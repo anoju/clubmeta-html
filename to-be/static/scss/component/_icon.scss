@@ -311,8 +311,7 @@
 .i-ico-warning-40 {
   width: 4rem;
   height: 4rem;
-  background-image: url(../images/icon/ico-warning-40.png);
-  // background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none'%3E%3Crect x='17.7998' y='10.4' width='4.4' height='13.3' rx='2.2' fill='%23D6DBE1'/%3E%3Crect x='17.7998' y='25.2' width='4.5' height='4.5' rx='2.25' fill='%23D6DBE1'/%3E%3Ccircle cx='20' cy='20' r='19.25' stroke='%23D6DBE1' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40' fill='none'%3E%3Crect x='17.7998' y='10.4' width='4.4' height='13.3' rx='2.2' fill='%23D6DBE1'/%3E%3Crect x='17.7998' y='25.2' width='4.5' height='4.5' rx='2.25' fill='%23D6DBE1'/%3E%3Ccircle cx='20' cy='20' r='19.25' stroke='%23D6DBE1' stroke-width='1.5'/%3E%3C/svg%3E");
 }
 .i-ico-warning-28 {
   width: 2.8rem;
@@ -512,16 +511,6 @@ a.visited {
   //background-image: url('../images/icon/ico-delete.png');
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22' fill='none'%3E%3Cpath opacity='0.7' d='M20.1666 10.9997C20.1666 16.0623 16.0626 20.1663 11 20.1663C5.93737 20.1663 1.83331 16.0623 1.83331 10.9997C1.83331 5.93706 5.93737 1.83301 11 1.83301C16.0626 1.83301 20.1666 5.93706 20.1666 10.9997Z' fill='%23424242'/%3E%3Cpath d='M7.76374 8.73614C7.49526 8.46765 7.49526 8.03235 7.76374 7.76386C8.03223 7.49538 8.46753 7.49538 8.73601 7.76386L10.9999 10.0277L13.2638 7.76386C13.5323 7.49538 13.9676 7.49538 14.2361 7.76386C14.5045 8.03235 14.5045 8.46765 14.2361 8.73614L11.9722 11L14.236 13.2639C14.5045 13.5323 14.5045 13.9677 14.236 14.2361C13.9675 14.5046 13.5322 14.5046 13.2637 14.2361L10.9999 11.9723L8.73605 14.2361C8.46757 14.5046 8.03227 14.5046 7.76378 14.2361C7.49529 13.9677 7.49529 13.5323 7.76378 13.2639L10.0276 11L7.76374 8.73614Z' fill='white'/%3E%3C/svg%3E");
 }
-.i-ico-join {
-  width: 1.8rem;
-  height: 1.8rem;
-  background-image: url('../images/icon/ico-join.png');
-}
-.i-ico-lock {
-  width: 1.8rem;
-  height: 1.8rem;
-  background-image: url('../images/icon/ico-lock.png');
-}
 .i-ico-agree-arrow {
   //background-image: url('../images/icon/ico-agree-arrow.png');
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9.22922 7.21967C9.53485 6.92678 10.0304 6.92678 10.336 7.21967L14.7708 11.4697C15.0764 11.7626 15.0764 12.2375 14.7708 12.5303L10.336 16.7803C10.0304 17.0732 9.53484 17.0732 9.22922 16.7803C8.92359 16.4874 8.92359 16.0126 9.22922 15.7197L13.1106 12L9.22922 8.28033C8.92359 7.98744 8.92359 7.51256 9.22922 7.21967Z' fill='%23424242'/%3E%3C/svg%3E");
@@ -545,17 +534,6 @@ a.visited {
   //background-image: url('../images/icon/ico-arrow-left-primary.png');
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M14.7708 7.21967C14.4652 6.92678 13.9696 6.92678 13.664 7.21967L9.22923 11.4697C8.92359 11.7626 8.92359 12.2375 9.22923 12.5303L13.664 16.7803C13.9696 17.0732 14.4652 17.0732 14.7708 16.7803C15.0764 16.4874 15.0764 16.0126 14.7708 15.7197L10.8894 12L14.7708 8.28033C15.0764 7.98744 15.0764 7.51256 14.7708 7.21967Z' fill='%23#{$primary-color-only}'/%3E%3C/svg%3E");
 }
-.i-ico-winning-rate {
-  width: 1.6rem;
-  height: 1.6rem;
-  background-image: url('../images/icon/ico-winning-rate.png');
-}
-.i-ico-influencer {
-  width: 2rem;
-  height: 2rem;
-  background-image: url('../images/icon/ico-influencer-badge.png');
-}
-
 .i-ico-header-info {
   width: 1.6rem;
   height: 1.6rem;
@@ -567,11 +545,6 @@ a.visited {
   height: 2rem;
   //background-image: url('../images/icon/ico-point-label.png');
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9' stroke='white' stroke-width='2'/%3E%3Cpath d='M10.7275 11.2822H8.76172V9.92334H10.7275C11.0176 9.92334 11.2503 9.875 11.4258 9.77832C11.6048 9.68164 11.7355 9.54915 11.8179 9.38086C11.9038 9.20898 11.9468 9.01562 11.9468 8.80078C11.9468 8.57878 11.9038 8.37288 11.8179 8.18311C11.7355 7.98975 11.6048 7.83398 11.4258 7.71582C11.2503 7.59766 11.0176 7.53857 10.7275 7.53857H9.39551V14H7.64453V6.17969H10.7275C11.3506 6.17969 11.8841 6.29248 12.3281 6.51807C12.7757 6.74365 13.1177 7.05339 13.354 7.44727C13.5939 7.83757 13.7139 8.28516 13.7139 8.79004C13.7139 9.29492 13.5939 9.73356 13.354 10.106C13.1177 10.4784 12.7757 10.7684 12.3281 10.9761C11.8841 11.1802 11.3506 11.2822 10.7275 11.2822Z' fill='white'/%3E%3C/svg%3E");
-}
-.i-ico-fire {
-  width: 1.6rem;
-  height: 1.6rem;
-  background-image: url('../images/icon/ico-fire.png');
 }
 .i-ico-btn-my {
   // background-image: url('../images/icon/ico-btn-my.png');
@@ -585,24 +558,6 @@ a.visited {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='25' height='24' viewBox='0 0 25 24' fill='none'%3E%3Cpath d='M7.83465 8.61319C8.09878 6.23596 10.1081 4.4375 12.5 4.4375V4.4375C14.8919 4.4375 16.9012 6.23596 17.1654 8.61319L17.3769 10.5174C17.4855 11.4943 17.8034 12.4363 18.3091 13.2791L18.7948 14.0886C19.1067 14.6084 19.2627 14.8683 19.2887 15.0783C19.343 15.5158 19.1044 15.9372 18.7013 16.1157C18.5079 16.2014 18.2048 16.2014 17.5986 16.2014H7.40139C6.79521 16.2014 6.49212 16.2014 6.29867 16.1157C5.89562 15.9372 5.65703 15.5158 5.7113 15.0783C5.73734 14.8683 5.89328 14.6084 6.20516 14.0886L6.69087 13.2791C7.19656 12.4363 7.51452 11.4943 7.62306 10.5174L7.83465 8.61319Z' stroke='%23424242' stroke-width='2'/%3E%3Cpath d='M10.0651 16.7599C10.2087 17.5639 10.5252 18.2744 10.9655 18.7811C11.4057 19.2878 11.9451 19.5625 12.5 19.5625C13.055 19.5625 13.5944 19.2878 14.0346 18.7811C14.4749 18.2744 14.7914 17.5639 14.935 16.7599' stroke='%23424242' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='20.2344' cy='3.23438' r='2.25' fill='%23E45055'/%3E%3C/svg%3E");
   }
 }
-.i-ico-kind {
-  width: 3.2rem;
-  height: 3.2rem;
-  background-image: url('../images/icon/ico-kind.png');
-}
-
-.i-ico-consume-event1 {
-  width: 4.8rem;
-  height: 4.8rem;
-  background-image: url('../images/icon/ico-consume-event1.png');
-}
-
-.i-ico-consume-event2 {
-  width: 4.8rem;
-  height: 4.8rem;
-  background-image: url('../images/icon/ico-consume-event2.png');
-}
-
 .i-ico-plus {
   width: 1rem;
   height: 1rem;
