@@ -1,7 +1,10 @@
+:root {
+  --header-height: 4rem;
+}
 .header-space {
   position: sticky;
   top: 0;
-  height: 4rem;
+  height: var(--header-height);
   flex-shrink: 0;
 }
 .page-head {
@@ -30,7 +33,7 @@
   }
 
   .head-inner {
-    min-height: 4rem;
+    min-height: var(--header-height);
     padding: 0 1.2rem;
     display: flex;
     align-items: center;
