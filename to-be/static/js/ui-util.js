@@ -396,12 +396,30 @@ const onlyNumber = function (num) {
 
 //콤마넣기
 const addComma = function (num) {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  try {
+    str += '';
+    const x = str.split('.');
+    let x1 = x[0];
+    const x2 = x.length > 1 ? '.' + x[1] : '';
+    const rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  } catch (error) {
+    console.error(error.name + ':' + error.message);
+  }
 };
 
 //콤마빼기
 const removeComma = function (num) {
   return num.toString().replace(/,/gi, '');
+};
+
+// 마스킹
+const maskingText = function (str, count) {
+  const $str = str.toString();
+  return $str.substring(0, count) + $str.substring(count, str.length).replace(/(?<=.{0})./gi, '*');
 };
 
 //배열에서 문자열 찾기
@@ -435,6 +453,7 @@ const imgError = function (img) {
   // $(img).hide();
 };
 
+//****  as-is 함수추가  ******//
 const getPageAjax = function (url, param) {
   var dfd = $.Deferred();
 
@@ -456,3 +475,58 @@ const getPageAjax = function (url, param) {
 
   return dfd.promise();
 };
+
+// 전화번호 형태로 반환
+function fn_getTelVal(val) {
+  try {
+    return val
+      .replace(/[^0-9]/g, '')
+      .replace(/(^02|^0505|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})/, '$1-$2-$3')
+      .replace('--', '-');
+  } catch (e) {
+    return val;
+  }
+}
+// 휴대폰 형태로 반환
+function fn_getHpVal(val) {
+  try {
+    return val
+      .replace(/[^0-9]/g, '')
+      .replace(/(^01[0-9])([0-9]*)([0-9]{4})/, '$1-$2-$3')
+      .replace('--', '-');
+  } catch (e) {
+    return val;
+  }
+}
+// 숫자만 반환
+function fn_getOnlyNumber(val) {
+  try {
+    return val.replace(/[^0-9]/g, '');
+  } catch (e) {
+    return val;
+  }
+}
+// 숫자에 콤마 찍기
+function fn_getCommaNumber(val) {
+  return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// 입력 형식 체크
+function fn_checkValid(type, checkValue) {
+  switch (type) {
+    case 'number':
+      var pattern = /^[0-9]$/i;
+      return pattern.test(checkValue);
+    case 'email':
+      var pattern = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+      return pattern.test(checkValue);
+    case 'tel':
+      var pattern = /(^02|^0505|^1[0-9]{3}|^0[0-9]{2})-([0-9]{3,4})-([0-9]{4})/;
+      return pattern.test(checkValue);
+    case 'hp':
+      var pattern = /(^01[0-9]-([0-9]{3,4})-([0-9]{4}))/;
+      return pattern.test(checkValue);
+    default:
+      return false;
+  }
+}

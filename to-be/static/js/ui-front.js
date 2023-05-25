@@ -2472,6 +2472,7 @@ ui.form = {
     });
     */
 
+    //메일
     $(document).on('keyup focusin', '.input-mail input', function () {
       ui.form.selectMail(this);
     });
@@ -2493,6 +2494,11 @@ ui.form = {
       .on('click touchend', '.input-mail', function (e) {
         e.stopPropagation();
       });
+
+    //핸드폰
+    $(document).on('input', '.input-phone input', function () {
+      $(this).val(fn_getHpVal($(this).val()));
+    });
   },
   input: function () {
     $('.input input, .textarea.del textarea').each(function () {

@@ -48,8 +48,8 @@
                       <option value="82">KR +82</option>
                     </select>
                   </div>
-                  <div class="input">
-                    <input type="tel" id="inpPhone" placeholder="전화번호 입력" title="전화번호 입력" />
+                  <div class="input input-phone">
+                    <input type="tel" id="inpPhone" placeholder="전화번호 입력" title="전화번호 입력" maxlength="13" />
                   </div>
                 </div>
               </div>
@@ -85,7 +85,7 @@
         <div>
           <div><a href="#popChangePassword" class="btn-txt ui-pop-open">비밀번호를 잊으셨나요?</a></div>
           <div class="flex mt-8">
-            <button type="button" class="button h60 primary">로그인</button>
+            <button type="button" class="button h60 primary" disabled>로그인</button>
           </div>
         </div>
       </div>
@@ -116,11 +116,23 @@
     </div>
 
     <script>
+      //탭 클릭시 입력값 초기화
       $('.ui-tab a').click(function (e) {
         e.preventDefault();
         $('#inpPhone').val('').change();
         $('#inpMail').val('').change();
         $('#inpPassword').val('').change();
+      });
+
+      // 메인버튼 활성화
+      $('.input input').on('input change', function () {
+        const $mainBtn = $('.bottom-fixed .primary');
+        let $mainBtnActive = true;
+        if ($('#inpPassword').val() === '') $mainBtnActive = false;
+        if ($('#inpPhone').val() === '' && $('#inpMail').val() === '') $mainBtnActive = false;
+
+        if ($mainBtnActive) $mainBtn.prop('disabled', false);
+        else $mainBtn.prop('disabled', true);
       });
     </script>
   </body>

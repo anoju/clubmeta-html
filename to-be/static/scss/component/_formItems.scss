@@ -270,3 +270,31 @@ i.require {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
   }
 }
+.validate-chk-list {
+  font-size: 1.4rem;
+  > li {
+    position: relative;
+    padding-left: 2rem;
+    color: #999;
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 0.3rem;
+      width: 1.4rem;
+      height: 1.4rem;
+      @include bg-etc;
+      @include ico-check-off;
+    }
+    &.checked {
+      color: var(--primary-color);
+      &:before {
+        @include ico-check-on;
+      }
+    }
+    + li {
+      margin-top: 0.5rem;
+    }
+  }
+}
