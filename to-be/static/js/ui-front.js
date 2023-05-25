@@ -413,9 +413,9 @@ ui.common = {
     });
   },
   header: function () {
-    const $page = $(ui.className.mainWrap);
-    if (!$page.length) return;
-    $page.each(function () {
+    const $mainWrap = $(ui.className.mainWrap);
+    if (!$mainWrap.length) return;
+    $mainWrap.each(function () {
       if (!$(this).is(':visible')) return;
       const $head = $(this).find(ui.className.header);
       const $body = $head.siblings(ui.className.body);
@@ -427,7 +427,10 @@ ui.common = {
       if ($head.closest(ui.className.wrap).find('.' + ui.common.scrollShowTitleClass).length) $titleEl.addClass('scl-title-hide');
 
       const $headLeft = $head.find(ui.className.headerLeft);
-      if ($headLeft.find('h1').length) return;
+      if ($headLeft.find('h1').length) {
+        $headLeft.addClass('full');
+        return;
+      }
       const $headLeftW = $headLeft.outerWidth();
       const $headRight = $head.find(ui.className.headerRight);
       const $headRightW = $headRight.outerWidth();
@@ -2161,7 +2164,7 @@ ui.form = {
     // ui.form.select2();
     ui.form.selectUI();
     ui.form.inputUI();
-    ui.form.inpBtn();
+    ui.form.input();
     ui.form.textarea();
     ui.form.textareaUI();
     ui.form.textCountInit();
@@ -2438,58 +2441,22 @@ ui.form = {
         $this.closest('.chk-item').removeClass('checked');
       }
     });
-  },
-  inpBtn: function () {
-    //input 삭제버튼
-    const insertDel = function (el) {
-      const $this = $(el);
-      const $val = $this.val();
-      if ($this.data('removeDelBtn') !== undefined) clearTimeout($this.data('removeDelBtn'));
-      if ($this.data('removePwdBtn') !== undefined) clearTimeout($this.data('removePwdBtn'));
-      // prettier-ignore
-      if (
-        $this.prop('readonly') ||
-        $this.prop('disabled') ||
-        $this.hasClass('hasDatepicker') ||
-        $this.hasClass('time') ||
-        $this.attr('type') === 'date' ||
-        $this.hasClass('t-right') ||
-        $this.hasClass('t-center') ||
-        $this.hasClass('no-del')
-      ) {
-        return false;
-      }
-      const $closest = $this.closest('.input');
-      if ($val != '') {
-        if (!$this.siblings('.btn-inp-del').length && !$this.siblings('.datepicker').length) {
-          $this.after('<a href="#" class="btn-inp-del" role="button" aria-label="입력내용삭제"></a>');
-        }
 
-        if ($closest.hasClass('password') && !$closest.find('.btn-inp-pwd').length) {
-          $closest.append('<a href="#" class="btn-inp-pwd" role="button" aria-label="비밀번호 입력확인"></a>');
-        }
+    $(document).on('click', '.btn-inp-del', function () {
+      const $inp = $(this).prev();
+      $inp.val('').change().focus().keyup();
+    });
+    $(document).on('click', '.btn-inp-pwd', function () {
+      const $inp = $(this).siblings('input');
+      if ($inp.attr('type') === 'password') {
+        $inp.attr('type', 'text');
       } else {
-        if ($this.siblings('.btn-inp-del').length) {
-          const removeDelBtn = setTimeout(function () {
-            $this.siblings('.btn-inp-del').remove();
-            $this.removeData('removeDelBtn');
-          }, 10);
-          $this.data('removeDelBtn', removeDelBtn);
-        }
-        if ($this.siblings('.btn-inp-pwd').length) {
-          const removePwdBtn = setTimeout(function () {
-            $this.siblings('.btn-inp-pwd').remove();
-            $this.removeData('removePwdBtn');
-          }, 10);
-          $this.data('removePwdBtn', removePwdBtn);
-        }
+        $inp.attr('type', 'password');
       }
-    };
-    // $('.input input, .textarea.del textarea').each(function () {
-    //   insertDel(this);
-    // });
+    });
+
     $(document).on('keyup focusin', '.input input, .textarea.del textarea', function () {
-      insertDel(this);
+      ui.form.insertDel(this);
     });
     /*
     $(document).on('focusout', '.input:not(.show-del) input, .textarea.del:not(.show-del) textarea', function () {
@@ -2503,18 +2470,64 @@ ui.form = {
       }
     });
     */
-    $(document).on('click', '.btn-inp-del', function () {
-      const $inp = $(this).prev();
-      $inp.val('').change().focus().keyup();
-    });
-    $(document).on('click', '.btn-inp-pwd', function () {
-      const $inp = $(this).siblings('input');
-      if ($inp.attr('type') === 'password') {
-        $inp.attr('type', 'text');
-      } else {
-        $inp.attr('type', 'password');
+  },
+  input: function () {
+    $('.input input, .textarea.del textarea').each(function () {
+      ui.form.insertDel(this);
+
+      const $closest = $(this).closest('.input');
+      if ($closest.hasClass('password') && !$closest.find('.btn-inp-pwd').length) {
+        $closest.append('<a href="#" class="btn-inp-pwd" role="button" aria-label="비밀번호 입력확인"></a>');
       }
     });
+  },
+  insertDel: function (el) {
+    //input 삭제버튼
+    const $this = $(el);
+    const $val = $this.val();
+    if ($this.data('removeDelBtn') !== undefined) clearTimeout($this.data('removeDelBtn'));
+    if ($this.data('removePwdBtn') !== undefined) clearTimeout($this.data('removePwdBtn'));
+    // prettier-ignore
+    if (
+        $this.prop('readonly') ||
+        $this.prop('disabled') ||
+        $this.hasClass('hasDatepicker') ||
+        $this.hasClass('time') ||
+        $this.attr('type') === 'date' ||
+        $this.hasClass('t-right') ||
+        $this.hasClass('t-center') ||
+        $this.hasClass('no-del')
+      ) {
+        return false;
+      }
+    // const $closest = $this.closest('.input');
+    if ($val != '') {
+      if (!$this.siblings('.btn-inp-del').length && !$this.siblings('.datepicker').length) {
+        $this.after('<a href="#" class="btn-inp-del" role="button" aria-label="입력내용삭제"></a>');
+      }
+      /*
+        if ($closest.hasClass('password') && !$closest.find('.btn-inp-pwd').length) {
+          $closest.append('<a href="#" class="btn-inp-pwd" role="button" aria-label="비밀번호 입력확인"></a>');
+        }
+        */
+    } else {
+      if ($this.siblings('.btn-inp-del').length) {
+        const removeDelBtn = setTimeout(function () {
+          $this.siblings('.btn-inp-del').remove();
+          $this.removeData('removeDelBtn');
+        }, 10);
+        $this.data('removeDelBtn', removeDelBtn);
+      }
+      /*
+        if ($this.siblings('.btn-inp-pwd').length) {
+          const removePwdBtn = setTimeout(function () {
+            $this.siblings('.btn-inp-pwd').remove();
+            $this.removeData('removePwdBtn');
+          }, 10);
+          $this.data('removePwdBtn', removePwdBtn);
+        }
+        */
+    }
   },
   textareaSpace: function () {
     $('.textarea.auto-height').each(function () {
@@ -4707,19 +4720,18 @@ const Layer = {
 
     // bg close
     //  && !$popup.hasClass('full')
-    if (!$popup.hasClass(Layer.className.alert) && !$popup.hasClass(Layer.className.bgNoClose)) {
+    if (!$popup.hasClass(Layer.className.alert) && !$popup.hasClass(Layer.className.bgNoClose) && !$popup.find('.pop-bg-close').length) {
       const $bgClick = '<div class="pop-bg-close ui-pop-close" role="button" aria-label="팝업창 닫기"></div>';
-      if (!$popup.find('.pop-bg-close').length) $popup.prepend($bgClick);
+      $popup.prepend($bgClick);
     }
 
     // delay time
     const $openDelay = 20 * Layer.opening;
-    const $showDelay = 510;
 
     //show
     $popup.attr('aria-hidden', false);
     $popup.css('display', 'flex');
-
+    console.log(event.currentTarget, Event.currentTarget, 'currentTarget');
     const $FocusEvt = function () {
       //리턴 포커스
       let $focusEl = '';

@@ -81,7 +81,7 @@
       <!-- 하단고정 -->
       <div class="btn-wrap bottom-fixed">
         <div>
-          <div><a href="#" class="btn-txt">비밀번호를 잊으셨나요?</a></div>
+          <div><a href="#popChangePassword" class="btn-txt ui-pop-open">비밀번호를 잊으셨나요?</a></div>
           <div class="flex mt-8">
             <button type="button" class="button h60 primary">로그인</button>
           </div>
@@ -89,5 +89,28 @@
       </div>
       <!-- //하단고정 -->
     </article>
+
+    <div id="popChangePassword" class="popup modal">
+      <article class="page">
+        <header class="page-head">
+          <div class="head-inner">
+            <div class="head-left full">
+              <h1>비밀번호 재설정 방법</h1>
+            </div>
+            <div class="head-right">
+              <button type="button" class="head-close head-btn ui-pop-close" aria-label="닫기"></button>
+            </div>
+          </div>
+        </header>
+        <main class="page-body">
+          <div class="section">
+            <div class="btn-wrap vertical mt-0">
+              <button type="button" class="button line primary">전화번호</button>
+              <button type="button" class="button line primary">이메일</button>
+            </div>
+          </div>
+        </main>
+      </article>
+    </div>
   </body>
 </html>
