@@ -2443,7 +2443,7 @@ ui.form = {
     });
 
     $(document).on('click', '.btn-inp-del', function () {
-      const $inp = $(this).prev();
+      const $inp = $(this).siblings('input');
       $inp.val('').change().focus().keyup();
     });
     $(document).on('click', '.btn-inp-pwd', function () {
@@ -2455,10 +2455,11 @@ ui.form = {
       }
     });
 
-    $(document).on('keyup focusin', '.input input, .textarea.del textarea', function () {
+    $(document).on('keyup focusin change', '.input input, .textarea.del textarea', function () {
       ui.form.insertDel(this);
     });
     /*
+    // focusout 시 삭제버튼 숨김
     $(document).on('focusout', '.input:not(.show-del) input, .textarea.del:not(.show-del) textarea', function () {
       const $this = $(this);
       if ($this.siblings('.btn-inp-del').length) {
@@ -2470,6 +2471,25 @@ ui.form = {
       }
     });
     */
+
+    $(document).on('keyup focusin change', '.input-mail input', function () {
+      ui.form.selectMail(this);
+    });
+
+    $(document).on('click', '.input-select-list-btn', function (e) {
+      e.preventDefault();
+      const $text = $(this).text();
+      const $input = $(this).closest('.input-select-list').prev('.input').find('input');
+      $input.val($text).change();
+    });
+
+    $(document)
+      .on('click touchend', function (e) {
+        if ($('.input-select-list').length) $('.input-select-list').remove();
+      })
+      .on('click touchend', '.input-mail', function (e) {
+        e.stopPropagation();
+      });
   },
   input: function () {
     $('.input input, .textarea.del textarea').each(function () {
@@ -2486,7 +2506,7 @@ ui.form = {
     const $this = $(el);
     const $val = $this.val();
     if ($this.data('removeDelBtn') !== undefined) clearTimeout($this.data('removeDelBtn'));
-    if ($this.data('removePwdBtn') !== undefined) clearTimeout($this.data('removePwdBtn'));
+    // if ($this.data('removePwdBtn') !== undefined) clearTimeout($this.data('removePwdBtn'));
     // prettier-ignore
     if (
         $this.prop('readonly') ||
@@ -2527,6 +2547,29 @@ ui.form = {
           $this.data('removePwdBtn', removePwdBtn);
         }
         */
+    }
+  },
+  selectMail: function (el) {
+    const mailList = ['gmail.com', 'naver.com', 'kakao.com', 'daum.net', 'nate.net', 'outlook.com'];
+    const $this = $(el);
+    const $val = $this.val();
+    const $input = $this.closest('.input');
+    const $wrap = $this.closest('.input-mail');
+    let $list = $wrap.find('.input-select-list');
+    if ($val === '' || $val.indexOf('@') > -1) {
+      $input.removeClass('show-select-list');
+      $list.remove();
+    } else {
+      $input.addClass('show-select-list');
+      if (!$list.length) {
+        $input.after('<ul class="input-select-list" role="listbox"></ul>');
+        $list = $wrap.find('.input-select-list');
+      }
+      let $options = '';
+      $.each(mailList, function () {
+        $options += '<li><a href="#" class="input-select-list-btn" role="option">' + $val + '@' + this + '</a></li>';
+      });
+      $list.html($options);
     }
   },
   textareaSpace: function () {
