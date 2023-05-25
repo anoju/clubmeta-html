@@ -2444,7 +2444,7 @@ ui.form = {
 
     $(document).on('click', '.btn-inp-del', function () {
       const $inp = $(this).siblings('input');
-      $inp.val('').change().focus().keyup();
+      $inp.val('').change().focus();
     });
     $(document).on('click', '.btn-inp-pwd', function () {
       const $inp = $(this).siblings('input');
@@ -2455,7 +2455,7 @@ ui.form = {
       }
     });
 
-    $(document).on('keyup focusin', '.input input, .textarea.del textarea', function () {
+    $(document).on('keyup focusin change', '.input input, .textarea.del textarea', function () {
       ui.form.insertDel(this);
     });
     /*
@@ -2480,12 +2480,15 @@ ui.form = {
       e.preventDefault();
       const $text = $(this).text();
       const $input = $(this).closest('.input-select-list').prev('.input').find('input');
-      $input.val($text).change();
+      $input.val($text).keyup();
     });
 
     $(document)
       .on('click touchend', function (e) {
-        if ($('.input-select-list').length) $('.input-select-list').remove();
+        if ($('.input-select-list').length) {
+          $('.show-select-list').removeClass('show-select-list');
+          $('.input-select-list').remove();
+        }
       })
       .on('click touchend', '.input-mail', function (e) {
         e.stopPropagation();
