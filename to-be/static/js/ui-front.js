@@ -2562,7 +2562,7 @@ ui.form = {
     } else {
       $input.addClass('show-select-list');
       if (!$list.length) {
-        $input.after('<ul class="input-select-list" role="listbox"></ul>');
+        $wrap.append('<ul class="input-select-list" role="listbox"></ul>');
         $list = $wrap.find('.input-select-list');
       }
       let $options = '';

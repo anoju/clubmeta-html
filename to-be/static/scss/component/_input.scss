@@ -305,10 +305,6 @@
 }
 
 .input-select-list {
-  // position: absolute;
-  // top: 100%;
-  // left: -0.1rem;
-  // right: -0.1rem;
   position: relative;
   margin-top: -0.1rem;
   padding: 0 0 0.5rem;
@@ -323,6 +319,7 @@
     border-color: var(--primary-color);
   }
   .input-select-list-btn {
+    position: relative;
     display: block;
     width: 100%;
     padding: 0.5rem 1.6rem;

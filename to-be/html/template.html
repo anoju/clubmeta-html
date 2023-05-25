@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover" />
     <title>클럽메타</title>
 
-    <!-- 퍼블용 include: 개발팀에서 재include 하길 바랍니다. -->
-    <script class="__include" src="./include/head.js"></script>
+    <!-- 퍼블용 include: 개발팀에서 재include 하길 바랍니다.
+    <script class="__include" src="./include/head.js"></script> -->
+    <link href="../static/css/front.min.css" rel="stylesheet" />
   </head>
   <body>
     <article class="page">
@@ -25,7 +26,18 @@
       <!-- //헤더 -->
 
       <!-- 컨테이너(컨텐츠) -->
-      <main class="page-body"></main>
+      <main class="page-body">
+        <div class="section">
+          <div class="input-mail">
+            <div class="flex full">
+              <div class="input">
+                <input type="text" id="inpMail0" placeholder="이메일 입력" title="이메일 입력" />
+              </div>
+              <button class="button primary w-70">확인</button>
+            </div>
+          </div>
+        </div>
+      </main>
       <!-- 컨테이너(컨텐츠) -->
 
       <!-- 하단고정 -->
@@ -36,5 +48,49 @@
       </div>
       <!-- //하단고정 -->
     </article>
+
+    <script type="text/javascript" src="../static/js/lib/jquery-3.7.0.min.js"></script>
+    <script>
+      $(document).on('keyup focusin change', '.input-mail input', function () {
+        selectMail(this);
+      });
+
+      $(document).on('click', '.input-select-list-btn', function (e) {
+        e.preventDefault();
+        console.log('select');
+        const $text = $(this).text();
+        const $input = $(this).closest('.input-select-list').prev('.input').find('input');
+        $input.val($text).change();
+      });
+
+      $(document).on('click', '.primary', function (e) {
+        e.preventDefault();
+        console.log('primary');
+      });
+
+      function selectMail(el) {
+        const mailList = ['gmail.com', 'naver.com', 'kakao.com', 'daum.net', 'nate.net', 'outlook.com'];
+        const $this = $(el);
+        const $val = $this.val();
+        const $input = $this.closest('.input');
+        const $wrap = $this.closest('.input-mail');
+        let $list = $wrap.find('.input-select-list');
+        if ($val === '' || $val.indexOf('@') > -1) {
+          $input.removeClass('show-select-list');
+          $list.remove();
+        } else {
+          $input.addClass('show-select-list');
+          if (!$list.length) {
+            $wrap.append('<ul class="input-select-list" role="listbox"></ul>');
+            $list = $wrap.find('.input-select-list');
+          }
+          let $options = '';
+          $.each(mailList, function () {
+            $options += '<li><a href="#" class="input-select-list-btn" role="option">' + $val + '@' + this + '</a></li>';
+          });
+          $list.html($options);
+        }
+      }
+    </script>
   </body>
 </html>
