@@ -59,7 +59,8 @@
         e.preventDefault();
         console.log('select');
         const $text = $(this).text();
-        const $input = $(this).closest('.input-select-list').prev('.input').find('input');
+        const $input = $(this).closest('.input-select-list').prev().find('input');
+        console.log($input);
         $input.val($text).change();
       });
 
