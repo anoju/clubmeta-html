@@ -2455,7 +2455,7 @@ ui.form = {
       }
     });
 
-    $(document).on('keyup focusin change', '.input input, .textarea.del textarea', function () {
+    $(document).on('keyup focusin', '.input input, .textarea.del textarea', function () {
       ui.form.insertDel(this);
     });
     /*
@@ -2472,7 +2472,7 @@ ui.form = {
     });
     */
 
-    $(document).on('keyup focusin change', '.input-mail input', function () {
+    $(document).on('keyup focusin', '.input-mail input', function () {
       ui.form.selectMail(this);
     });
 
