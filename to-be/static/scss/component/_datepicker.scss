@@ -66,6 +66,7 @@ jq-Datepicker
     bottom: 0;
     top: 5.3rem;
     overflow: hidden;
+    opacity: 0.08;
     .txt {
       position: absolute;
       left: 50%;
@@ -76,40 +77,45 @@ jq-Datepicker
     }
     .arr {
       position: absolute;
-      width: 5rem;
-      height: 5rem;
-      background: url(../images/common/icon-calendar-swiper.png) no-repeat left top / 5rem auto;
+      width: 4rem;
+      height: 4rem;
+      @include bg-etc;
+      // background: url(../images/common/icon-calendar-swiper.png) no-repeat left top / 5rem auto;
       animation-duration: 1.5s;
       animation-timing-function: ease;
       &.top,
       &.bottom {
         left: 50%;
-        margin-left: -2.5rem;
+        margin-left: -2rem;
       }
       &.top {
         top: 2rem;
-        background-position: 0 -5rem;
         animation-name: bounceInDown;
+        // background-position: 0 -5rem;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)'%3E%3Cpath d='M 66.878 37.366 c -0.781 -0.781 -2.047 -0.781 -2.828 0 L 47 54.415 V 2 c 0 -1.104 -0.896 -2 -2 -2 s -2 0.896 -2 2 v 52.415 L 25.95 37.366 c -0.78 -0.781 -2.048 -0.781 -2.828 0 c -0.781 0.781 -0.781 2.047 0 2.828 l 20.463 20.462 c 0.093 0.094 0.196 0.177 0.307 0.251 c 0.048 0.032 0.099 0.053 0.148 0.081 c 0.065 0.036 0.127 0.075 0.196 0.103 c 0.065 0.027 0.133 0.042 0.2 0.062 c 0.058 0.017 0.113 0.039 0.173 0.051 c 0.129 0.026 0.26 0.039 0.392 0.039 s 0.262 -0.014 0.392 -0.039 c 0.06 -0.012 0.115 -0.034 0.173 -0.051 c 0.067 -0.02 0.135 -0.035 0.2 -0.062 c 0.069 -0.028 0.131 -0.067 0.196 -0.103 c 0.049 -0.027 0.101 -0.049 0.148 -0.081 c 0.11 -0.074 0.213 -0.157 0.307 -0.251 l 20.463 -20.462 C 67.659 39.413 67.659 38.146 66.878 37.366 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3Cpath d='M 45 90 C 20.187 90 0 69.813 0 45 C 0 26.412 11.681 9.498 29.066 2.913 c 1.034 -0.393 2.188 0.129 2.579 1.162 c 0.392 1.033 -0.129 2.188 -1.162 2.579 C 14.643 12.653 4 28.064 4 45 c 0 22.607 18.393 41 41 41 s 41 -18.393 41 -41 c 0 -16.936 -10.643 -32.347 -26.483 -38.347 c -1.033 -0.391 -1.554 -1.545 -1.162 -2.579 c 0.391 -1.033 1.548 -1.553 2.578 -1.162 C 78.319 9.498 90 26.412 90 45 C 90 69.813 69.813 90 45 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
       }
       &.bottom {
         bottom: 2rem;
-        background-position: 0 0;
         animation-name: bounceInUp;
+        // background-position: 0 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81) matrix(1 0 0 -1 0 90)'%3E%3Cpath d='M 66.878 37.366 c -0.781 -0.781 -2.047 -0.781 -2.828 0 L 47 54.415 V 2 c 0 -1.104 -0.896 -2 -2 -2 s -2 0.896 -2 2 v 52.415 L 25.95 37.366 c -0.78 -0.781 -2.048 -0.781 -2.828 0 c -0.781 0.781 -0.781 2.047 0 2.828 l 20.463 20.462 c 0.093 0.094 0.196 0.177 0.307 0.251 c 0.048 0.032 0.099 0.053 0.148 0.081 c 0.065 0.036 0.127 0.075 0.196 0.103 c 0.065 0.027 0.133 0.042 0.2 0.062 c 0.058 0.017 0.113 0.039 0.173 0.051 c 0.129 0.026 0.26 0.039 0.392 0.039 s 0.262 -0.014 0.392 -0.039 c 0.06 -0.012 0.115 -0.034 0.173 -0.051 c 0.067 -0.02 0.135 -0.035 0.2 -0.062 c 0.069 -0.028 0.131 -0.067 0.196 -0.103 c 0.049 -0.027 0.101 -0.049 0.148 -0.081 c 0.11 -0.074 0.213 -0.157 0.307 -0.251 l 20.463 -20.462 C 67.659 39.413 67.659 38.146 66.878 37.366 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3Cpath d='M 45 90 C 20.187 90 0 69.813 0 45 C 0 26.412 11.681 9.498 29.066 2.913 c 1.034 -0.393 2.188 0.129 2.579 1.162 c 0.392 1.033 -0.129 2.188 -1.162 2.579 C 14.643 12.653 4 28.064 4 45 c 0 22.607 18.393 41 41 41 s 41 -18.393 41 -41 c 0 -16.936 -10.643 -32.347 -26.483 -38.347 c -1.033 -0.391 -1.554 -1.545 -1.162 -2.579 c 0.391 -1.033 1.548 -1.553 2.578 -1.162 C 78.319 9.498 90 26.412 90 45 C 90 69.813 69.813 90 45 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
       }
       &.left,
       &.right {
         top: 50%;
-        margin-top: -2.5rem;
+        margin-top: -2rem;
       }
       &.left {
         left: 2rem;
-        background-position: 0 -15rem;
         animation-name: bounceInLeft;
+        // background-position: 0 -15rem;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(1.4065934065934158 254.59340659340654) rotate(-90) scale(2.81 2.81)'%3E%3Cpath d='M 66.878 37.366 c -0.781 -0.781 -2.047 -0.781 -2.828 0 L 47 54.415 V 2 c 0 -1.104 -0.896 -2 -2 -2 s -2 0.896 -2 2 v 52.415 L 25.95 37.366 c -0.78 -0.781 -2.048 -0.781 -2.828 0 c -0.781 0.781 -0.781 2.047 0 2.828 l 20.463 20.462 c 0.093 0.094 0.196 0.177 0.307 0.251 c 0.048 0.032 0.099 0.053 0.148 0.081 c 0.065 0.036 0.127 0.075 0.196 0.103 c 0.065 0.027 0.133 0.042 0.2 0.062 c 0.058 0.017 0.113 0.039 0.173 0.051 c 0.129 0.026 0.26 0.039 0.392 0.039 s 0.262 -0.014 0.392 -0.039 c 0.06 -0.012 0.115 -0.034 0.173 -0.051 c 0.067 -0.02 0.135 -0.035 0.2 -0.062 c 0.069 -0.028 0.131 -0.067 0.196 -0.103 c 0.049 -0.027 0.101 -0.049 0.148 -0.081 c 0.11 -0.074 0.213 -0.157 0.307 -0.251 l 20.463 -20.462 C 67.659 39.413 67.659 38.146 66.878 37.366 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3Cpath d='M 45 90 C 20.187 90 0 69.813 0 45 C 0 26.412 11.681 9.498 29.066 2.913 c 1.034 -0.393 2.188 0.129 2.579 1.162 c 0.392 1.033 -0.129 2.188 -1.162 2.579 C 14.643 12.653 4 28.064 4 45 c 0 22.607 18.393 41 41 41 s 41 -18.393 41 -41 c 0 -16.936 -10.643 -32.347 -26.483 -38.347 c -1.033 -0.391 -1.554 -1.545 -1.162 -2.579 c 0.391 -1.033 1.548 -1.553 2.578 -1.162 C 78.319 9.498 90 26.412 90 45 C 90 69.813 69.813 90 45 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
       }
       &.right {
         right: 2rem;
-        background-position: 0 -10rem;
         animation-name: bounceInRight;
+        // background-position: 0 -10rem;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(1.4065934065933874 254.5934065934066) rotate(-90) scale(2.81 2.81) matrix(1 0 0 -1 0 90)'%3E%3Cpath d='M 66.878 37.366 c -0.781 -0.781 -2.047 -0.781 -2.828 0 L 47 54.415 V 2 c 0 -1.104 -0.896 -2 -2 -2 s -2 0.896 -2 2 v 52.415 L 25.95 37.366 c -0.78 -0.781 -2.048 -0.781 -2.828 0 c -0.781 0.781 -0.781 2.047 0 2.828 l 20.463 20.462 c 0.093 0.094 0.196 0.177 0.307 0.251 c 0.048 0.032 0.099 0.053 0.148 0.081 c 0.065 0.036 0.127 0.075 0.196 0.103 c 0.065 0.027 0.133 0.042 0.2 0.062 c 0.058 0.017 0.113 0.039 0.173 0.051 c 0.129 0.026 0.26 0.039 0.392 0.039 s 0.262 -0.014 0.392 -0.039 c 0.06 -0.012 0.115 -0.034 0.173 -0.051 c 0.067 -0.02 0.135 -0.035 0.2 -0.062 c 0.069 -0.028 0.131 -0.067 0.196 -0.103 c 0.049 -0.027 0.101 -0.049 0.148 -0.081 c 0.11 -0.074 0.213 -0.157 0.307 -0.251 l 20.463 -20.462 C 67.659 39.413 67.659 38.146 66.878 37.366 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3Cpath d='M 45 90 C 20.187 90 0 69.813 0 45 C 0 26.412 11.681 9.498 29.066 2.913 c 1.034 -0.393 2.188 0.129 2.579 1.162 c 0.392 1.033 -0.129 2.188 -1.162 2.579 C 14.643 12.653 4 28.064 4 45 c 0 22.607 18.393 41 41 41 s 41 -18.393 41 -41 c 0 -16.936 -10.643 -32.347 -26.483 -38.347 c -1.033 -0.391 -1.554 -1.545 -1.162 -2.579 c 0.391 -1.033 1.548 -1.553 2.578 -1.162 C 78.319 9.498 90 26.412 90 45 C 90 69.813 69.813 90 45 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
       }
       &.off {
         opacity: 0;
@@ -155,25 +161,29 @@ jq-Datepicker
   .ui-datepicker-prev-y {
     order: 1;
     span {
-      background-image: url(../images/icon/btn-datepicker-prev-y.png);
+      //background-image: url(../images/icon/btn-datepicker-prev-y.png);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(254.59340659340654 254.59340659340654) rotate(180) scale(2.81 2.81) matrix(1 0 0 -1 0 90)'%3E%3Cpath d='M 33.25 90 c -0.384 0 -0.768 -0.146 -1.061 -0.439 c -0.586 -0.586 -0.586 -1.535 0 -2.121 L 74.629 45 L 32.189 2.561 c -0.586 -0.585 -0.586 -1.536 0 -2.121 c 0.586 -0.586 1.535 -0.586 2.121 0 l 43.5 43.5 c 0.586 0.585 0.586 1.536 0 2.121 l -43.5 43.5 C 34.018 89.854 33.634 90 33.25 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(29,29,27); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3Cpath d='M 13.25 90 c -0.384 0 -0.768 -0.146 -1.061 -0.439 c -0.586 -0.586 -0.586 -1.535 0 -2.121 L 54.629 45 L 12.189 2.561 c -0.586 -0.585 -0.586 -1.536 0 -2.121 c 0.586 -0.586 1.535 -0.586 2.121 0 l 43.5 43.5 c 0.586 0.585 0.586 1.536 0 2.121 l -43.5 43.5 C 14.018 89.854 13.634 90 13.25 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(29,29,27); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
     }
   }
   .ui-datepicker-prev {
     order: 2;
     span {
-      background-image: url(../images/icon/btn-datepicker-prev.png);
+      // background-image: url(../images/icon/btn-datepicker-prev.png);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(254.59340659340654 254.59340659340654) rotate(180) scale(2.81 2.81) matrix(1 0 0 -1 0 90)'%3E%3Cpath d='M 23.25 90 c -0.384 0 -0.768 -0.146 -1.061 -0.439 c -0.586 -0.586 -0.586 -1.535 0 -2.121 L 64.629 45 L 22.189 2.561 c -0.586 -0.585 -0.586 -1.536 0 -2.121 c 0.586 -0.586 1.535 -0.586 2.121 0 l 43.5 43.5 c 0.586 0.585 0.586 1.536 0 2.121 l -43.5 43.5 C 24.018 89.854 23.634 90 23.25 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(29,29,27); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
     }
   }
   .ui-datepicker-next {
     order: 4;
     span {
-      background-image: url(../images/icon/btn-datepicker-next.png);
+      // background-image: url(../images/icon/btn-datepicker-next.png);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)'%3E%3Cpath d='M 23.25 90 c -0.384 0 -0.768 -0.146 -1.061 -0.439 c -0.586 -0.586 -0.586 -1.535 0 -2.121 L 64.629 45 L 22.189 2.561 c -0.586 -0.585 -0.586 -1.536 0 -2.121 c 0.586 -0.586 1.535 -0.586 2.121 0 l 43.5 43.5 c 0.586 0.585 0.586 1.536 0 2.121 l -43.5 43.5 C 24.018 89.854 23.634 90 23.25 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(29,29,27); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
     }
   }
   .ui-datepicker-next-y {
     order: 5;
     span {
-      background-image: url(../images/icon/btn-datepicker-next-y.png);
+      // background-image: url(../images/icon/btn-datepicker-next-y.png);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' width='256' height='256' viewBox='0 0 256 256' xml:space='preserve'%3E%3Cdefs%3E%3C/defs%3E%3Cg style='stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;' transform='translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)'%3E%3Cpath d='M 33.25 90 c -0.384 0 -0.768 -0.146 -1.061 -0.439 c -0.586 -0.586 -0.586 -1.535 0 -2.121 L 74.629 45 L 32.189 2.561 c -0.586 -0.585 -0.586 -1.536 0 -2.121 c 0.586 -0.586 1.535 -0.586 2.121 0 l 43.5 43.5 c 0.586 0.585 0.586 1.536 0 2.121 l -43.5 43.5 C 34.018 89.854 33.634 90 33.25 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(29,29,27); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3Cpath d='M 13.25 90 c -0.384 0 -0.768 -0.146 -1.061 -0.439 c -0.586 -0.586 -0.586 -1.535 0 -2.121 L 54.629 45 L 12.189 2.561 c -0.586 -0.585 -0.586 -1.536 0 -2.121 c 0.586 -0.586 1.535 -0.586 2.121 0 l 43.5 43.5 c 0.586 0.585 0.586 1.536 0 2.121 l -43.5 43.5 C 14.018 89.854 13.634 90 13.25 90 z' style='stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(29,29,27); fill-rule: nonzero; opacity: 1;' transform=' matrix(1 0 0 1 0 0) ' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
     }
   }
 

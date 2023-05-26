@@ -240,7 +240,7 @@
   border-width: 0;
   border-bottom: 0.2rem solid #d6dbe1;
   border-radius: 0;
-  padding-top: 2.2rem;
+  padding-top: 1.4rem;
   background: none;
   &:before {
     content: '';
@@ -257,7 +257,7 @@
 @mixin input-line-lbl {
   position: absolute;
   left: 0;
-  top: 2.6rem;
+  top: 1.8rem;
   font-size: 2rem;
   line-height: 1.4;
   color: var(--placeholder-txt-color);
