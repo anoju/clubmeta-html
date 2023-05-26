@@ -4786,7 +4786,7 @@ const Layer = {
     //show
     $popup.attr('aria-hidden', false);
     $popup.css('display', 'flex');
-    console.log(event.currentTarget, Event.currentTarget, 'currentTarget');
+    // console.log(event.currentTarget, Event.currentTarget, 'currentTarget');
     const $FocusEvt = function () {
       //리턴 포커스
       let $focusEl = '';
