@@ -69,44 +69,6 @@
         <div class="section">
           <!--텍스트-->
           <div>
-            <h1 class="gd__h1">input</h1>
-            <div>
-              <h2 class="gd__h2">일반</h2>
-              <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" /></div>
-              <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
-              <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
-
-              <h2 class="gd__h2">line</h2>
-              <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" /></div>
-              <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
-              <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
-
-              <h2 class="gd__h2">패스워드</h2>
-              <div class="input password"><input type="password" placeholder="비밀번호 입력" title="비밀번호입력" /></div>
-
-              <h2 class="gd__h2">조합</h2>
-              <div class="input">
-                <input type="text" placeholder="내용을 입력하세요" />
-                <button type="button" class="button line h32">버튼</button>
-              </div>
-              <br />
-              <div class="flex">
-                <div class="input">
-                  <input type="text" placeholder="내용을 입력하세요" />
-                </div>
-                <button type="button" class="button line w-80f">버튼</button>
-              </div>
-              <br />
-              <div class="input">
-                <input type="text" placeholder="내용을 입력하세요" />
-                <button type="button" class="button h32 search" aria-label="검색"><i class="i-btn-search-24" aria-hidden="true"></i></button>
-              </div>
-              <div class="input">
-                <input type="tel" placeholder="금액을 입력하세요" />
-                <div class="unit">원</div>
-              </div>
-            </div>
-
             <h1 class="gd__h1">checkbox</h1>
             <div>
               <h2 class="gd__h2">일반</h2>
@@ -506,6 +468,48 @@
               </div>
             </div>
 
+            <h1 class="gd__h1">input</h1>
+            <div>
+              <h2 class="gd__h2">일반</h2>
+              <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" /></div>
+              <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
+              <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
+
+              <h2 class="gd__h2">box, line</h2>
+              <div class="input box"><input type="text" placeholder="내용을 입력하세요" title="내용입력" /></div>
+              <div class="input box"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
+              <div class="input box"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
+
+              <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" /></div>
+              <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
+              <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
+
+              <h2 class="gd__h2">패스워드</h2>
+              <div class="input password"><input type="password" placeholder="비밀번호 입력" title="비밀번호입력" /></div>
+
+              <h2 class="gd__h2">조합</h2>
+              <div class="input">
+                <input type="text" placeholder="내용을 입력하세요" />
+                <button type="button" class="button line h32">버튼</button>
+              </div>
+              <br />
+              <div class="flex">
+                <div class="input">
+                  <input type="text" placeholder="내용을 입력하세요" />
+                </div>
+                <button type="button" class="button line w-80f">버튼</button>
+              </div>
+              <br />
+              <div class="input">
+                <input type="text" placeholder="내용을 입력하세요" />
+                <button type="button" class="button h32 search" aria-label="검색"><i class="i-btn-search-24" aria-hidden="true"></i></button>
+              </div>
+              <div class="input">
+                <input type="tel" placeholder="금액을 입력하세요" />
+                <div class="unit">원</div>
+              </div>
+            </div>
+
             <h1 class="gd__h1">select</h1>
             <div>
               <h2 class="gd__h2">기본</h2>
@@ -528,8 +532,26 @@
                   </select>
                 </div>
               </div>
-              <h2 class="gd__h2">line</h2>
+              <h2 class="gd__h2">box, line</h2>
               <div>
+                <div class="select box">
+                  <select title="선택">
+                    <option value="">선택</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                  </select>
+                </div>
+
+                <div class="select box">
+                  <select title="날짜 선택" disabled>
+                    <option value="">날짜 선택</option>
+                    <option value="1">1일</option>
+                    <option value="2">2일</option>
+                    <option value="3">3일</option>
+                  </select>
+                </div>
+
                 <div class="select line">
                   <select title="선택">
                     <option value="">선택</option>
@@ -572,20 +594,27 @@
               <div class="textarea">
                 <textarea rows="3">textarea</textarea>
               </div>
-              <h2 class="gd__h2">line</h2>
+              <h2 class="gd__h2">box, line</h2>
+              <div class="textarea box">
+                <textarea rows="1">textarea</textarea>
+              </div>
+              <div class="textarea box">
+                <textarea rows="3">textarea</textarea>
+              </div>
               <div class="textarea line">
                 <textarea rows="1">textarea</textarea>
               </div>
               <div class="textarea line">
                 <textarea rows="3">textarea</textarea>
               </div>
+
               <h2 class="gd__h2">auto height</h2>
               <div class="textarea auto-height">
                 <textarea>textarea</textarea>
               </div>
             </div>
 
-            <h2 class="gd__h1">line</h2>
+            <h2 class="gd__h1">line + label</h2>
             <div>
               <div class="input line">
                 <input type="text" id="input2-1" title="내용입력" placeholder="내용입력" />
@@ -611,32 +640,35 @@
             </div>
 
             <h1 class="gd__h1">입력폼</h1>
+            <h2 class="gd__h2">사용</h2>
             <div>
-              <div class="input form-box">
-                <div class="form-lbl">문의 제목</div>
-                <input id="input" type="text" placeholder="제목을 입력해주세요" title="제목입력" />
+              <label for="inpPhone" class="form-lbl">전화번호</label>
+              <div class="form-item">
+                <div class="flex full">
+                  <div class="select w-100 fz-14">
+                    <select title="국가번호 선택">
+                      <option value="82">KR +82</option>
+                    </select>
+                  </div>
+                  <div class="input input-phone">
+                    <input type="tel" id="inpPhone" placeholder="전화번호 입력" title="전화번호 입력" maxlength="13" />
+                  </div>
+                </div>
               </div>
 
-              <div class="select form-box">
-                <div class="form-lbl">문의 유형</div>
-                <select id="select">
-                  <option value="">문의 유형을 선택해주세요</option>
-                  <option value="1">매치</option>
-                  <option value="2">회원정보</option>
-                  <option value="3">마이자산</option>
-                  <option value="4">인증서</option>
-                  <option value="5">등록유형05</option>
-                  <option value="6">등록유형06</option>
-                </select>
+              <label for="inpMail" class="form-lbl">이메일</label>
+              <div class="form-item">
+                <div class="flex full">
+                  <div class="input-mail">
+                    <div class="input">
+                      <input type="mail" id="inpMail" placeholder="이메일 입력" title="이메일 입력" />
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              <div class="textarea form-box">
-                <div class="form-lbl">문의 내용</div>
-                <textarea id="textarea" rows="7" placeholder="내용을 입력해주세요" title="내용입력"></textarea>
-              </div>
-
-              <h2 class="gd__h2">임시 폼타입(안씀)</h2>
-
+            </div>
+            <h2 class="gd__h2">임시</h2>
+            <div>
               <div class="form-lbl">
                 <div class="left">
                   <label for="userID">아이디</label>
