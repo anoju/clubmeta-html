@@ -5695,6 +5695,47 @@ const Layer = {
 
     $('body').append($html);
     Layer.open('#' + tooltipPopId);
+  },
+  like: function () {
+    const wrapClass = '.layer-like';
+    const $delayTime = 2000;
+    let $fileUrl = ui.basePath() + '/lottie/love.json';
+    const $html = '<div class="' + wrapClass.slice(1) + '" aria-hidden="true"><div class="lottie" data-lottie="' + $fileUrl + '"></div></div>';
+    if ($(wrapClass).length) return;
+    // 넣고
+    $('body').append($html);
+    // 보여주고
+    ui.common.lottie(
+      function (target) {
+        if ($(target).closest(wrapClass).length) {
+          $(wrapClass).addClass('show');
+        }
+      },
+      function (target) {
+        if ($(target).closest(wrapClass).length) {
+          $(wrapClass).removeClass('show');
+          const $transitionend = function () {
+            $(wrapClass).remove();
+            $(wrapClass).off('transitionend', $transitionend);
+          };
+          $(wrapClass).on('transitionend', $transitionend);
+        }
+      }
+    );
+    /*
+    setTimeout(function () {
+      $('.layer-like')
+      ui.common.lottie();
+      // 숨기고
+      setTimeout(function () {
+        $('.layer-like').removeClass('show');
+        // 지우고
+        setTimeout(function () {
+          $('.layer-like').remove();
+        }, 310);
+      }, $delayTime);
+    }, 10);
+    */
   }
 };
 Layer.morphing = {
