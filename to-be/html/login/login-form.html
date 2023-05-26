@@ -138,7 +138,8 @@
       function passwordFind(type) {
         const $setObj = {
           title: '비밀번호 재설정 본인인증',
-          pageType: type
+          pageType: type,
+          checkType: 'passwordReset'
         };
         uiStorage.set('userCheckType', JSON.stringify($setObj));
         location.href = '../common/user-check.html';

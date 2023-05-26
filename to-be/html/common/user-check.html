@@ -24,40 +24,55 @@
 
       <!-- 컨테이너(컨텐츠) -->
       <main class="page-body">
-        <div class="section">
-          <div id="inpPhoneWrap">
-            <label for="inpPhone" class="form-lbl">전화번호</label>
-            <div class="form-item">
-              <div class="flex full">
-                <div class="select w-100 fz-14">
-                  <select id="inpPhoneSel" title="국가번호 선택">
-                    <option value="82">KR +82</option>
-                  </select>
-                </div>
-                <div class="input input-phone">
-                  <input type="tel" id="inpPhone" placeholder="전화번호 입력" title="전화번호 입력" maxlength="13" />
-                </div>
-              </div>
-            </div>
-
-            <p class="validate-txt is-error" style="display: none">이미 사용중인 전화번호 입니다.</p>
-            <p class="validate-txt is-error" style="display: none">전화번호 형식이 올바르지 않습니다.</p>
+        <div class="tab-line-menu ui-tab">
+          <div class="tab-inner">
+            <i class="tab-line" aria-hidden="true"></i>
+            <ul class="tab-list">
+              <li class="tab">
+                <a href="#inpPhoneWrap"><span>전화</span></a>
+              </li>
+              <li class="tab">
+                <a href="#inpMailWrap"><span>이메일</span></a>
+              </li>
+            </ul>
           </div>
-
-          <div id="inpMailWrap" style="display: none">
-            <label for="inpMail" class="form-lbl">이메일</label>
-            <div class="form-item">
-              <div class="flex full">
-                <div class="input-mail">
-                  <div class="input">
-                    <input type="mail" id="inpMail" placeholder="이메일 입력" title="이메일 입력" />
+        </div>
+        <div class="section">
+          <div class="tab-panels">
+            <div id="inpPhoneWrap" class="tab-panel">
+              <label for="inpPhone" class="form-lbl">전화번호</label>
+              <div class="form-item">
+                <div class="flex full">
+                  <div class="select w-100 fz-14">
+                    <select id="inpPhoneSel" title="국가번호 선택">
+                      <option value="82">KR +82</option>
+                    </select>
+                  </div>
+                  <div class="input input-phone">
+                    <input type="tel" id="inpPhone" placeholder="전화번호 입력" title="전화번호 입력" maxlength="13" />
                   </div>
                 </div>
               </div>
+
+              <p class="validate-txt is-error" style="display: none">이미 사용중인 전화번호 입니다.</p>
+              <p class="validate-txt is-error" style="display: none">전화번호 형식이 올바르지 않습니다.</p>
             </div>
 
-            <p class="validate-txt is-error" style="display: none">정확한 메일 주소를 입력해주세요.</p>
-            <p class="validate-txt is-success" style="display: none">사용가능한 이메일입니다.</p>
+            <div id="inpMailWrap" class="tab-panel">
+              <label for="inpMail" class="form-lbl">이메일</label>
+              <div class="form-item">
+                <div class="flex full">
+                  <div class="input-mail">
+                    <div class="input">
+                      <input type="mail" id="inpMail" placeholder="이메일 입력" title="이메일 입력" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p class="validate-txt is-error" style="display: none">정확한 메일 주소를 입력해주세요.</p>
+              <p class="validate-txt is-success" style="display: none">사용가능한 이메일입니다.</p>
+            </div>
           </div>
         </div>
       </main>
@@ -74,18 +89,25 @@
 
     <script>
       const userCheckType = JSON.parse(uiStorage.get('userCheckType'));
-      let pageType;
       let pageTitle;
+      let pageType;
+      let checkType;
       if (userCheckType) {
-        if (userCheckType.title) pageTitle = userCheckType.title;
-        if (userCheckType.pageType) pageType = userCheckType.pageType;
+        if (userCheckType.title) {
+          pageTitle = userCheckType.title;
+          $('.head-title h1').text(pageTitle);
+        }
+        if (userCheckType.pageType) {
+          pageType = userCheckType.pageType;
+          $('.ui-tab').remove();
+          if (pageType === 'mail') {
+            $('#inpMailWrap').show();
+          } else {
+            $('#inpPhoneWrap').show();
+          }
+        }
+        if (userCheckType.checkType) checkType = userCheckType.checkType;
         uiStorage.remove('userCheckType');
-      }
-
-      if (pageTitle) $('.head-title h1').text(pageTitle);
-      if (pageType === 'mail') {
-        $('#inpPhoneWrap').hide();
-        $('#inpMailWrap').show();
       }
 
       // 메인버튼 활성화
@@ -103,7 +125,7 @@
         const $setValue = pageType === 'mail' ? $('#inpMail').val() : '+' + $('#inpPhoneSel').val() + ' ' + $('#inpPhone').val();
         const $setObj = {
           title: pageTitle,
-          checkType: 'passwordReset',
+          checkType: checkType,
           data: $setValue
         };
         uiStorage.set('userCheckType', JSON.stringify($setObj));

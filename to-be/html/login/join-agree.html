@@ -220,6 +220,16 @@
         if ($('#chk2').prop('checked') && $('#chk3').prop('checked')) $('#btnMain').prop('disabled', false);
         else $('#btnMain').prop('disabled', true);
       }
+
+      $('#btnMain').click(function (e) {
+        e.preventDefault();
+        const $setObj = {
+          title: '가입하기 본인인증',
+          checkType: 'join'
+        };
+        uiStorage.set('userCheckType', JSON.stringify($setObj));
+        location.href = '../common/user-check.html';
+      });
     </script>
   </body>
 </html>
