@@ -66,7 +66,7 @@
       }
 
       // 만료시간 처리
-      let codeExpTimeSec = 10;
+      let codeExpTimeSec = 180;
       function fn_setConfirmCodeTimeout() {
         // 남은 시간 표시
         var remainMin = parseInt(codeExpTimeSec / 60);
@@ -117,7 +117,13 @@
           // 모두 다 입력 시
           if ($this.val() !== '' && $input.index() === $length - 1) {
             console.log('전부 입력!!!');
-            if (checkType === 'passwordReset') location.href = '../login/password-reset.html';
+            if (checkType === 'passwordReset') {
+              location.href = '../mypage/password-form.html?type=reset';
+            } else if (checkType === 'passwordChange') {
+              location.href = '../mypage/password-form.html?type=change';
+            } else if (checkType === 'join') {
+              location.href = '../mypage/password-form.html?type=join';
+            }
           }
         })
         .on('keydown', function (e) {

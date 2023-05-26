@@ -2196,6 +2196,11 @@ ui.form = {
         $(this).addClass('off');
       }
     });
+    if ($('.input-date input').length) {
+      $('.input-date input').each(function () {
+        ui.form.selectDate(this);
+      });
+    }
   },
   focus: function () {
     const $inpEls = 'input:not(:checkbox):not(:radio):not(:hidden), select, textarea, .btn-select';
@@ -2500,6 +2505,19 @@ ui.form = {
     $(document).on('input', '.input-phone input', function () {
       $(this).val(fn_getHpVal($(this).val()));
     });
+
+    // 날짜선택기
+    $(document).on('focusin', '.input-date input', function () {
+      $(this).closest('.input-date').addClass('open');
+    });
+
+    $(document)
+      .on('click touchend', function (e) {
+        if ($('.input-date.open').length) $('.input-date.open').removeClass('open');
+      })
+      .on('click touchend', '.input-date', function (e) {
+        e.stopPropagation();
+      });
   },
   input: function () {
     $('.input input, .textarea.del textarea').each(function () {
@@ -2581,6 +2599,128 @@ ui.form = {
       });
       $list.html($options);
     }
+  },
+  selectDateIdx: 0,
+  selectDate: function (el, i = 0) {
+    const $el = $(el);
+    if (!$el.length) return;
+
+    const $wrap = $el.closest('.input-date');
+    if ($wrap.find('.scroll-selector-wrap').length) return;
+    let $scrollHtml = '<div class="scroll-selector-wrap">';
+    $scrollHtml += '<div class="year" id="scrollSelectorYear-' + ui.form.selectDateIdx + '"></div>';
+    $scrollHtml += '<div class="month" id="scrollSelectorMonth-' + ui.form.selectDateIdx + '"></div>';
+    $scrollHtml += '<div class="day" id="scrollSelectorDay-' + ui.form.selectDateIdx + '"></div>';
+    $scrollHtml += '</div>';
+    $wrap.append($scrollHtml);
+
+    var yearSelector;
+    var monthSelector;
+    var dateSelector;
+
+    function fn_initDateSelector() {
+      var now = new Date();
+
+      yearSelector = new scrollSelector({
+        el: '#scrollSelectorYear-' + ui.form.selectDateIdx,
+        option: fn_getDateOption('year'),
+        value: now.getFullYear(),
+        // sensitivity: 5, // 숫자가 낮을수록 돌렸을때 팽그르르 돌며, 초기 select 할때도 느려진다. 기본값은 0.8
+        onChange: (selected) => {
+          fn_dateChanged('year');
+        }
+      });
+      // 			yearSelector.select(now.getFullYear());
+
+      monthSelector = new scrollSelector({
+        el: '#scrollSelectorMonth-' + ui.form.selectDateIdx,
+        loop: true,
+        option: fn_getDateOption('month'),
+        value: now.getMonth() + 1,
+        sensitivity: 5, // 숫자가 낮을수록 돌렸을때 팽그르르 돌며, 초기 select 할때도 느려진다. 기본값은 0.8
+        onChange: (selected) => {
+          fn_dateChanged('month');
+        }
+      });
+
+      dateSelector = new scrollSelector({
+        el: '#scrollSelectorDay-' + ui.form.selectDateIdx,
+        option: fn_getDateOption('date'),
+        value: now.getDate(),
+        sensitivity: 5, // 숫자가 낮을수록 돌렸을때 팽그르르 돌며, 초기 select 할때도 느려진다. 기본값은 0.8
+        onChange: (selected) => {
+          fn_dateChanged('date');
+        }
+      });
+
+      ui.form.selectDateIdx += 1;
+      $(this).data({
+        year: yearSelector,
+        month: monthSelector,
+        date: dateSelector
+      });
+    }
+
+    // 날짜 변경시 처리(type : year/month/date)
+    function fn_dateChanged(type) {
+      if (type == 'year' || type == 'month') {
+        // 연도나 월이 변경 되면 선택된 연/월로 일자 Option 재조회
+        var newDateOption = fn_getDateOption('date');
+        // 일자 목록보다 선택된 날짜가 크면
+        if (dateSelector.value > newDateOption.length) {
+          // 목록의 마지막 날짜로 설정
+          dateSelector.select(newDateOption.length);
+        }
+        // 일자 Selector Option 갱신
+        dateSelector.updateOption(newDateOption);
+      }
+
+      var dateStr = yearSelector.value;
+      dateStr += '-' + (monthSelector.value < 10 ? '0' + monthSelector.value : monthSelector.value);
+      dateStr += '-' + (dateSelector.value < 10 ? '0' + dateSelector.value : dateSelector.value);
+
+      $el.val(dateStr);
+      $el.trigger('input');
+    }
+
+    // 연/월/일 option 조회
+    function fn_getDateOption(type) {
+      var now = new Date();
+      var dataOption = []; // 목록
+
+      if (type == 'year') {
+        var fromYear = now.getFullYear() - 100; // 연도 시작
+        // fromYear부터 현재 연도까지 표시
+        for (var i = fromYear; i <= now.getFullYear(); i++) {
+          dataOption.push({
+            value: i,
+            text: i + '년'
+          });
+        }
+      } else if (type == 'month') {
+        // 1~12월
+        for (var i = 1; i <= 12; i++) {
+          dataOption.push({
+            value: i,
+            text: i + '월'
+          });
+        }
+      } else if (type == 'date') {
+        // 선택된 연/월에 따른 날짜 목록
+        var date = [];
+        var dateCnt = new Date(yearSelector.value, monthSelector.value, 0).getDate();
+        for (var i = 1; i <= dateCnt; i++) {
+          dataOption.push({
+            value: i,
+            text: i + '일'
+          });
+        }
+      }
+
+      return dataOption;
+    }
+
+    fn_initDateSelector();
   },
   textareaSpace: function () {
     $('.textarea.auto-height').each(function () {

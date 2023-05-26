@@ -317,3 +317,48 @@
   line-height: 1.6rem;
   color: var(--alert-txt-color);
 }
+
+.input-date {
+  position: relative;
+  overflow: hidden;
+  .input {
+    input {
+      padding-right: 4rem;
+      @include bg-etc(2.4rem auto, right 1.6rem center);
+      @include ico-calendar;
+    }
+  }
+  .scroll-selector-wrap {
+    visibility: hidden;
+    position: absolute;
+    top: 200%;
+    border-radius: 0 0 1rem 1rem;
+    border: 1px solid #fafafa;
+    border-top-width: 0;
+    margin-top: -0.1rem;
+    transition: border 0.3s;
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 1.6rem;
+      right: 1.6rem;
+      height: 0.1rem;
+      background: #ddd;
+    }
+  }
+  &.open {
+    .input {
+      border-color: var(--primary-color);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .scroll-selector-wrap {
+      visibility: visible;
+      position: relative;
+      top: auto;
+      border-color: var(--primary-color);
+    }
+  }
+}
