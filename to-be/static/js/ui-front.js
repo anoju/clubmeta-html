@@ -2473,7 +2473,7 @@ ui.form = {
     */
 
     //메일
-    $(document).on('keyup focusin', '.input-mail input', function () {
+    $(document).on('input', '.input-mail input', function () {
       ui.form.selectMail(this);
     });
 
@@ -2481,7 +2481,8 @@ ui.form = {
       e.preventDefault();
       const $text = $(this).text();
       const $input = $(this).closest('.input-select-list').prev('.input').find('input');
-      $input.val($text).keyup();
+      $input.val($text);
+      ui.form.selectMail($input, true);
     });
 
     $(document)
@@ -2558,14 +2559,14 @@ ui.form = {
         */
     }
   },
-  selectMail: function (el) {
+  selectMail: function (el, isRemove) {
     const mailList = ['gmail.com', 'naver.com', 'kakao.com', 'daum.net', 'nate.net', 'outlook.com'];
     const $this = $(el);
     const $val = $this.val();
     const $input = $this.closest('.input');
     const $wrap = $this.closest('.input-mail');
     let $list = $wrap.find('.input-select-list');
-    if ($val === '' || $val.indexOf('@') > -1) {
+    if ($val === '' || $val.indexOf('@') > -1 || isRemove) {
       $input.removeClass('show-select-list');
       $list.remove();
     } else {

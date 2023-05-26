@@ -51,7 +51,7 @@
 
     <script type="text/javascript" src="../static/js/lib/jquery-3.7.0.min.js"></script>
     <script>
-      $(document).on('keyup focusin change', '.input-mail input', function () {
+      $(document).on('input', '.input-mail input', function () {
         selectMail(this);
       });
 
@@ -60,8 +60,8 @@
         console.log('select');
         const $text = $(this).text();
         const $input = $(this).closest('.input-select-list').prev().find('input');
-        console.log($input);
-        $input.val($text).change();
+        $input.val($text);
+        selectMail($input, true);
       });
 
       $(document).on('click', '.primary', function (e) {
@@ -69,14 +69,14 @@
         console.log('primary');
       });
 
-      function selectMail(el) {
+      function selectMail(el, isRemove) {
         const mailList = ['gmail.com', 'naver.com', 'kakao.com', 'daum.net', 'nate.net', 'outlook.com'];
         const $this = $(el);
         const $val = $this.val();
         const $input = $this.closest('.input');
         const $wrap = $this.closest('.input-mail');
         let $list = $wrap.find('.input-select-list');
-        if ($val === '' || $val.indexOf('@') > -1) {
+        if ($val === '' || $val.indexOf('@') > -1 || isRemove) {
           $input.removeClass('show-select-list');
           $list.remove();
         } else {
