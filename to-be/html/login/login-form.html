@@ -107,8 +107,8 @@
         <main class="page-body">
           <div class="section">
             <div class="btn-wrap vertical mt-0">
-              <a href="password-reset.html" class="button line primary">전화번호</a>
-              <a href="password-reset.html?type=mail" class="button line primary">이메일</a>
+              <button type="button" class="button line primary" onclick="passwordFind('phone')">전화번호</button>
+              <button type="button" class="button line primary" onclick="passwordFind('mail')">이메일</button>
             </div>
           </div>
         </main>
@@ -134,6 +134,15 @@
         if ($mainBtnActive) $mainBtn.prop('disabled', false);
         else $mainBtn.prop('disabled', true);
       });
+
+      function passwordFind(type) {
+        const $setObj = {
+          title: '비밀번호 재설정 본인인증',
+          pageType: type
+        };
+        uiStorage.set('userCheckType', JSON.stringify($setObj));
+        location.href = '../common/user-check.html';
+      }
     </script>
   </body>
 </html>
