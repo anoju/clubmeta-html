@@ -63,6 +63,9 @@
   }
 
   .page-body {
+    &:first-child {
+      padding-top: 0;
+    }
     .bottom-fixed {
       height: 6.1rem;
     }
@@ -247,11 +250,10 @@
         font-size: 1.4rem;
         line-height: 1.57;
         word-break: break-all;
-        .pop-close {
+        .head-close {
           float: right;
-          margin-left: 0.8rem;
-          margin-top: -0.7rem;
-          z-index: 10;
+          margin: calc(var(--outer-padding) / 2) calc(var(--outer-padding) / 2) calc(var(--base-padding) / 2) calc(var(--base-padding) / 2);
+          z-index: 1;
         }
         .tit {
           margin-bottom: 1.2rem;

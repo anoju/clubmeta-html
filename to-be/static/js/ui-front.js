@@ -4699,6 +4699,7 @@ const Layer = {
     headerInner: ui.className.headerInner.slice(1),
     headerLeft: ui.className.headerLeft.slice(1),
     headerRight: ui.className.headerRight.slice(1),
+    close: 'head-close',
     body: ui.className.body.slice(1),
     inner: 'section',
     active: 'show',
@@ -4711,6 +4712,7 @@ const Layer = {
     lastPopup: 'ui-pop-last',
     bgNoClose: 'bg-no-click'
   },
+  closeBtn: '<button type="button" class="head-close head-btn ui-pop-close" aria-label="팝업창 닫기"></button>',
   reOpen: false,
   openEl: '',
   openPop: [],
@@ -4821,8 +4823,8 @@ const Layer = {
         //모바일
         if ($popup.find('.' + Layer.className.header + ' h1').length) {
           $popup.attr({ tabindex: 0 }).focus();
-        } else if ($popup.find('.' + Layer.className.header + ' .head-close').length) {
-          $popup.find('.' + Layer.className.header + ' .head-close').focus();
+        } else if ($popup.find('.' + Layer.className.header + ' .' + Layer.className.close).length) {
+          $popup.find('.' + Layer.className.header + ' .' + Layer.className.close).focus();
         } else {
           if (!$focusInEl.length) {
             $focusInEl = $popup.find('.' + Layer.className.body);
@@ -5225,7 +5227,7 @@ const Layer = {
     $popHtml += '<h1>' + $title + '</h1>';
     $popHtml += '</div>';
     $popHtml += '<div class="' + Layer.className.headerRight + '">';
-    $popHtml += '<a href="#" class="head-close head-btn ui-pop-close" role="button" aria-label="팝업창 닫기"></a>';
+    $popHtml += Layer.closeBtn;
     $popHtml += '</div>';
     $popHtml += '</div>';
     $popHtml += '</header>';
@@ -5663,6 +5665,36 @@ const Layer = {
         $(this).remove();
       });
     });
+  },
+  tooltip: function (contents, title) {
+    const tooltipPopId = 'uiPopToolTip';
+    let $html = '<div id="' + tooltipPopId + '" class="' + Layer.className.popup + ' modal tooltip ' + Layer.className.removePopup + '" role="dialog" aria-hidden="true">';
+    $html += '<article class="' + Layer.className.wrap + '">';
+    if (title !== undefined && title !== '') {
+      $html += '<header class="' + Layer.className.header + '">';
+      $html += '<div class="' + Layer.className.headerInner + '">';
+      $html += '<div class="' + Layer.className.headerLeft + '">';
+      $html += '<h1>' + title + '</h1>';
+      $html += '</div>';
+      $html += '<div class="' + Layer.className.headerRight + '">';
+      $html += Layer.closeBtn;
+      $html += '</div>';
+      $html += '</div>';
+      $html += '</header>';
+    }
+    $html += '<div class="' + Layer.className.body + '">';
+    $html += '<div class="' + Layer.className.inner + '">';
+    if (title === undefined) {
+      $html += Layer.closeBtn;
+    }
+    $html += contents;
+    $html += '</div>';
+    $html += '</div>';
+    $html += '</article>';
+    $html += '</div>';
+
+    $('body').append($html);
+    Layer.open('#' + tooltipPopId);
   }
 };
 Layer.morphing = {

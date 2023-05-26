@@ -184,22 +184,7 @@
   }
 
   &.line {
-    border-width: 0;
-    border-bottom: 0.2rem solid #d6dbe1;
-    border-radius: 0;
-    padding-top: 2.2rem;
-    background: none;
-    &:before {
-      content: '';
-      display: block;
-      position: absolute;
-      left: 0;
-      bottom: -0.2rem;
-      width: 0;
-      height: 0.2rem;
-      background: var(--primary-color);
-      transition: width 0.3s ease;
-    }
+    @include input-line;
     &.focus,
     &.focused {
       &:before {
@@ -227,9 +212,7 @@
         color: transparent;
       }
       &:not(:placeholder-shown) ~ .lbl {
-        top: 0.4rem;
-        font-size: 1rem;
-        color: #818892;
+        @include input-line-lbl-active;
       }
     }
     .btn-inp-del {
@@ -239,16 +222,7 @@
     }
 
     .lbl {
-      position: absolute;
-      left: 0;
-      top: 2.6rem;
-      font-size: 2rem;
-      line-height: 1.4;
-      color: var(--placeholder-txt-color);
-      transition: 0.3s;
-      &:not(label) {
-        pointer-events: none;
-      }
+      @include input-line-lbl;
     }
     .timer {
       margin-right: 0;

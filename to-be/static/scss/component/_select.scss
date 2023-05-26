@@ -32,7 +32,7 @@
   display: flex;
   position: relative;
   width: 100%;
-  &.line {
+  &.box {
     border-color: var(--line-color);
     background-color: #fff;
     // select,
@@ -161,12 +161,12 @@
     z-index: 1;
   }
 
-  &.line-lbl-inp {
-    border-width: 0;
-    border-bottom: 0.2rem solid #d6dbe1;
-    border-radius: 0;
-    padding-top: 1.6rem;
-    background-color: transparent;
+  &.line {
+    @include input-line;
+    &.focus:before,
+    &.focused:before {
+      width: 100%;
+    }
     select,
     .btn-select {
       height: 3.6rem;
@@ -181,10 +181,11 @@
         color: transparent;
       }
       &:not(.off) ~ .lbl {
-        top: 0;
-        font-size: 1rem;
-        color: #818892;
+        @include input-line-lbl-active;
       }
+    }
+    .lbl {
+      @include input-line-lbl;
     }
     select {
       background-position: right center;
