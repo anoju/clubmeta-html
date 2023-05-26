@@ -2480,7 +2480,7 @@ ui.form = {
     $(document).on('click', '.input-select-list-btn', function (e) {
       e.preventDefault();
       const $text = $(this).text();
-      const $input = $(this).closest('.input-select-list').prev('.input').find('input');
+      const $input = $(this).closest('.input-mail').find('input');
       $input.val($text);
       ui.form.selectMail($input, true);
     });
