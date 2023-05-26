@@ -158,12 +158,44 @@
 
           <div class="btn-wrap mt-24">
             <div class="flex">
-              <a href="#none" class="button line" role="button">다음</a>
+              <a href="#none" class="button line disabled" role="button">다음</a>
             </div>
           </div>
         </div>
       </main>
       <!-- 컨테이너(컨텐츠) -->
     </article>
+    <script>
+      function buttonAble() {
+        $('.button').removeClass('disabled');
+        $('.button').switchClass('line', 'primary');
+      }
+      function buttonDisable() {
+        $('.button').addClass('disabled');
+        $('.button').switchClass('primary', 'line');
+      }
+
+      function selectTerms() {
+        $('input').on('input change', function () {
+          if ($('#chk2').prop('checked') == true && $('#chk3').prop('checked') == true) {
+            buttonAble();
+          } else {
+            buttonDisable();
+          }
+        });
+
+        $('#chk1').on('click', function () {
+          if ($(this).prop('checked') == true) {
+            $("input[type='checkbox']").prop('checked', true);
+            buttonAble();
+          } else {
+            $("input[type='checkbox']").prop('checked', false);
+            buttonDisable();
+          }
+        });
+      }
+
+      selectTerms();
+    </script>
   </body>
 </html>
