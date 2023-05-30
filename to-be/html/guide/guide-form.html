@@ -528,26 +528,8 @@
                   </select>
                 </div>
               </div>
-              <h2 class="gd__h2">box, line</h2>
+              <h2 class="gd__h2">line</h2>
               <div>
-                <div class="select box">
-                  <select title="선택">
-                    <option value="">선택</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                  </select>
-                </div>
-
-                <div class="select box">
-                  <select title="날짜 선택" disabled>
-                    <option value="">날짜 선택</option>
-                    <option value="1">1일</option>
-                    <option value="2">2일</option>
-                    <option value="3">3일</option>
-                  </select>
-                </div>
-
                 <div class="select line">
                   <select title="선택">
                     <option value="">선택</option>
@@ -607,19 +589,19 @@
               </div>
             </div>
 
-            <h2 class="gd__h1">line + label</h2>
+            <h2 class="gd__h1">line + label(line-lbl)</h2>
             <div>
-              <div class="input line">
+              <div class="input line line-lbl">
                 <input type="text" id="input2-1" title="내용입력" placeholder="내용입력" />
                 <label for="input2-1" class="lbl">내용입력</label>
               </div>
-              <div class="input line">
+              <div class="input line line-lbl">
                 <input type="text" id="input2-2" title="내용입력" placeholder="내용입력" />
                 <label for="input2-2" class="lbl">내용입력</label>
                 <div class="unit">원</div>
               </div>
 
-              <div class="select line">
+              <div class="select line line-lbl">
                 <!-- off 클래스가 있어야 lbl이 로딩때부터 제위치에 잇음-->
                 <select title="선택" class="off">
                   <option value="">선택</option>
@@ -629,6 +611,11 @@
                   <option value="4">옵션4</option>
                 </select>
                 <div class="lbl">선택</div>
+              </div>
+
+              <div class="textarea line line-lbl">
+                <textarea rows="1" id="textarea-1" placeholder="내용입력"></textarea>
+                <label for="textarea-1" class="lbl">내용입력</label>
               </div>
             </div>
 

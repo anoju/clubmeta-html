@@ -30,6 +30,7 @@
   line-height: 3.6rem;
   font-weight: 500;
   appearance: none;
+  transition: color 0.3s ease;
   &.off {
     color: var(--placeholder-txt-color);
   }
@@ -195,30 +196,20 @@
   }
 
   &.line {
-    @include input-line;
+    @include line-form;
     &.focus:before,
     &.focused:before {
       width: 100%;
     }
     select,
     .btn-select {
-      height: 3.6rem;
-      padding: 0.6rem 3rem 0.6rem 0;
-      font-size: 2rem;
-      line-height: 2.4rem;
-      // color: #818892;
+      padding-left: 0;
+      padding-right: 3rem;
       border-width: 0;
-      border-radius: 0;
-      transition: color 0.3s ease;
-      &.off {
-        color: transparent;
-      }
-      &:not(.off) ~ .lbl {
-        @include input-line-lbl-active;
-      }
+      @include line-form-input;
     }
     .lbl {
-      @include input-line-lbl;
+      @include line-form-lbl-off;
     }
     select {
       background-position: right center;
@@ -226,6 +217,23 @@
     .btn-select {
       &:after {
         right: 0;
+      }
+    }
+    &.line-lbl {
+      @include line-form-lbl;
+      select,
+      .btn-select {
+        @include line-form-lbl-input;
+        &.off {
+          color: transparent;
+        }
+        &:not(.off) ~ .lbl {
+          @include line-form-lbl-on;
+        }
+      }
+
+      .lbl {
+        @include line-form-lbl-off;
       }
     }
   }

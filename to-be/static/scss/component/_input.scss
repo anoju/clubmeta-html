@@ -182,7 +182,7 @@
   }
 
   &.line {
-    @include input-line;
+    @include line-form;
     &.focus,
     &.focused {
       &:before {
@@ -200,18 +200,9 @@
       }
     }
     input {
-      height: 3.6rem;
-      padding: 0.6rem 0;
-      font-size: 2rem;
-      line-height: 2.4rem;
-      // color: #818892;
-      border-radius: 0;
-      &::placeholder {
-        color: transparent;
-      }
-      &:not(:placeholder-shown) ~ .lbl {
-        @include input-line-lbl-active;
-      }
+      padding-left: 0;
+      padding-left: 0;
+      @include line-form-input;
     }
     .btn-inp-del {
       &:last-child,
@@ -220,9 +211,6 @@
       }
     }
 
-    .lbl {
-      @include input-line-lbl;
-    }
     .timer {
       margin-right: 0;
     }
@@ -230,6 +218,22 @@
     // & + .input.line {
     //   margin-top: 4rem;
     // }
+    &.line-lbl {
+      @include line-form-lbl;
+      input {
+        @include line-form-lbl-input;
+        &::placeholder {
+          color: transparent;
+        }
+        &:not(:placeholder-shown) ~ .lbl {
+          @include line-form-lbl-on;
+        }
+      }
+
+      .lbl {
+        @include line-form-lbl-off;
+      }
+    }
   }
 
   &.search-inp {

@@ -5053,7 +5053,9 @@ const Layer = {
 
       //callback
       const transitionEndEvt = function () {
-        $popup.addClass(Layer.className.active + '-end');
+        setTimeout(function () {
+          $popup.addClass(Layer.className.active + '-end');
+        }, 100);
         $FocusEvt();
         $popup.trigger('Layer.show');
         dfd.resolve();

@@ -28,7 +28,7 @@
   }
 
   &.line {
-    @include input-line;
+    @include line-form;
     &.focus,
     &.focused {
       &:before {
@@ -36,17 +36,10 @@
       }
     }
     textarea {
-      padding: 0.6rem 0;
-      font-size: 2rem;
+      padding-left: 0;
+      padding-left: 0;
       line-height: 2.4rem;
-      // color: #818892;
-      border-radius: 0;
-      &::placeholder {
-        color: transparent;
-      }
-      &:not(:placeholder-shown) ~ .lbl {
-        @include input-line-lbl-active;
-      }
+      @include line-form-input;
     }
     .btn-inp-del {
       margin-right: 0;
@@ -55,8 +48,21 @@
       }
     }
 
-    .lbl {
-      @include input-line-lbl;
+    &.line-lbl {
+      @include line-form-lbl;
+      textarea {
+        @include line-form-lbl-input;
+        &::placeholder {
+          color: transparent;
+        }
+        &:not(:placeholder-shown) ~ .lbl {
+          @include line-form-lbl-on;
+        }
+      }
+
+      .lbl {
+        @include line-form-lbl-off;
+      }
     }
   }
   &.disabled {
