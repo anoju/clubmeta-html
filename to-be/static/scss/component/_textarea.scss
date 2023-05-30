@@ -1,13 +1,8 @@
 .textarea {
   position: relative;
-  border: 0.1rem solid #fafafa;
+  border: 0.1rem solid var(--line-color);
   border-radius: 1rem;
-  // min-height: 4.8rem;
-  background: #fafafa;
-  &.box {
-    border-color: var(--line-color);
-    background-color: #fff;
-  }
+  background: #fff;
   &.focus {
     border-color: var(--primary-color);
   }
@@ -64,10 +59,12 @@
       @include input-line-lbl;
     }
   }
-
+  &.disabled {
+    background-color: var(--input-disabled-bg-color);
+  }
   &.disabled textarea,
   textarea:disabled {
-    opacity: 0.4;
+    color: var(--input-disabled-color);
   }
   &.readonly input,
   input[readonly] {

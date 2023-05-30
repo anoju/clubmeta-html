@@ -426,7 +426,7 @@
                 <h3 class="gd__h3">라디오</h3>
                 <div>
                   <div class="btn-wrap">
-                    <div class="flex full">
+                    <div class="flex">
                       <div class="radio btn">
                         <input type="radio" id="tglrdo1-1" name="rdo1" /><i aria-hidden="true"></i>
                         <label for="tglrdo1-1" class="lbl">라디오</label>
@@ -475,11 +475,7 @@
               <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
               <div class="input"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
 
-              <h2 class="gd__h2">box, line</h2>
-              <div class="input box"><input type="text" placeholder="내용을 입력하세요" title="내용입력" /></div>
-              <div class="input box"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
-              <div class="input box"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
-
+              <h2 class="gd__h2">line</h2>
               <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" /></div>
               <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" readonly value="readonly" /></div>
               <div class="input line"><input type="text" placeholder="내용을 입력하세요" title="내용입력" disabled value="disabled" /></div>
@@ -594,13 +590,10 @@
               <div class="textarea">
                 <textarea rows="3">textarea</textarea>
               </div>
-              <h2 class="gd__h2">box, line</h2>
-              <div class="textarea box">
-                <textarea rows="1">textarea</textarea>
+              <div class="textarea">
+                <textarea rows="3" disabled>disabled</textarea>
               </div>
-              <div class="textarea box">
-                <textarea rows="3">textarea</textarea>
-              </div>
+              <h2 class="gd__h2">line</h2>
               <div class="textarea line">
                 <textarea rows="1">textarea</textarea>
               </div>
@@ -690,30 +683,31 @@
                   <button type="button" class="button line h32">중복확인</button>
                 </div>
               </div>
-
-              <div class="form-lbl">
-                <div class="left">
-                  <label for="userPWD">비밀번호</label>
-                </div>
-                <div class="right">
-                  <div class="tooltip-wrap">
-                    <button type="button" class="tooltip-btn is-pop" aria-label="자세한 내용 확인"><i class="i-ico-tooltip" aria-hidden="true"></i></button>
-                    <div class="tooltip-body">
-                      <ul class="txt-list">
-                        <li class="dot">영문 대/소문자, 숫자, 특수문자 조합으로 8~16자리로 변경 가능합니다.</li>
-                        <li class="dot">사용 가능 특수문자(-/:;()\&@.,?![]{}#%^*+=_|~$)</li>
-                        <li class="dot">연속된 숫자/문자, 동일한 문자 3회 이상 사용하실 수 없습니다.</li>
-                        <li class="dot">개인정보와 관련된 생년월일, 핸드폰번호 뒤 4자리, 아이디는 사용하실 수 없습니다.</li>
-                      </ul>
+              <form action="">
+                <div class="form-lbl">
+                  <div class="left">
+                    <label for="userPWD">비밀번호</label>
+                  </div>
+                  <div class="right">
+                    <div class="tooltip-wrap">
+                      <button type="button" class="tooltip-btn is-pop" aria-label="자세한 내용 확인"><i class="i-ico-tooltip" aria-hidden="true"></i></button>
+                      <div class="tooltip-body">
+                        <ul class="txt-list">
+                          <li class="dot">영문 대/소문자, 숫자, 특수문자 조합으로 8~16자리로 변경 가능합니다.</li>
+                          <li class="dot">사용 가능 특수문자(-/:;()\&@.,?![]{}#%^*+=_|~$)</li>
+                          <li class="dot">연속된 숫자/문자, 동일한 문자 3회 이상 사용하실 수 없습니다.</li>
+                          <li class="dot">개인정보와 관련된 생년월일, 핸드폰번호 뒤 4자리, 아이디는 사용하실 수 없습니다.</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="form-item">
-                <div class="input password">
-                  <input id="userPWD" type="password" placeholder="비밀번호 입력" title="비밀번호 입력" />
+                <div class="form-item">
+                  <div class="input password">
+                    <input id="userPWD" type="password" placeholder="비밀번호 입력" title="비밀번호 입력" autocomplete="current-password" />
+                  </div>
                 </div>
-              </div>
+              </form>
 
               <div class="form-lbl">
                 <label for="userBirth1">생년월일</label>

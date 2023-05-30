@@ -1128,6 +1128,8 @@ ui.button = {
     const checking = function () {
       setTimeout(function () {
         ui.button.disabled();
+        ui.form.input();
+        ui.form.select();
       }, 100);
     };
     $(document).on('click', 'a, button', function () {
@@ -2192,9 +2194,8 @@ ui.form = {
     //select off효과
     $('select').each(function () {
       const $val = $(this).val();
-      if ($val == '' || $val == null) {
-        $(this).addClass('off');
-      }
+      if ($val == '' || $val == null) $(this).addClass('off');
+      else $(this).removeClass('off');
     });
     if ($('.input-date input').length) {
       $('.input-date input').each(function () {
@@ -2290,40 +2291,39 @@ ui.form = {
     const $btnVal = $target.siblings('.btn-select').find('.btn-select-val');
     if ($selectTxt === $btnVal.text()) return;
     $btnVal.html($selectTxt);
-    if ($val == '') {
-      $target.siblings('.btn-select').addClass('off');
-    } else {
-      $target.siblings('.btn-select').removeClass('off');
-    }
+    if ($val == '') $target.siblings('.btn-select').addClass('off');
+    else $target.siblings('.btn-select').removeClass('off');
   },
   select: function () {
     const $select = $('.select').not('.btn, .not');
     if ($select.length) {
       $select.each(function (e) {
         const $this = $(this);
-        const $selEl = $this.find('select');
-        $selEl.each(function () {
-          const $sel = $(this);
-          if (!$sel.siblings('.btn-select').length) {
-            let $selId = $sel.attr('id');
-            let $title = $sel.attr('title');
+        const $sel = $this.find('select');
+        const $val = $sel.val();
+        if ($val == '' || $val == null) $sel.addClass('off');
+        else $sel.removeClass('off');
+        if ($sel.prop('readonly')) $this.addClass('readonly');
+        else $this.removeClass('readonly');
+        if ($sel.prop('disabled')) $this.addClass('disabled');
+        else $this.removeClass('disabled');
 
-            if ($selId == undefined) $selId = 'none';
-            if ($title == undefined) $title = '선택';
-            const $btnTitle = '팝업으로 ' + $title;
-            const $btnHtml = '<a href="#' + $selId + '" class="btn-select ui-select-open" title="' + $btnTitle + '" role="button"><span class="btn-select-val"></span></a>';
+        if (!$sel.siblings('.btn-select').length) {
+          let $selId = $sel.attr('id');
+          let $title = $sel.attr('title');
 
-            $sel.hide().after($btnHtml);
+          if ($selId == undefined) $selId = 'none';
+          if ($title == undefined) $title = '선택';
+          const $btnTitle = '팝업으로 ' + $title;
+          const $btnHtml = '<a href="#' + $selId + '" class="btn-select ui-select-open" title="' + $btnTitle + '" role="button"><span class="btn-select-val"></span></a>';
 
-            const $forLbl = $('label[for="' + $selId + '"]');
-            if ($forLbl.length) $forLbl.addClass('ui-select-lbl').attr('title', $btnTitle);
+          $sel.hide().after($btnHtml);
 
-            $sel.change(function () {
-              ui.form.selectSetVal(this);
-            });
-          }
-          $sel.change();
-        });
+          const $forLbl = $('label[for="' + $selId + '"]');
+          if ($forLbl.length) $forLbl.addClass('ui-select-lbl').attr('title', $btnTitle);
+
+          ui.form.selectSetVal($sel);
+        }
       });
     }
   },
@@ -2375,6 +2375,7 @@ ui.form = {
       } else {
         $(this).removeClass('off');
       }
+      if ($(this).siblings('.btn-select').length) ui.form.selectSetVal(this);
     });
 
     /*
@@ -2527,6 +2528,14 @@ ui.form = {
       if ($closest.hasClass('password') && !$closest.find('.btn-inp-pwd').length) {
         $closest.append('<a href="#" class="btn-inp-pwd" role="button" aria-label="비밀번호 입력확인"></a>');
       }
+    });
+    $('.input input').each(function () {
+      const $this = $(this);
+      const $wrap = $(this).closest('.input');
+      if ($this.prop('readonly')) $wrap.addClass('readonly');
+      else $wrap.removeClass('readonly');
+      if ($this.prop('disabled')) $wrap.addClass('disabled');
+      else $wrap.removeClass('disabled');
     });
   },
   insertDel: function (el) {

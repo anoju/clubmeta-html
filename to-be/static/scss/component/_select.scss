@@ -1,12 +1,21 @@
+@mixin ico-select {
+  // background-image: url(../images/icon/ico-select.png);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10L12 15L17 10' stroke='%23424242' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+@mixin ico-select-off {
+  // background-image: url(../images/icon/ico-select-off.png);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10L12 15L17 10' stroke='%23B0B0B0' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
 // select
 .select {
   color: var(--strong-txt-color);
   font-size: 1.6rem;
-  background-color: #fafafa;
-  border: 0.1rem solid #fafafa;
+  background-color: #fff;
+  border: 0.1rem solid var(--line-color);
   border-radius: 1rem;
   transition: border 0.3s;
 }
+
 .select select,
 .btn-select {
   position: relative;
@@ -28,50 +37,74 @@
     color: var(--strong-txt-color);
   }
 }
+.btn-select {
+  display: inline-flex;
+  align-items: center;
+  &:after {
+    position: absolute;
+    right: 1.2rem;
+    top: 50%;
+    margin-top: -1.2rem;
+    @include rotateZ(0);
+    transition: 0.3s;
+    @include ico-after-apend;
+    @include ico-select;
+  }
+  // &.off {
+  //   &:after {
+  //     @include ico-select-off;
+  //   }
+  // }
+  &.open,
+  &.pop__focused {
+    &:after {
+      @include rotateZ(180);
+    }
+  }
+  .btn-select-txt {
+    display: block;
+  }
+}
 .select {
   display: flex;
   position: relative;
   width: 100%;
-  &.box {
-    border-color: var(--line-color);
-    background-color: #fff;
-    // select,
-    // .btn-select {
-    //   border-color: var(--line-color);
-    //   background-color: #fff;
-    // }
-  }
+  overflow: hidden;
   select {
     @include bg-etc(2.4rem auto, right 1.2rem center);
-    // background-image: url(../images/icon/ico-select.png);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10L12 15L17 10' stroke='%23424242' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    @include ico-select;
     // &.off {
-    //   // background-image: url(../images/icon/ico-select-off.png);
-    //   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10L12 15L17 10' stroke='%23B0B0B0' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    //   @include ico-select-off;
     // }
-  }
-  &:not(.inline) {
-    select:disabled,
-    select:disabled ~ .btn-select {
-      opacity: 0.4;
-    }
-    select:disabled {
+    &:disabled {
       display: block !important;
+      color: var(--input-disabled-color);
+      @include ico-select-off;
       ~ .btn-select {
         display: none;
+        color: var(--input-disabled-color);
+        &:after {
+          @include ico-select-off;
+        }
       }
+    }
+  }
+  &:not(.inline):not(.line) {
+    select:disabled,
+    select:disabled ~ .btn-select {
+      background-color: var(--input-disabled-bg-color);
     }
   }
   &.focus,
   &.focused {
     border-color: var(--primary-color);
   }
-  &.disabled {
-    select,
-    .btn-select {
-      opacity: 0.4;
-    }
-  }
+  // &.disabled {
+  //   select,
+  //   .btn-select {
+  //     opacity: 0.4;
+  //   }
+  // }
   &.is-error {
     select,
     .btn-select {
@@ -139,9 +172,9 @@
         margin-top: -1.2rem;
       }
     }
-    select:disabled ~ .btn-select {
-      opacity: 0.4;
-    }
+    // select:disabled ~ .btn-select {
+    //   opacity: 0.4;
+    // }
     .option-wrap {
       margin-top: 1rem;
     }
@@ -197,36 +230,7 @@
     }
   }
 }
-.btn-select {
-  display: inline-flex;
-  align-items: center;
-  &:after {
-    position: absolute;
-    right: 1.2rem;
-    top: 50%;
-    margin-top: -1.2rem;
-    @include rotateZ(0);
-    transition: 0.3s;
-    @include ico-after-apend;
-    // background-image: url(../images/icon/ico-select.png);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10L12 15L17 10' stroke='%23424242' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  }
-  // &.off {
-  //   &:after {
-  //     // background-image: url(../images/icon/ico-select-off.png);
-  //     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M7 10L12 15L17 10' stroke='%23B0B0B0' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  //   }
-  // }
-  &.open,
-  &.pop__focused {
-    &:after {
-      @include rotateZ(180);
-    }
-  }
-  .btn-select-txt {
-    display: block;
-  }
-}
+
 // @media (max-width: 320px) {
 //   .select select,
 //   .btn-select {
@@ -272,8 +276,8 @@
       transition: opacity 0.2s;
     }
     &.disabled {
-      color: var(--disabled-color);
-      background-color: var(--disabled-bg-color);
+      color: var(--input-disabled-color);
+      background-color: var(--input-disabled-bg-color);
     }
     .select-item-txt {
       font-weight: 500;

@@ -399,6 +399,12 @@ button.btn-click-outer {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
+  .flex {
+    .checkbox.btn,
+    .radio.btn {
+      width: 100%;
+    }
+  }
   &.group {
     .button {
       border-radius: 0;
