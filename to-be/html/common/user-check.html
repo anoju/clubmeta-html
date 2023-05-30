@@ -99,15 +99,15 @@
         }
         if (userCheckType.pageType) {
           pageType = userCheckType.pageType;
-          $('.ui-tab').remove();
-          if (pageType === 'mail') {
-            $('#inpMailWrap').show();
-          } else {
-            $('#inpPhoneWrap').show();
-          }
         }
         if (userCheckType.checkType) checkType = userCheckType.checkType;
         uiStorage.remove('userCheckType');
+      }
+
+      if (pageType === 'mail') {
+        $(window).on('load', function () {
+          ui.tab.active('[href="#inpMailWrap"]');
+        });
       }
 
       // 메인버튼 활성화
